@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Developer News | Singapore Property Developers Vulnerability Monitor</title>
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+</head>
+<body data-page="news">
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">Singapore Property Developers Vulnerability Monitor</div>
+      <nav class="nav-tabs" aria-label="Main">
+        <a href="./index.html" data-page="home">Home</a>
+        <a href="./macro.html" data-page="macro">Macro</a>
+        <a href="./news.html" data-page="news">Developer News</a>
+        <a href="./developers.html" data-page="developers">Listed Developers</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <p class="meta-row">Data last updated: <span id="global-last-updated">Loading...</span></p>
+    <section class="panel">
+      <h1>RSS-style developer news feed</h1>
+      <div id="news-filters" class="filters">
+        <div><label for="severity-filter">Severity</label><select id="severity-filter" multiple></select></div>
+        <div><label for="developer-filter">Developer</label><select id="developer-filter" multiple></select></div>
+        <div><label for="source-filter">Source</label><select id="source-filter" multiple></select></div>
+        <div>
+          <label for="date-range">Date range</label>
+          <select id="date-range">
+            <option value="7">Last 7 days</option>
+            <option value="30" selected>Last 30 days</option>
+            <option value="90">Last 90 days</option>
+            <option value="all">All</option>
+          </select>
+        </div>
+        <div><label for="search-text">Text search</label><input id="search-text" placeholder="Refinancing, covenant, sales..." /></div>
+      </div>
+    </section>
+
+    <section class="panel" id="news-list">
+      <p class="loading">Loading news...</p>
+    </section>
+
+    <footer class="footer">Data timestamp: <span class="last-updated-copy">Loading...</span></footer>
+  </main>
+
+  <script src="./assets/js/app.js"></script>
+  <script src="./assets/js/news.js"></script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{
+  "meta": {"asOf": "2026-02-21"},
+  "scoringModel": {
+    "weights": {"leverage":0.25,"liquidity":0.20,"maturity":0.20,"coverage":0.20,"sales":0.15},
+    "bands": {"status": {"green":70,"amber":45,"red":0}}
+  },
+  "developers": [
+    {"name":"City Developments","ticker":"C09.SI","segment":"Mixed","statusOverride":null,
+      "metrics":{"netGearing":0.92,"interestCoverage":2.4,"debtMaturity12mPct":0.34,"cashToShortDebt":0.88,"presalesCoverage":0.68},
+      "drivers":{"leverage":"Elevated but manageable net gearing","coverage":"Moderate headroom as finance cost rises","maturity":"Meaningful 12m refinancing cluster","liquidity":"Adequate liquidity with disposal optionality","sales":"Decent presales coverage on key launches","exposure":"Concentrated Singapore/China mix with office exposure"},
+      "notes":["Monitor execution of planned capital recycling.","Watch refinance timing vs interest-rate path."],"lastUpdated":"2026-02-21"},
+    {"name":"UOL Group","ticker":"U14.SI","segment":"Residential","statusOverride":null,
+      "metrics":{"netGearing":0.61,"interestCoverage":3.7,"debtMaturity12mPct":0.22,"cashToShortDebt":1.18,"presalesCoverage":0.74},
+      "drivers":{"leverage":"Moderate leverage","coverage":"Solid coverage despite higher rates","maturity":"Staggered debt profile","liquidity":"Strong liquidity buffer","sales":"Healthy but slowing presales trajectory","exposure":"High exposure to Singapore residential cycle"},
+      "notes":["Presales momentum remains the key near-term swing factor."],"lastUpdated":"2026-02-21"},
+    {"name":"Frasers Property","ticker":"TQ5.SI","segment":"Mixed","statusOverride":null,
+      "metrics":{"netGearing":1.05,"interestCoverage":1.9,"debtMaturity12mPct":0.41,"cashToShortDebt":0.71,"presalesCoverage":0.57},
+      "drivers":{"leverage":"High gearing relative to peers","coverage":"Coverage pressured by debt costs","maturity":"Large near-term maturity stack","liquidity":"Tighter buffer vs short-term debt","sales":"Average presales coverage","exposure":"Diversified geography but execution complexity"},
+      "notes":["Funding plan credibility is critical under tight credit conditions."],"lastUpdated":"2026-02-21"},
+    {"name":"GuocoLand","ticker":"F17.SI","segment":"Residential","statusOverride":null,
+      "metrics":{"netGearing":0.74,"interestCoverage":2.9,"debtMaturity12mPct":0.27,"cashToShortDebt":0.95,"presalesCoverage":0.79},
+      "drivers":{"leverage":"Moderate gearing","coverage":"Comfortable coverage currently","maturity":"Manageable maturity ladder","liquidity":"Adequate buffer with project inflows","sales":"Strong presales on flagship developments","exposure":"Concentrated to premium residential segment"},
+      "notes":["Premium segment demand sensitivity should be monitored."],"lastUpdated":"2026-02-21"},
+    {"name":"Oxley Holdings","ticker":"5UX.SI","segment":"Mixed","statusOverride":null,
+      "metrics":{"netGearing":1.28,"interestCoverage":1.3,"debtMaturity12mPct":0.48,"cashToShortDebt":0.52,"presalesCoverage":0.49},
+      "drivers":{"leverage":"Very high leverage profile","coverage":"Thin coverage margin","maturity":"Heavy refinancing in next 12 months","liquidity":"Constrained liquidity buffer","sales":"Lower presales absorption","exposure":"Higher concentration to selected overseas projects"},
+      "notes":["Capital raising/asset monetization likely required if markets tighten."],"lastUpdated":"2026-02-21"}
+  ]
+}

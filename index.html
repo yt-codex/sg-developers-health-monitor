@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Singapore Property Developers Vulnerability Monitor</title>
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+</head>
+<body data-page="home">
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">Singapore Property Developers Vulnerability Monitor</div>
+      <nav class="nav-tabs" aria-label="Main">
+        <a href="./index.html" data-page="home">Home</a>
+        <a href="./macro.html" data-page="macro">Macro</a>
+        <a href="./news.html" data-page="news">Developer News</a>
+        <a href="./developers.html" data-page="developers">Listed Developers</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <p class="meta-row">Data last updated: <span id="global-last-updated">Loading...</span></p>
+    <section class="panel">
+      <h1>Purpose and interpretation guide</h1>
+      <p>This dashboard consolidates macroeconomic pressure points, developer-specific balance sheet and liquidity signals, and news-driven risk alerts to help monitor vulnerability across Singapore-listed property developers.</p>
+      <p><strong>How to use it:</strong> the <strong>Macro</strong> tab frames the operating environment; <strong>Developer News</strong> flags event risks from headlines and summaries; <strong>Listed Developers</strong> turns key balance sheet and operating drivers into a transparent health score with explainable components.</p>
+      <p><strong>Caveats:</strong> this is informational monitoring, not investment advice. Signal quality depends on the timeliness and completeness of source updates. Always validate with primary disclosures and audited filings.</p>
+    </section>
+
+    <section class="cards" aria-label="Quick links">
+      <a class="card-link" href="./macro.html">
+        <h2>Macro</h2>
+        <p>Track rates, costs, property demand proxies and credit conditions with trend mini-charts.</p>
+      </a>
+      <a class="card-link" href="./news.html">
+        <h2>Developer News</h2>
+        <p>Scan a reverse-chronological feed tagged with regex-based risk severities and filters.</p>
+      </a>
+      <a class="card-link" href="./developers.html">
+        <h2>Listed Developers</h2>
+        <p>Review health scores, statuses and the specific drivers behind each company's risk profile.</p>
+      </a>
+    </section>
+
+    <footer class="footer">Data timestamp: <span class="last-updated-copy">Loading...</span></footer>
+  </main>
+
+  <script src="./assets/js/app.js"></script>
+</body>
+</html>
