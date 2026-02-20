@@ -43,7 +43,7 @@ async function initDevelopersPage() {
       return `
         <tr>
           <td>${dev.name}</td><td>${dev.ticker}</td><td>${dev.segment}</td>
-          <td><strong>${score}</strong></td><td class="${cls}">${status}</td>
+          <td><strong>${score}</strong></td><td><span class="status-pill ${cls}">${status}</span></td>
           <td>${dev.drivers.leverage}</td><td>${dev.drivers.coverage}</td><td>${dev.drivers.maturity}</td>
           <td>${dev.drivers.liquidity}</td><td>${dev.drivers.sales}</td><td>${dev.drivers.exposure}</td>
           <td><button data-target="${id}">Details</button></td>
