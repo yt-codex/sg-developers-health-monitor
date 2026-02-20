@@ -1,0 +1,45 @@
+name: Update dashboard data
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 1 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Refresh metadata timestamps
+        run: |
+          python - <<'PY'
+          import json
+          from datetime import datetime, timezone
+          files = [
+            'data/site_meta.json',
+            'data/macro_indicators.json',
+            'data/developer_news.json',
+            'data/listed_developers.json',
+            'data/risk_rules.json'
+          ]
+          now_iso = datetime.now(timezone.utc).isoformat()
+          for path in files:
+            with open(path, 'r', encoding='utf-8') as f:
+              data = json.load(f)
+            if path.endswith('site_meta.json'):
+              data['lastUpdated'] = now_iso
+            else:
+              data.setdefault('meta', {})['asOf'] = now_iso[:10]
+            with open(path, 'w', encoding='utf-8') as f:
+              json.dump(data, f, indent=2)
+          PY
+      - name: Commit updates
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add data/*.json
+          git diff --staged --quiet || git commit -m "chore(data): refresh dashboard json timestamps"
+          git push

@@ -1,0 +1,197 @@
+:root {
+  --bg: #f6f8fb;
+  --surface: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --primary: #1d4ed8;
+  --critical: #b91c1c;
+  --warning: #c2410c;
+  --watch: #a16207;
+  --info: #1e40af;
+  --healthy: #15803d;
+  --amber: #b45309;
+  --stressed: #b91c1c;
+  --shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.5;
+}
+
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.container {
+  width: min(1100px, 92vw);
+  margin: 0 auto;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(255,255,255,0.95);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(6px);
+}
+
+.header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 0;
+  flex-wrap: wrap;
+}
+
+.brand {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.nav-tabs {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.nav-tabs a {
+  padding: 0.4rem 0.7rem;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.nav-tabs a.active,
+.nav-tabs a:hover {
+  background: #dbeafe;
+  color: #1d4ed8;
+  text-decoration: none;
+}
+
+.meta-row {
+  margin: 0.75rem 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+main { padding: 1.2rem 0 2rem; }
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 1rem;
+}
+
+h1, h2, h3 { line-height: 1.25; margin-top: 0; }
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+}
+
+.card-link {
+  display: block;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  background: linear-gradient(160deg,#fff,#eff6ff);
+  transition: transform 0.15s ease;
+}
+.card-link:hover {
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+.indicator-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.indicator-tile .value {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.sparkline {
+  width: 100%;
+  height: 44px;
+  margin: 0.5rem 0;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.sev-critical { background: #fee2e2; color: var(--critical); }
+.sev-warning { background: #ffedd5; color: var(--warning); }
+.sev-watch { background: #fef9c3; color: var(--watch); }
+.sev-info { background: #dbeafe; color: var(--info); }
+.status-green { color: var(--healthy); font-weight: 700; }
+.status-amber { color: var(--amber); font-weight: 700; }
+.status-red { color: var(--stressed); font-weight: 700; }
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.7rem;
+  align-items: end;
+}
+
+label { font-size: 0.88rem; font-weight: 600; display:block; margin-bottom:0.3rem; }
+input, select {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0.45rem;
+  background: white;
+}
+
+.news-item { border-top: 1px solid var(--border); padding: 0.9rem 0; }
+.news-item:first-child { border-top: 0; }
+.chips { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.4rem; }
+.chip { font-size: 0.76rem; background: #eef2ff; color: #3730a3; border-radius: 999px; padding: 0.2rem 0.45rem; }
+
+.table-wrap { overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+}
+th, td {
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem;
+  text-align: left;
+  font-size: 0.92rem;
+}
+th { background: #f8fafc; }
+
+details summary { cursor: pointer; font-weight: 600; }
+
+.footer {
+  margin-top: 1.5rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.loading, .empty { color: var(--muted); font-style: italic; }
+
+@media (max-width: 700px) {
+  .brand { width: 100%; }
+}

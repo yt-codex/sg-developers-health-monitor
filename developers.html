@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Listed Developers | Singapore Property Developers Vulnerability Monitor</title>
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+</head>
+<body data-page="developers">
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">Singapore Property Developers Vulnerability Monitor</div>
+      <nav class="nav-tabs" aria-label="Main">
+        <a href="./index.html" data-page="home">Home</a>
+        <a href="./macro.html" data-page="macro">Macro</a>
+        <a href="./news.html" data-page="news">Developer News</a>
+        <a href="./developers.html" data-page="developers">Listed Developers</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <p class="meta-row">Data last updated: <span id="global-last-updated">Loading...</span></p>
+    <section class="panel">
+      <h1>Listed developers health scoring</h1>
+      <details>
+        <summary>Methodology</summary>
+        <p id="methodology-content"></p>
+      </details>
+    </section>
+
+    <section class="panel table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th><th>Ticker</th><th>Segment</th><th>Health Score</th><th>Status</th>
+            <th>Leverage</th><th>Interest coverage pressure</th><th>Debt maturity</th>
+            <th>Cash/liquidity</th><th>Presales coverage</th><th>Exposure concentration</th><th>Details</th>
+          </tr>
+        </thead>
+        <tbody id="developers-body"><tr><td colspan="12" class="loading">Loading developers...</td></tr></tbody>
+      </table>
+    </section>
+
+    <footer class="footer">Data timestamp: <span class="last-updated-copy">Loading...</span></footer>
+  </main>
+
+  <script src="./assets/js/app.js"></script>
+  <script src="./assets/js/developers.js"></script>
+</body>
+</html>
