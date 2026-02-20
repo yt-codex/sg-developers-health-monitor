@@ -51,8 +51,10 @@ a:hover { text-decoration: underline; }
 }
 
 .container {
-  width: min(1160px, 92vw);
+  max-width: 1160px;
   margin: 0 auto;
+  padding: 0 24px;
+  width: 100%;
 }
 
 .site-header {
@@ -104,6 +106,17 @@ a:hover { text-decoration: underline; }
 
 main { padding: var(--space-4) 0 var(--space-5); }
 
+
+body[data-page="home"] main.container {
+  display: block;
+}
+
+body[data-page="home"] .intro-panel {
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+}
+
 .meta-row {
   margin: 0 0 var(--space-3);
   color: var(--muted);
@@ -125,6 +138,7 @@ main { padding: var(--space-4) 0 var(--space-5); }
 
 .intro-text {
   max-width: 70ch;
+  margin: 0;
 }
 
 h1, h2, h3 {
@@ -384,5 +398,9 @@ details summary {
 }
 
 @media (max-width: 700px) {
+  .container {
+    padding: 0 16px;
+  }
+
   .brand { width: 100%; }
 }
