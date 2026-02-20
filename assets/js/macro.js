@@ -10,7 +10,7 @@ function sparklineSvg(series) {
   const points = values
     .map((v, i) => `${(i * step).toFixed(1)},${(h - ((v - min) / range) * h).toFixed(1)}`)
     .join(' ');
-  return `<svg class="sparkline" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polyline fill="none" stroke="#1d4ed8" stroke-width="2" points="${points}" /></svg>`;
+  return `<svg class="sparkline" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polyline fill="none" stroke="#64748b" stroke-width="2" points="${points}" /></svg>`;
 }
 
 function computeMacroRisk(indicators) {
