@@ -61,14 +61,18 @@ async function initNewsPage() {
     const devSelect = document.getElementById('developer-filter');
     const sourceSelect = document.getElementById('source-filter');
 
+    sevSelect.insertAdjacentHTML('beforeend', '<option value="all" selected>All severities</option>');
+    devSelect.insertAdjacentHTML('beforeend', '<option value="all" selected>All developers</option>');
+    sourceSelect.insertAdjacentHTML('beforeend', '<option value="all" selected>All sources</option>');
+
     ['Critical', 'Warning', 'Watch', 'Info'].forEach((s) => sevSelect.insertAdjacentHTML('beforeend', `<option value="${s}">${s}</option>`));
     developers.forEach((d) => devSelect.insertAdjacentHTML('beforeend', `<option value="${d}">${d}</option>`));
     sources.forEach((s) => sourceSelect.insertAdjacentHTML('beforeend', `<option value="${s}">${s}</option>`));
 
     const runFilter = () => {
-      const sevs = Array.from(sevSelect.selectedOptions).map((o) => o.value);
-      const devSel = Array.from(devSelect.selectedOptions).map((o) => o.value);
-      const srcSel = Array.from(sourceSelect.selectedOptions).map((o) => o.value);
+      const sevs = sevSelect.value;
+      const devSel = devSelect.value;
+      const srcSel = sourceSelect.value;
       const range = document.getElementById('date-range').value;
       const search = document.getElementById('search-text').value.trim().toLowerCase();
       const now = Date.now();
@@ -77,9 +81,9 @@ async function initNewsPage() {
       const out = processed.filter((i) => {
         const ageDays = (now - new Date(i.published).getTime()) / (1000 * 60 * 60 * 24);
         if (ageDays > dayMap[range]) return false;
-        if (sevs.length && !sevs.includes(i.primarySeverity)) return false;
-        if (devSel.length && !i.developerTags.some((d) => devSel.includes(d))) return false;
-        if (srcSel.length && !srcSel.includes(i.source)) return false;
+        if (sevs !== 'all' && i.primarySeverity !== sevs) return false;
+        if (devSel !== 'all' && !(i.developerTags || []).includes(devSel)) return false;
+        if (srcSel !== 'all' && i.source !== srcSel) return false;
         if (search) {
           const blob = `${i.title} ${i.summary}`.toLowerCase();
           if (!blob.includes(search)) return false;

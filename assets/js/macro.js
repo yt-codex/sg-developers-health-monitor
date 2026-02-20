@@ -5,7 +5,7 @@ function sparklineSvg(series) {
   const max = Math.max(...values);
   const range = max - min || 1;
   const w = 240;
-  const h = 42;
+  const h = 72;
   const step = w / (values.length - 1);
   const points = values
     .map((v, i) => `${(i * step).toFixed(1)},${(h - ((v - min) / range) * h).toFixed(1)}`)
