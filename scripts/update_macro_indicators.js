@@ -27,8 +27,16 @@ const DATASET_IDS = [
 
 const REQUIRED_DATASETS = {
   d_5fe5a4bb4a1ecc4d8a56a095832e2b24: [
-    { key: 'sgs_10y', target: 'SGS 10-Year Bond Yield' },
-    { key: 'sgs_2y', target: 'SGS 2-Year Bond Yield' }
+    {
+      key: 'sgs_10y',
+      target: 'SGS 10-Year Bond Yield',
+      aliases: ['Government Securities - 10-Year Bond Yield']
+    },
+    {
+      key: 'sgs_2y',
+      target: 'SGS 2-Year Bond Yield',
+      aliases: ['Government Securities - 2-Year Bond Yield']
+    }
   ],
   d_f9fc9b5420d96bcab45bc31eeb8ae3c3: [
     { key: 'unit_labour_cost_construction', target: 'Unit Labour Cost Of Construction' }
@@ -173,7 +181,8 @@ async function fetchDataset(datasetId, limit = 5000) {
 
 function findSeriesOrThrow(records, seriesField, requirement, datasetId) {
   const seriesNames = [...new Set(records.map((r) => String(r[seriesField] || '').trim()).filter(Boolean))];
-  let found = records.find((r) => String(r[seriesField] || '').trim() === requirement.target);
+  const acceptedTargets = [requirement.target, ...(requirement.aliases || [])];
+  let found = records.find((r) => acceptedTargets.includes(String(r[seriesField] || '').trim()));
   if (!found) {
     const ranked = seriesNames
       .map((name) => ({ name, score: scoreSimilarity(name, requirement.target) }))
@@ -185,6 +194,7 @@ function findSeriesOrThrow(records, seriesField, requirement, datasetId) {
         `Missing required series in dataset ${datasetId}`,
         `Required key: ${requirement.key}`,
         `Required exact target: ${requirement.target}`,
+        ...(requirement.aliases?.length ? [`Accepted aliases: ${requirement.aliases.join(' | ')}`] : []),
         `Closest 20 Data Series names:`,
         ...ranked.map((n) => `  - ${n}`)
       ].join('\n')
