@@ -1,11 +1,73 @@
 {
-  "meta": {"asOf": "2026-02-21"},
+  "meta": {
+    "asOf": "2026-02-21"
+  },
   "rules": [
-    {"severity":"Critical","regex":"default|insolvenc|judicial management|winding up","flags":"i","appliesTo":["title","summary"],"label":"distress event","rationale":"Potential solvency crisis event."},
-    {"severity":"Critical","regex":"covenant breach|breach(ed)? covenant","flags":"i","appliesTo":["title","summary"],"label":"covenant breach","rationale":"Debt covenant break materially elevates refinancing risk."},
-    {"severity":"Warning","regex":"refinanc|rights issue|asset sale","flags":"i","appliesTo":["title","summary"],"label":"liquidity action","rationale":"Financing actions may indicate pressure in funding stack."},
-    {"severity":"Warning","regex":"downgrad|negative outlook|rating cut","flags":"i","appliesTo":["title","summary"],"label":"rating pressure","rationale":"Credit profile deterioration warning."},
-    {"severity":"Watch","regex":"slow sales|weaker presales|cooling measures","flags":"i","appliesTo":["title","summary"],"label":"sales momentum risk","rationale":"Potential demand moderation."},
-    {"severity":"Info","regex":"joint venture|launch|land bid","flags":"i","appliesTo":["title","summary"],"label":"corporate development","rationale":"Informational corporate update."}
+    {
+      "severity": "Critical",
+      "regex": "default|insolvenc|judicial management|winding up",
+      "flags": "i",
+      "appliesTo": [
+        "title",
+        "summary"
+      ],
+      "label": "distress event",
+      "rationale": "Potential solvency crisis event."
+    },
+    {
+      "severity": "Critical",
+      "regex": "covenant breach|breach(ed)? covenant",
+      "flags": "i",
+      "appliesTo": [
+        "title",
+        "summary"
+      ],
+      "label": "covenant breach",
+      "rationale": "Debt covenant break materially elevates refinancing risk."
+    },
+    {
+      "severity": "Warning",
+      "regex": "refinanc|rights issue|asset sale",
+      "flags": "i",
+      "appliesTo": [
+        "title",
+        "summary"
+      ],
+      "label": "liquidity action",
+      "rationale": "Financing actions may indicate pressure in funding stack."
+    },
+    {
+      "severity": "Warning",
+      "regex": "downgrad|negative outlook|rating cut",
+      "flags": "i",
+      "appliesTo": [
+        "title",
+        "summary"
+      ],
+      "label": "rating pressure",
+      "rationale": "Credit profile deterioration warning."
+    },
+    {
+      "severity": "Watch",
+      "regex": "slow sales|weaker presales|cooling measures",
+      "flags": "i",
+      "appliesTo": [
+        "title",
+        "summary"
+      ],
+      "label": "sales momentum risk",
+      "rationale": "Potential demand moderation."
+    },
+    {
+      "severity": "Info",
+      "regex": "joint venture|launch|land bid",
+      "flags": "i",
+      "appliesTo": [
+        "title",
+        "summary"
+      ],
+      "label": "corporate development",
+      "rationale": "Informational corporate update."
+    }
   ]
 }
