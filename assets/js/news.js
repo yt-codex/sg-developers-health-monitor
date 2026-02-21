@@ -26,11 +26,11 @@ function renderNewsItems(items) {
   list.innerHTML = items
     .map((item) => `
       <article class="news-item">
-        <div><span class="badge sev-${item.primarySeverity.toLowerCase()}">${item.primarySeverity}</span></div>
         <div class="news-header-row">
+          <span class="badge sev-${item.primarySeverity.toLowerCase()}">${item.primarySeverity}</span>
           <h3><a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.title}</a></h3>
-          <div class="chips">${item.matches.map((m) => `<span class="chip" title="${m.rationale}">Matched: ${m.label}</span>`).join('')}</div>
         </div>
+        <div class="chips">${item.matches.map((m) => `<span class="chip" title="${m.rationale}">Matched: ${m.label}</span>`).join('')}</div>
         <div class="meta-row">${App.formatDateTime(item.published)} • ${item.source} • Developers: ${item.developerTags.join(', ') || 'Unspecified'}</div>
         <p>${item.summary}</p>
       </article>
