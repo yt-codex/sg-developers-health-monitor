@@ -192,15 +192,56 @@ function extractLatestFromRecord(record) {
 }
 
 function parseSgsMonthKey(value) {
-  const m = String(value).match(/^(\d{4})\s+([A-Za-z]{3})\b/);
-  if (!m) return null;
-  const dt = parsePeriodToDate(`${m[1]} ${m[2]}`);
-  if (!dt) return null;
-  return { sortKey: dt.getUTCFullYear() * 100 + (dt.getUTCMonth() + 1) };
+  const monthMap = {
+    jan: 1,
+    feb: 2,
+    mar: 3,
+    apr: 4,
+    may: 5,
+    jun: 6,
+    jul: 7,
+    aug: 8,
+    sep: 9,
+    oct: 10,
+    nov: 11,
+    dec: 12
+  };
+
+  let m = String(value).trim().match(/^(\d{4})([A-Za-z]{3})$/);
+  if (m) {
+    const mon = monthMap[m[2].toLowerCase()];
+    if (!mon) return null;
+    return { year: Number(m[1]), mon, sortKey: Number(m[1]) * 100 + mon };
+  }
+
+  m = String(value).trim().match(/^(\d{4})\s([A-Za-z]{3}).*$/);
+  if (m) {
+    const mon = monthMap[m[2].toLowerCase()];
+    if (!mon) return null;
+    return { year: Number(m[1]), mon, sortKey: Number(m[1]) * 100 + mon };
+  }
+
+  m = String(value).trim().match(/^(\d{4})-(\d{2})$/);
+  if (m) {
+    const mon = Number(m[2]);
+    if (!Number.isInteger(mon) || mon < 1 || mon > 12) return null;
+    return { year: Number(m[1]), mon, sortKey: Number(m[1]) * 100 + mon };
+  }
+
+  return null;
 }
 
-function listSgsMonthColumns(record) {
-  return Object.keys(record)
+function listSgsMonthColumnsFromFields(fields) {
+  if (!Array.isArray(fields)) return [];
+  return fields
+    .map((field) => ({ key: field?.id, parsed: parseSgsMonthKey(field?.id) }))
+    .filter((x) => x.key && x.parsed)
+    .sort((a, b) => b.parsed.sortKey - a.parsed.sortKey)
+    .map((x) => x.key);
+}
+
+function listSgsMonthColumnsFromRecord(record) {
+  return Object.keys(record || {})
     .map((key) => ({ key, parsed: parseSgsMonthKey(key) }))
     .filter((x) => x.parsed)
     .sort((a, b) => b.parsed.sortKey - a.parsed.sortKey)
@@ -228,15 +269,20 @@ function findRowBySeriesName(records, seriesName) {
 }
 
 async function extractSgs2y10y() {
-  const records = await fetchDataset(SGS_DATASET_ID, 50);
+  const { records, fields } = await fetchDataset(SGS_DATASET_ID, 50);
   if (!records.length) throw new Error('No records returned');
 
-  let monthColumns = [];
-  for (const row of records) {
-    const cols = listSgsMonthColumns(row);
-    if (cols.length > monthColumns.length) monthColumns = cols;
+  let monthColumns = listSgsMonthColumnsFromFields(fields);
+  if (!monthColumns.length) {
+    for (const row of records) {
+      const cols = listSgsMonthColumnsFromRecord(row);
+      if (cols.length > monthColumns.length) monthColumns = cols;
+    }
   }
-  if (!monthColumns.length) throw new Error('No month columns detected (expected keys like "2025 Dec")');
+  if (!monthColumns.length) throw new Error('No month columns detected (expected keys like "2025Dec", "2025 Dec", or "2025-12")');
+  if (VERIFY_MODE) {
+    console.log(`[verify-series] datasetId=${SGS_DATASET_ID} monthFieldsDetectedCount=${monthColumns.length} newestMonthFields=${monthColumns.slice(0, 3).join(',')}`);
+  }
 
   const row10 = findRowBySeriesName(records, SGS_10Y_SERIES);
   const row2 = findRowBySeriesName(records, SGS_2Y_SERIES);
@@ -279,6 +325,7 @@ function detectSeriesField(records) {
 
 async function fetchDataset(datasetId, pageLimit = 10000) {
   const records = [];
+  let fields = [];
   let offset = 0;
   let total = null;
 
@@ -300,6 +347,10 @@ async function fetchDataset(datasetId, pageLimit = 10000) {
       throw new Error(`Unexpected CKAN payload for ${datasetId}`);
     }
 
+    if (!fields.length && Array.isArray(json?.result?.fields)) {
+      fields = json.result.fields;
+    }
+
     const pageRecords = json.result.records;
     if (total == null) total = Number(json?.result?.total || 0);
     records.push(...pageRecords);
@@ -308,7 +359,7 @@ async function fetchDataset(datasetId, pageLimit = 10000) {
     if (offset >= total) break;
   }
 
-  return records;
+  return { records, fields };
 }
 
 function findSeriesMatch(records, seriesField, requirement) {
@@ -690,13 +741,13 @@ async function buildMacroIndicators(verifyOnly = false) {
   const datasetCache = new Map();
   const getDataset = async (datasetId) => {
     if (!datasetCache.has(datasetId)) {
-      const records = await fetchDataset(datasetId);
+      const dataset = await fetchDataset(datasetId);
       if (VERIFY_MODE) {
-        const seriesField = detectSeriesField(records);
-        const sample = findSampleRecordWithTimeColumns(records);
-        console.log(`[verify-dataset] datasetId=${datasetId} rows=${records.length} seriesField=${seriesField || 'n/a'} sample_time_columns=${sample.timeColumns.length}`);
+        const seriesField = detectSeriesField(dataset.records);
+        const sample = findSampleRecordWithTimeColumns(dataset.records);
+        console.log(`[verify-dataset] datasetId=${datasetId} rows=${dataset.records.length} seriesField=${seriesField || 'n/a'} sample_time_columns=${sample.timeColumns.length}`);
       }
-      datasetCache.set(datasetId, records);
+      datasetCache.set(datasetId, dataset);
     }
     return datasetCache.get(datasetId);
   };
@@ -733,7 +784,8 @@ async function buildMacroIndicators(verifyOnly = false) {
   });
 
   for (const [datasetId, requirements] of Object.entries(REQUIRED_DATASETS)) {
-    const records = await getDataset(datasetId);
+    const dataset = await getDataset(datasetId);
+    const records = dataset.records;
     const seriesField = detectSeriesField(records);
     for (const requirement of requirements) {
       await tryIndicator(
@@ -813,7 +865,8 @@ async function buildMacroIndicators(verifyOnly = false) {
 
   for (const spec of optionalDatasetSpecs) {
     await tryIndicator({ key: `dataset_${spec.datasetId}`, source: spec.source, dataset_ref: spec.datasetId }, async () => {
-      const records = await getDataset(spec.datasetId);
+      const dataset = await getDataset(spec.datasetId);
+      const records = dataset.records;
       if (!records.length) throw new Error('dataset returned 0 rows');
       const seriesField = detectSeriesField(records);
       if (!seriesField) throw new Error('no Data Series field');
