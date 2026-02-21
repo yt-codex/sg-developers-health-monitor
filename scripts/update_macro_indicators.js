@@ -8,6 +8,9 @@ const DATA_FILE = path.join(process.cwd(), 'data', 'macro_indicators.json');
 const CKAN_BASE = 'https://data.gov.sg/api/action/datastore_search';
 const MAS_SORA_URL = 'https://eservices.mas.gov.sg/statistics/dir/domesticinterestrates.aspx';
 const MAS_MSB_I6_CSV_URL = 'https://www.mas.gov.sg/-/media/mas-media-library/statistics/monthly-statistical-bulletin/msb-historical/money-and-banking--i6--yearly.csv';
+const SGS_DATASET_ID = 'd_5fe5a4bb4a1ecc4d8a56a095832e2b24';
+const SGS_10Y_SERIES = 'Government Securities - 10-Year Bond Yield';
+const SGS_2Y_SERIES = 'Government Securities - 2-Year Bond Yield';
 const DEFAULT_JSON_HEADERS = {
   accept: 'application/json',
   'user-agent': 'macro-indicator-bot/1.0'
@@ -28,18 +31,6 @@ const DATASET_IDS = [
 ];
 
 const REQUIRED_DATASETS = {
-  d_5fe5a4bb4a1ecc4d8a56a095832e2b24: [
-    {
-      key: 'sgs_10y',
-      target: 'Government Securities - 10-Year Bond Yield',
-      aliases: ['SGS 10-Year Bond Yield']
-    },
-    {
-      key: 'sgs_2y',
-      target: 'Government Securities - 2-Year Bond Yield',
-      aliases: ['SGS 2-Year Bond Yield']
-    }
-  ],
   d_f9fc9b5420d96bcab45bc31eeb8ae3c3: [
     { key: 'unit_labour_cost_construction', target: 'Unit Labour Cost Of Construction' }
   ],
@@ -225,6 +216,84 @@ function extractLatestFromRecord(record) {
     if (value != null) return { period, value };
   }
   return null;
+}
+
+function parseSgsMonthKey(value) {
+  const m = String(value).match(/^(\d{4})\s+([A-Za-z]{3})\b/);
+  if (!m) return null;
+  const dt = parsePeriodToDate(`${m[1]} ${m[2]}`);
+  if (!dt) return null;
+  return { sortKey: dt.getUTCFullYear() * 100 + (dt.getUTCMonth() + 1) };
+}
+
+function listSgsMonthColumns(record) {
+  return Object.keys(record)
+    .map((key) => ({ key, parsed: parseSgsMonthKey(key) }))
+    .filter((x) => x.parsed)
+    .sort((a, b) => b.parsed.sortKey - a.parsed.sortKey)
+    .map((x) => x.key);
+}
+
+function extractLatestFromWideSeriesRow(row, monthColumns) {
+  for (const col of monthColumns) {
+    const value = toNumber(row[col]);
+    if (value != null) return { period: col, value };
+  }
+  return null;
+}
+
+function findRowBySeriesName(records, seriesName) {
+  const fields = ['Data Series', 'DataSeries', 'data_series', 'dataseries'];
+  for (const field of fields) {
+    const row = records.find((r) => String(r[field] || '').trim() === seriesName);
+    if (row) return row;
+  }
+
+  const fallbackField = Object.keys(records[0] || {}).find((k) => /series/i.test(k));
+  if (!fallbackField) return null;
+  return records.find((r) => String(r[fallbackField] || '').trim() === seriesName) || null;
+}
+
+async function extractSgs2y10y() {
+  const records = await fetchDataset(SGS_DATASET_ID, 50);
+  if (!records.length) throw new Error('No records returned');
+
+  let monthColumns = [];
+  for (const row of records) {
+    const cols = listSgsMonthColumns(row);
+    if (cols.length > monthColumns.length) monthColumns = cols;
+  }
+  if (!monthColumns.length) throw new Error('No month columns detected (expected keys like "2025 Dec")');
+
+  const row10 = findRowBySeriesName(records, SGS_10Y_SERIES);
+  const row2 = findRowBySeriesName(records, SGS_2Y_SERIES);
+  if (!row10) throw new Error(`Series not found: ${SGS_10Y_SERIES}`);
+  if (!row2) throw new Error(`Series not found: ${SGS_2Y_SERIES}`);
+
+  const latest10 = extractLatestFromWideSeriesRow(row10, monthColumns);
+  const latest2 = extractLatestFromWideSeriesRow(row2, monthColumns);
+  if (!latest10) throw new Error(`No numeric values found for: ${SGS_10Y_SERIES}`);
+  if (!latest2) throw new Error(`No numeric values found for: ${SGS_2Y_SERIES}`);
+
+  let spread = null;
+  let spreadPeriod = null;
+  for (const col of monthColumns) {
+    const v10 = toNumber(row10[col]);
+    const v2 = toNumber(row2[col]);
+    if (v10 != null && v2 != null) {
+      spread = Number((v10 - v2).toFixed(4));
+      spreadPeriod = col;
+      break;
+    }
+  }
+
+  return {
+    sgs_10y: { freq: 'M', latest_period: latest10.period, latest_value: latest10.value, units: '%' },
+    sgs_2y: { freq: 'M', latest_period: latest2.period, latest_value: latest2.value, units: '%' },
+    term_spread_10y_2y: spread != null
+      ? { freq: 'M', latest_period: spreadPeriod, latest_value: spread, units: 'pp' }
+      : null
+  };
 }
 
 
@@ -658,6 +727,37 @@ async function buildMacroIndicators(verifyOnly = false) {
     return datasetCache.get(datasetId);
   };
 
+  let sgsBundlePromise;
+  const getSgsBundle = async () => {
+    if (!sgsBundlePromise) sgsBundlePromise = extractSgs2y10y();
+    return sgsBundlePromise;
+  };
+
+  await tryIndicator({ key: 'sgs_10y', source: 'data.gov.sg', dataset_ref: SGS_DATASET_ID }, async () => {
+    const sgs = await getSgsBundle();
+    if (!verifyOnly) series.sgs_10y = sgs.sgs_10y;
+    if (VERIFY_MODE) {
+      console.log(`[verify-series] datasetId=${SGS_DATASET_ID} required=${SGS_10Y_SERIES} latest=${sgs.sgs_10y.latest_period}=${sgs.sgs_10y.latest_value}`);
+    }
+    return { latest_period: sgs.sgs_10y.latest_period, latest_value: sgs.sgs_10y.latest_value };
+  });
+
+  await tryIndicator({ key: 'sgs_2y', source: 'data.gov.sg', dataset_ref: SGS_DATASET_ID }, async () => {
+    const sgs = await getSgsBundle();
+    if (!verifyOnly) series.sgs_2y = sgs.sgs_2y;
+    if (VERIFY_MODE) {
+      console.log(`[verify-series] datasetId=${SGS_DATASET_ID} required=${SGS_2Y_SERIES} latest=${sgs.sgs_2y.latest_period}=${sgs.sgs_2y.latest_value}`);
+    }
+    return { latest_period: sgs.sgs_2y.latest_period, latest_value: sgs.sgs_2y.latest_value };
+  });
+
+  await tryIndicator({ key: 'term_spread_10y_2y', source: 'derived', dataset_ref: 'sgs_10y-sgs_2y' }, async () => {
+    const sgs = await getSgsBundle();
+    if (!sgs.term_spread_10y_2y) throw new Error('no overlapping monthly observations for SGS 10Y and 2Y');
+    if (!verifyOnly) series.term_spread_10y_2y = sgs.term_spread_10y_2y;
+    return { latest_period: sgs.term_spread_10y_2y.latest_period, latest_value: sgs.term_spread_10y_2y.latest_value };
+  });
+
   for (const [datasetId, requirements] of Object.entries(REQUIRED_DATASETS)) {
     const records = await getDataset(datasetId);
     const seriesField = detectSeriesField(records);
@@ -794,19 +894,6 @@ async function buildMacroIndicators(verifyOnly = false) {
     return { latest_period: utilisedLatest.period, latest_value: utilisedLatest.value };
   });
 
-  await tryIndicator({ key: 'term_spread_10y_2y', source: 'derived', dataset_ref: 'sgs_10y-sgs_2y' }, async () => {
-    if (!series.sgs_10y || !series.sgs_2y) throw new Error('no matching series');
-    const latestValue = Number((series.sgs_10y.latest_value - series.sgs_2y.latest_value).toFixed(4));
-    if (!verifyOnly) {
-      series.term_spread_10y_2y = {
-        freq: 'M',
-        latest_period: series.sgs_10y.latest_period,
-        latest_value: latestValue,
-        units: 'pp'
-      };
-    }
-    return { latest_period: series.sgs_10y.latest_period, latest_value: latestValue };
-  });
 
   const updateRun = printRunSummary(results);
   return { series, updateRun, results };
