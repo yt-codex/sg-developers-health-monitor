@@ -2,8 +2,6 @@
 
 const fs = require('fs/promises');
 const path = require('path');
-const { load } = require('cheerio');
-const { parse } = require('csv-parse/sync');
 
 const VERIFY_MODE = process.argv.includes('--verify_sources');
 const DATA_FILE = path.join(process.cwd(), 'data', 'macro_indicators.json');
@@ -301,14 +299,108 @@ function addSeries(series, key, freq, latest, units, metadata = {}) {
   console.log(`- ${key}: ${latest.period} = ${latest.value}`);
 }
 
-function parseSoraRows(html) {
-  const $ = load(html);
+function decodeHtmlEntities(text) {
+  return String(text || '')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&#39;/gi, "'")
+    .replace(/&quot;/gi, '"');
+}
+
+function stripHtmlTags(text) {
+  return decodeHtmlEntities(String(text || '').replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ').trim();
+}
+
+function parseSimpleHtmlTableRows(html) {
   const rows = [];
-  $('table tr').each((_, tr) => {
-    const cells = $(tr)
-      .find('td')
-      .map((__, td) => $(td).text().trim())
-      .get();
+  const rowMatches = String(html || '').match(/<tr\b[^>]*>[\s\S]*?<\/tr>/gi) || [];
+  for (const rowHtml of rowMatches) {
+    const cellMatches = rowHtml.match(/<t[dh]\b[^>]*>[\s\S]*?<\/t[dh]>/gi) || [];
+    const cells = cellMatches.map((cellHtml) => stripHtmlTags(cellHtml));
+    if (cells.length) rows.push(cells);
+  }
+  return rows;
+}
+
+function parseSelectDefinitions(html) {
+  const selects = [];
+  const selectRegex = /<select\b([^>]*)>([\s\S]*?)<\/select>/gi;
+  let selectMatch;
+  while ((selectMatch = selectRegex.exec(html)) !== null) {
+    const attrs = selectMatch[1] || '';
+    const body = selectMatch[2] || '';
+    const name = ((attrs.match(/\bname\s*=\s*"([^"]*)"/i) || [])[1]
+      || (attrs.match(/\bname\s*=\s*'([^']*)'/i) || [])[1]
+      || '').trim();
+    const id = ((attrs.match(/\bid\s*=\s*"([^"]*)"/i) || [])[1]
+      || (attrs.match(/\bid\s*=\s*'([^']*)'/i) || [])[1]
+      || '').trim();
+
+    const options = [];
+    const optionRegex = /<option\b([^>]*)>([\s\S]*?)<\/option>/gi;
+    let optionMatch;
+    while ((optionMatch = optionRegex.exec(body)) !== null) {
+      const optionAttrs = optionMatch[1] || '';
+      const text = stripHtmlTags(optionMatch[2] || '');
+      const value = ((optionAttrs.match(/\bvalue\s*=\s*"([^"]*)"/i) || [])[1]
+        || (optionAttrs.match(/\bvalue\s*=\s*'([^']*)'/i) || [])[1]
+        || text).trim();
+      const selected = /\bselected\b/i.test(optionAttrs);
+      options.push({ value, text, selected });
+    }
+
+    selects.push({ name, id, options });
+  }
+  return selects;
+}
+
+function parseCsvLine(line) {
+  const out = [];
+  let current = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i += 1) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i += 1;
+      } else {
+        inQuotes = !inQuotes;
+      }
+      continue;
+    }
+    if (ch === ',' && !inQuotes) {
+      out.push(current);
+      current = '';
+      continue;
+    }
+    current += ch;
+  }
+  out.push(current);
+  return out;
+}
+
+function parseSimpleCsv(text) {
+  const lines = String(text || '').replace(/\uFEFF/g, '').split(/\r?\n/).filter((line) => line.trim() !== '');
+  if (!lines.length) return [];
+  const headers = parseCsvLine(lines[0]);
+  return lines.slice(1).map((line) => {
+    const cols = parseCsvLine(line);
+    const row = {};
+    headers.forEach((header, i) => {
+      row[header] = cols[i] == null ? '' : cols[i];
+    });
+    return row;
+  });
+}
+
+function parseSoraRows(html) {
+  const rows = [];
+  const tableRows = parseSimpleHtmlTableRows(html);
+  tableRows.forEach((cells) => {
     if (cells.length < 2) return;
     const dateText = cells.find((c) => /\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}/.test(c) || /\d{4}-\d{2}-\d{2}/.test(c));
     const valueText = cells.find((c) => /^-?[\d,.]+$/.test(c.replace('%', '').trim()));
@@ -332,31 +424,35 @@ function parseSoraRows(html) {
 }
 
 function buildSoraPostPayload(html) {
-  const $ = load(html);
   const payload = {};
-  $('input[type="hidden"]').each((_, el) => {
-    const name = $(el).attr('name');
-    if (name) payload[name] = $(el).attr('value') || '';
-  });
+  const hiddenInputRegex = /<input\b([^>]*\btype\s*=\s*["']hidden["'][^>]*)>/gi;
+  let hiddenMatch;
+  while ((hiddenMatch = hiddenInputRegex.exec(html)) !== null) {
+    const attrs = hiddenMatch[1] || '';
+    const name = (attrs.match(/\bname\s*=\s*"([^"]*)"/i) || attrs.match(/\bname\s*=\s*'([^']*)'/i) || [])[1];
+    const value = (attrs.match(/\bvalue\s*=\s*"([^"]*)"/i) || attrs.match(/\bvalue\s*=\s*'([^']*)'/i) || [])[1] || '';
+    if (name) payload[name] = decodeHtmlEntities(value);
+  }
+
+  const selects = parseSelectDefinitions(html);
 
   const now = new Date();
   const start = new Date(now);
   start.setDate(start.getDate() - 14);
 
   const setSelectValue = (regex, desiredTextRegex, fallbackValue) => {
-    const el = $('select').filter((_, s) => regex.test($(s).attr('name') || $(s).attr('id') || ''));
-    if (!el.length) return;
-    const name = el.first().attr('name');
+    const el = selects.find((s) => regex.test(s.name || s.id || ''));
+    if (!el || !el.name) return;
     let chosen = fallbackValue;
     if (desiredTextRegex) {
-      const opt = el
-        .first()
-        .find('option')
-        .filter((__, o) => desiredTextRegex.test($(o).text()))
-        .first();
-      if (opt.length) chosen = opt.attr('value');
+      const opt = el.options.find((o) => desiredTextRegex.test(o.text));
+      if (opt) chosen = opt.value;
     }
-    payload[name] = chosen;
+    if (chosen == null) {
+      const selectedOption = el.options.find((o) => o.selected) || el.options[0];
+      if (selectedOption) chosen = selectedOption.value;
+    }
+    if (chosen != null) payload[el.name] = chosen;
   };
 
   const startYearSelector = /start.*year|from.*year/i;
@@ -374,7 +470,7 @@ function buildSoraPostPayload(html) {
   setSelectValue(seriesSelector, /sora/i, null);
 
   const hasSelector = (regex) =>
-    $('select').toArray().some((s) => regex.test($(s).attr('name') || $(s).attr('id') || ''));
+    selects.some((s) => regex.test(s.name || s.id || ''));
   const expectedControls = [
     ['start year', startYearSelector],
     ['end year', endYearSelector],
@@ -388,9 +484,12 @@ function buildSoraPostPayload(html) {
     throw new Error(`SORA page missing expected selector controls: ${missingControls.join(', ')}`);
   }
 
-  const submit = $('input[type="submit"],button[type="submit"]').first();
-  const submitName = submit.attr('name');
-  if (submitName) payload[submitName] = submit.attr('value') || 'Submit';
+  const submitInputMatch = html.match(/<input\b([^>]*\btype\s*=\s*["']submit["'][^>]*)>/i);
+  const submitButtonMatch = html.match(/<button\b([^>]*\btype\s*=\s*["']submit["'][^>]*)>/i);
+  const submitAttrs = (submitInputMatch && submitInputMatch[1]) || (submitButtonMatch && submitButtonMatch[1]) || '';
+  const submitName = (submitAttrs.match(/\bname\s*=\s*"([^"]*)"/i) || submitAttrs.match(/\bname\s*=\s*'([^']*)'/i) || [])[1];
+  const submitValue = (submitAttrs.match(/\bvalue\s*=\s*"([^"]*)"/i) || submitAttrs.match(/\bvalue\s*=\s*'([^']*)'/i) || [])[1] || 'Submit';
+  if (submitName) payload[submitName] = decodeHtmlEntities(submitValue);
 
   return payload;
 }
@@ -452,7 +551,7 @@ async function fetchMasMsbI6() {
   const res = await fetch(MAS_MSB_I6_CSV_URL, { headers: DEFAULT_JSON_HEADERS });
   if (!res.ok) throw new Error(`MAS MSB CSV URL not reachable: ${MAS_MSB_I6_CSV_URL} (HTTP ${res.status})`);
   const text = await res.text();
-  const rows = parse(text, { columns: true, skip_empty_lines: true });
+  const rows = parseSimpleCsv(text);
   if (!rows.length) throw new Error('MAS MSB CSV parsed but contains no rows');
 
   const headers = Object.keys(rows[0]);
