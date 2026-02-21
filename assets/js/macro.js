@@ -13,6 +13,15 @@ function sparklineSvg(series) {
   return `<svg class="sparkline" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polyline fill="none" stroke="#64748b" stroke-width="2" points="${points}" /></svg>`;
 }
 
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
 function computeMacroRisk(indicators) {
   const scores = indicators.map((ind) => {
     const latest = ind.series[ind.series.length - 1]?.value;
@@ -45,20 +54,23 @@ async function initMacroPage() {
         return;
       }
       wrap.innerHTML = indicators
-        .map((i) => {
+        .map((i, index) => {
           const latest = i.series[i.series.length - 1];
           const prior = i.series[i.series.length - 2];
           const delta = prior ? (latest.value - prior.value).toFixed(2) : 'n/a';
+          const tooltipId = `macro-tooltip-${index}`;
           return `<article class="panel indicator-tile">
-            <h3>${i.name}</h3>
+            <div class="indicator-title-row">
+              <h3>${i.name}</h3>
+              <span class="info-tooltip">
+                <button class="tooltip-trigger" type="button" aria-label="Why it matters for ${escapeHtml(i.name)}" aria-describedby="${tooltipId}">?</button>
+                <span class="tooltip-content" id="${tooltipId}" role="tooltip">${escapeHtml(i.why)}</span>
+              </span>
+            </div>
             <div class="value">${latest.value.toFixed(2)} ${i.unit}</div>
             <div class="meta-row">Change vs prior: ${delta}</div>
             <div class="meta-row">Last point: ${App.formatDate(latest.date)}</div>
             ${sparklineSvg(i.series)}
-            <details>
-              <summary>Why it matters</summary>
-              <p>${i.why}</p>
-            </details>
           </article>`;
         })
         .join('');
