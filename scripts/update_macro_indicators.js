@@ -7,8 +7,11 @@ const {
   fetchAllRecords,
   detectTimeFields,
   parseQuarterlyFieldId,
-  detectSeriesFieldId,
+  findSeriesFieldId,
   findSeriesRow,
+  sortRecordsStable,
+  getLatestCommonPeriod,
+  sumCheck,
   extractLatest,
   toFiniteNumber
 } = require('./lib/datagov');
@@ -106,7 +109,7 @@ function inferFrequencyFromTimeFields(timeFields) {
 async function fetchDataset(datasetId) {
   const dataset = await fetchAllRecords(datasetId, dataGovApiKey, { verifyMode: VERIFY_MODE });
   const timeFields = detectTimeFields(dataset.fields);
-  const seriesField = detectSeriesFieldId(dataset.fields);
+  const seriesField = findSeriesFieldId(dataset.fields);
   if (VERIFY_MODE) {
     console.log(
       `[dataset] ${datasetId} rows=${dataset.records.length} seriesField=${seriesField || 'n/a'} timeFields=${timeFields.length} newest=${timeFields.slice(0, 3).map((x) => x.id).join(',')}`
@@ -221,6 +224,52 @@ function summarizeError(err) {
   const httpMatch = message.match(/HTTP\s+(\d{3})/i);
   if (httpMatch) return `HTTP ${httpMatch[1]} ${message.replace(/.*HTTP\s+\d{3}\s*/i, '').trim()}`.trim();
   return message;
+}
+
+function labelOf(row, seriesField) {
+  return String(row?.[seriesField] || '').trim();
+}
+
+function verifyAdjacentComponentBlock(sortedRecords, seriesField, anchorIndex, expectedLabels, datasetId, anchorLabel) {
+  const totalRow = sortedRecords[anchorIndex];
+  const componentRows = sortedRecords.slice(anchorIndex + 1, anchorIndex + 1 + expectedLabels.length);
+  const componentLabels = componentRows.map((row) => labelOf(row, seriesField));
+  if (componentRows.length !== expectedLabels.length) {
+    throw new Error(`expected ${expectedLabels.length} rows below ${anchorLabel}, found ${componentRows.length}`);
+  }
+  const mismatch = expectedLabels.findIndex((expected, idx) => componentLabels[idx] !== expected);
+  if (mismatch !== -1) {
+    const blockLabels = [labelOf(totalRow, seriesField), ...componentLabels];
+    const nearby = sortedRecords
+      .slice(Math.max(0, anchorIndex - 5), anchorIndex + 6)
+      .map((row) => labelOf(row, seriesField));
+    throw new Error(
+      [
+        `component label mismatch for ${anchorLabel}`,
+        `found block: ${blockLabels.join(' | ')}`,
+        `nearby labels: ${nearby.join(' | ')}`
+      ].join(' ; ')
+    );
+  }
+  if (VERIFY_MODE) {
+    console.log(`[verify-block] datasetId=${datasetId} total=${labelOf(totalRow, seriesField)} components=${componentLabels.join(' | ')}`);
+  }
+  return { totalRow, componentRows, componentLabels };
+}
+
+function latestPeriodAndSumCheck({ datasetId, timeFields, totalRow, componentRows, seriesField, absTol = 1, relTol = 1e-3 }) {
+  const period = getLatestCommonPeriod([totalRow, ...componentRows], timeFields);
+  if (!period) throw new Error('no common period with numeric values across total/components');
+  const check = sumCheck(totalRow, componentRows, period, absTol, relTol);
+  if (!check.pass) {
+    console.warn(`[warn] sum-check failed dataset=${datasetId} period=${period} total=${check.total} sum=${check.sum_components} diff=${check.diff}`);
+  }
+  if (VERIFY_MODE) {
+    console.log(
+      `[verify-sum] datasetId=${datasetId} period=${period} total=${check.total} sum_components=${check.sum_components} diff=${check.diff} pass=${check.pass}`
+    );
+  }
+  return { period, check };
 }
 
 function recordOk(results, payload) {
@@ -618,31 +667,127 @@ async function buildMacroIndicators(verifyOnly = false) {
     },
     {
       datasetId: 'd_ba3c493ad160125ce347d5572712f14f', source: 'data.gov.sg',
-      build: (records, sf, tf) => pickByKeywords(records, sf, ['demand', 'construction'], 2).map((row) => ({
-        key: `construction_material_demand_${String(row[sf]).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '')}`,
-        freq: inferFrequencyFromTimeFields(tf), units: 'index', latest: extractLatest(row, tf), metadata: { source_series_name: row[sf] }
-      }))
+      build: (records, sf, tf, datasetId) => {
+        const targets = [
+          { key: 'demand_construction_materials_cement', label: 'Cement' },
+          { key: 'demand_construction_materials_steel_reinforcement_bars', label: 'Steel Reinforcement Bars' },
+          { key: 'demand_construction_materials_granite', label: 'Granite' },
+          { key: 'demand_construction_materials_ready_mixed_concrete', label: 'Ready-Mixed Concrete' }
+        ];
+        return targets.map((target) => {
+          const match = findSeriesRow(records, sf, target.label);
+          if (!match.row) throw new Error(`${target.label}: ${match.error || 'series not found'}`);
+          if (VERIFY_MODE) {
+            console.log(`[verify-series] datasetId=${datasetId} required=${target.label} matched=${match.matchedSeriesName} (${match.matchType})`);
+          }
+          return {
+            key: target.key,
+            freq: inferFrequencyFromTimeFields(tf),
+            units: 'index',
+            latest: extractLatest(match.row, tf),
+            metadata: { datasetId, matched_series_label: match.matchedSeriesName }
+          };
+        });
+      }
     },
     {
       datasetId: 'd_055b6549444dedb341c50805d9682a41', source: 'data.gov.sg',
-      build: (records, sf, tf) => pickByKeywords(records, sf, ['private', 'residential', 'pipeline', 'uncompleted'], 2).map((row) => ({
-        key: `private_residential_pipeline_${String(row[sf]).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`,
-        freq: inferFrequencyFromTimeFields(tf), units: 'units', latest: extractLatest(row, tf), metadata: { source_series_name: row[sf] }
-      }))
+      build: (records, sf, tf, datasetId) => {
+        const sorted = sortRecordsStable(records);
+        const anchorLabel = 'Total Non-Landed Properties';
+        const expected = ['Under Construction', 'Planned - Written Permission', 'Planned - Provisional Permission', 'Planned - Others'];
+        const anchorIndex = sorted.findIndex((row) => labelOf(row, sf) === anchorLabel);
+        if (anchorIndex === -1) throw new Error(`anchor not found: ${anchorLabel}`);
+        const { totalRow, componentRows } = verifyAdjacentComponentBlock(sorted, sf, anchorIndex, expected, datasetId, anchorLabel);
+        const { check } = latestPeriodAndSumCheck({ datasetId, timeFields: tf, totalRow, componentRows, seriesField: sf, absTol: 1, relTol: 1e-3 });
+        const status = check.pass ? 'ok' : 'ok_with_warning';
+        const keys = [
+          'prp_pipeline_total_non_landed',
+          'prp_pipeline_non_landed_under_construction',
+          'prp_pipeline_non_landed_planned_written_permission',
+          'prp_pipeline_non_landed_planned_provisional_permission',
+          'prp_pipeline_non_landed_planned_others'
+        ];
+        const rows = [totalRow, ...componentRows];
+        return rows.map((row, idx) => ({
+          key: keys[idx],
+          freq: inferFrequencyFromTimeFields(tf),
+          units: 'units',
+          latest: extractLatest(row, tf),
+          metadata: { source_series_name: row[sf], check, status }
+        }));
+      }
     },
     {
       datasetId: 'd_e47c0f0674b46981c4994d5257de5be4', source: 'data.gov.sg',
-      build: (records, sf, tf) => pickByKeywords(records, sf, ['commercial', 'industrial', 'pipeline'], 2).map((row) => ({
-        key: `commercial_industrial_pipeline_${String(row[sf]).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`,
-        freq: inferFrequencyFromTimeFields(tf), units: 'units', latest: extractLatest(row, tf), metadata: { source_series_name: row[sf] }
-      }))
+      build: (records, sf, tf, datasetId) => {
+        const sorted = sortRecordsStable(records);
+        const expected = ['Under Construction', 'Planned - Written Permission', 'Planned - Provisional Permission', 'Planned - Others'];
+        const categories = [
+          {
+            total: 'Total Office Space',
+            category: 'office',
+            keys: ['commind_office_total', 'commind_office_under_construction', 'commind_office_planned_written_permission', 'commind_office_planned_provisional_permission', 'commind_office_planned_others']
+          },
+          {
+            total: 'Total Business Park Space',
+            category: 'business_park',
+            keys: ['commind_business_park_total', 'commind_business_park_under_construction', 'commind_business_park_planned_written_permission', 'commind_business_park_planned_provisional_permission', 'commind_business_park_planned_others']
+          },
+          {
+            total: 'Total Retail Space',
+            category: 'retail',
+            keys: ['commind_retail_total', 'commind_retail_under_construction', 'commind_retail_planned_written_permission', 'commind_retail_planned_provisional_permission', 'commind_retail_planned_others']
+          }
+        ];
+
+        const out = [];
+        for (const cat of categories) {
+          try {
+            const anchorIndex = sorted.findIndex((row) => labelOf(row, sf) === cat.total);
+            if (anchorIndex === -1) throw new Error(`anchor not found: ${cat.total}`);
+            const { totalRow, componentRows } = verifyAdjacentComponentBlock(sorted, sf, anchorIndex, expected, datasetId, cat.total);
+            const { check } = latestPeriodAndSumCheck({ datasetId, timeFields: tf, totalRow, componentRows, seriesField: sf, absTol: 1, relTol: 1e-3 });
+            const status = check.pass ? 'ok' : 'ok_with_warning';
+            [totalRow, ...componentRows].forEach((row, idx) => {
+              out.push({
+                key: cat.keys[idx],
+                freq: inferFrequencyFromTimeFields(tf),
+                units: 'units',
+                latest: extractLatest(row, tf),
+                metadata: { source_series_name: row[sf], parent_total: cat.total, category: cat.category, check, status }
+              });
+            });
+          } catch (err) {
+            console.warn(`[warn] dataset=${datasetId} category=${cat.category} block extraction failed: ${summarizeError(err)}`);
+          }
+        }
+        if (!out.length) throw new Error('all category blocks failed');
+        return out;
+      }
     },
     {
       datasetId: 'd_4dca06508cd9d0a8076153443c17ea5f', source: 'data.gov.sg',
-      build: (records, sf, tf) => pickByKeywords(records, sf, ['industrial', 'space', 'supply'], 2).map((row) => ({
-        key: `industrial_space_supply_${String(row[sf]).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`,
-        freq: inferFrequencyFromTimeFields(tf), units: 'sqm', latest: extractLatest(row, tf), metadata: { source_series_name: row[sf] }
-      }))
+      build: (records, sf, tf, datasetId) => {
+        const labels = ['Total', 'Under Construction', 'Written Permission', 'Provisional Permission', 'Others'];
+        const rows = labels.map((label) => {
+          const match = findSeriesRow(records, sf, label);
+          if (!match.row || match.matchType !== 'exact') throw new Error(`required exact series missing: ${label}`);
+          return match.row;
+        });
+        const totalRow = rows[0];
+        const componentRows = rows.slice(1);
+        const { check } = latestPeriodAndSumCheck({ datasetId, timeFields: tf, totalRow, componentRows, seriesField: sf, absTol: 1, relTol: 1e-3 });
+        const status = check.pass ? 'ok' : 'ok_with_warning';
+        const keys = ['industrial_pipeline_total', 'industrial_pipeline_under_construction', 'industrial_pipeline_written_permission', 'industrial_pipeline_provisional_permission', 'industrial_pipeline_others'];
+        return rows.map((row, idx) => ({
+          key: keys[idx],
+          freq: inferFrequencyFromTimeFields(tf),
+          units: 'sqm',
+          latest: extractLatest(row, tf),
+          metadata: { source_series_name: row[sf], check, status }
+        }));
+      }
     },
     {
       datasetId: 'd_e9cc9d297b1cf8024cf99db4b12505cc', source: 'data.gov.sg',
@@ -671,7 +816,7 @@ async function buildMacroIndicators(verifyOnly = false) {
       const timeFields = dataset.timeFields;
       if (!seriesField) throw new Error('no Data Series field');
       if (!timeFields.length) throw new Error('0 time fields');
-      const entries = spec.build(records, seriesField, timeFields);
+      const entries = spec.build(records, seriesField, timeFields, spec.datasetId);
       if (!entries.length) throw new Error('no matching series');
       let latestSeen = null;
       for (const entry of entries) {
