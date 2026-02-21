@@ -15,7 +15,7 @@ const {
   extractLatest,
   toFiniteNumber
 } = require('./lib/datagov');
-const { MAS_MSB_XML_I6_URL, fetchMasMsbXmlI6Monthly } = require('./lib/mas_msb_xml_i6');
+const { MAS_MSB_I6_PAGE_URL, fetchMasMsbI6Monthly } = require('./lib/mas_msb_i6_monthly');
 
 const VERIFY_MODE = process.argv.includes('--verify_sources');
 const IS_GITHUB_ACTIONS = process.env.GITHUB_ACTIONS === 'true';
@@ -524,6 +524,9 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
       const payload = await fn();
       return recordOk(results, { ...meta, ...payload });
     } catch (err) {
+      if (VERIFY_MODE && Array.isArray(err?.debugLabels) && err.debugLabels.length) {
+        console.log(`[verify-mas-msb-i6] first_40_tbody_row_labels=${err.debugLabels.slice(0, 40).join(' | ')}`);
+      }
       return recordFail(results, { ...meta, error_summary: summarizeError(err) });
     }
   };
@@ -786,11 +789,11 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
 
   let msbMonthlyPromise;
   const getMsbMonthly = async () => {
-    if (!msbMonthlyPromise) msbMonthlyPromise = fetchMasMsbXmlI6Monthly({ verifyMode: VERIFY_MODE });
+    if (!msbMonthlyPromise) msbMonthlyPromise = fetchMasMsbI6Monthly({ verifyMode: VERIFY_MODE });
     return msbMonthlyPromise;
   };
 
-  await tryIndicator({ key: 'loan_limits_granted_building_construction', source: 'MAS MSB XML', dataset_ref: MAS_MSB_XML_I6_URL }, async () => {
+  await tryIndicator({ key: 'loan_limits_granted_building_construction', source: 'MAS MSB I.6 page', dataset_ref: MAS_MSB_I6_PAGE_URL }, async () => {
     const msb = await getMsbMonthly();
     const merged = mergeMonthlyHistory(existingSeries.loan_limits_granted_building_construction?.values, msb.grantedValues);
     const grantedLatest = merged.merged[merged.merged.length - 1];
@@ -806,14 +809,14 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
     }
     if (VERIFY_MODE) {
       const newestHeaders = [...msb.monthHeaders].slice(-3).reverse();
-      console.log(`[verify-mas-msb-xml-i6] newest_headers=${newestHeaders.map((h) => `${h.rawLabel} -> ${h.period}, prelim=${h.prelim}`).join(' | ')}`);
+      console.log(`[verify-mas-msb-i6] newest_headers=${newestHeaders.map((h) => `${h.rawLabel} -> ${h.period}, prelim=${h.prelim}`).join(' | ')}`);
       console.log(`[OK] loan_limits_granted_building_construction latest_period=${grantedLatest.period} latest_value=${grantedLatest.value} prelim=${Boolean(grantedLatest.prelim)}`);
       console.log(`[verify-mas-msb-i6] granted counts extracted_months=${msb.monthHeaders.length} merged_updated=${merged.updated} merged_appended=${merged.appended}`);
     }
     return { latest_period: grantedLatest.period, latest_value: grantedLatest.value };
   });
 
-  await tryIndicator({ key: 'loan_limits_utilised_building_construction', source: 'MAS MSB XML', dataset_ref: MAS_MSB_XML_I6_URL }, async () => {
+  await tryIndicator({ key: 'loan_limits_utilised_building_construction', source: 'MAS MSB I.6 page', dataset_ref: MAS_MSB_I6_PAGE_URL }, async () => {
     const msb = await getMsbMonthly();
     const merged = mergeMonthlyHistory(existingSeries.loan_limits_utilised_building_construction?.values, msb.utilisedValues);
     const utilisedLatest = merged.merged[merged.merged.length - 1];
@@ -912,7 +915,7 @@ async function main() {
     sources: [
       { name: 'data.gov.sg', method: 'datastore_search', dataset_ids: DATASET_IDS },
       { name: 'MAS eServices', method: 'html_form_parse', url: MAS_SORA_URL },
-      { name: 'MAS MSB XML', method: 'aspnet_form_submit_html_table_parse', url: MAS_MSB_XML_I6_URL }
+      { name: 'MAS MSB I.6 page', method: 'html_table_parse_transposed_table', url: MAS_MSB_I6_PAGE_URL }
     ],
     series: mergedSeries
   };
