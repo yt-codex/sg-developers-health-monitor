@@ -27,15 +27,27 @@ function normalizeLabel(text) {
 }
 
 function parseMonthLabel(periodLabel) {
-  const m = String(periodLabel || '').trim().match(/^(\d{4})\s+([A-Za-z]{3})$/);
-  if (!m) return null;
-  const monthMap = {
-    jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06',
-    jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12'
-  };
-  const month = monthMap[m[2].toLowerCase()];
-  if (!month) return null;
-  return `${m[1]}-${month}-01`;
+  const label = String(periodLabel || '').trim();
+  const monthMatch = label.match(/^(\d{4})\s+([A-Za-z]{3})$/);
+  if (monthMatch) {
+    const monthMap = {
+      jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06',
+      jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12'
+    };
+    const month = monthMap[monthMatch[2].toLowerCase()];
+    if (!month) return null;
+    return `${monthMatch[1]}-${month}-01`;
+  }
+
+  const quarterMatch = label.match(/^(?:([Qq]([1-4]))\s*(\d{4})|(\d{4})\s*(?:[Qq]([1-4])|([1-4])[Qq]))$/);
+  if (quarterMatch) {
+    const year = quarterMatch[3] || quarterMatch[4];
+    const quarter = Number(quarterMatch[2] || quarterMatch[5] || quarterMatch[6]);
+    return `${year}-${String((quarter - 1) * 3 + 1).padStart(2, '0')}-01`;
+  }
+
+  if (/^\d{4}$/.test(label)) return `${label}-01-01`;
+  return null;
 }
 
 function findSeriesRowLabel(row) {
@@ -164,7 +176,7 @@ function parseTableBuilderPivotJson(payload) {
   }
 
   if (!periodSet.size) {
-    throw new Error('SingStat response has no "YYYY Mon" time columns');
+    throw new Error('SingStat response has no supported time period columns (e.g., "YYYY Mon", "YYYY Qn")');
   }
 
   const deduped = new Map();
