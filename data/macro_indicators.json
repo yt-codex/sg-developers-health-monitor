@@ -241,8 +241,8 @@
       },
       {
         "name": "MAS MSB",
-        "method": "csv_download",
-        "url": "https://www.mas.gov.sg/-/media/mas-media-library/statistics/monthly-statistical-bulletin/msb-historical/money-and-banking--i6--yearly.csv"
+        "method": "html_table_parse",
+        "url": "https://www.mas.gov.sg/statistics/monthly-statistical-bulletin/i-6-commercial-banks-loan-limits-granted-to-non-bank-customers-by-industry"
       }
     ],
     "series": {
@@ -916,13 +916,13 @@
         {
           "name": "loan_limits_granted_building_construction",
           "source": "MAS MSB",
-          "dataset_ref": "https://www.mas.gov.sg/-/media/mas-media-library/statistics/monthly-statistical-bulletin/msb-historical/money-and-banking--i6--yearly.csv",
+          "dataset_ref": "https://www.mas.gov.sg/statistics/monthly-statistical-bulletin/i-6-commercial-banks-loan-limits-granted-to-non-bank-customers-by-industry",
           "error_summary": "Unable to extract MAS MSB I.6 construction granted/utilised rows."
         },
         {
           "name": "loan_limits_utilised_building_construction",
           "source": "MAS MSB",
-          "dataset_ref": "https://www.mas.gov.sg/-/media/mas-media-library/statistics/monthly-statistical-bulletin/msb-historical/money-and-banking--i6--yearly.csv",
+          "dataset_ref": "https://www.mas.gov.sg/statistics/monthly-statistical-bulletin/i-6-commercial-banks-loan-limits-granted-to-non-bank-customers-by-industry",
           "error_summary": "Unable to extract MAS MSB I.6 construction granted/utilised rows."
         }
       ]

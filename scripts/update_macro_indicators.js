@@ -15,12 +15,12 @@ const {
   extractLatest,
   toFiniteNumber
 } = require('./lib/datagov');
+const { MAS_MSB_I6_PAGE_URL, fetchMasMsbI6Monthly } = require('./lib/mas_msb_i6_monthly');
 
 const VERIFY_MODE = process.argv.includes('--verify_sources');
 const IS_GITHUB_ACTIONS = process.env.GITHUB_ACTIONS === 'true';
 const DATA_FILE = path.join(process.cwd(), 'data', 'macro_indicators.json');
 const MAS_SORA_URL = 'https://eservices.mas.gov.sg/statistics/dir/domesticinterestrates.aspx';
-const MAS_MSB_I6_CSV_URL = 'https://www.mas.gov.sg/-/media/mas-media-library/statistics/monthly-statistical-bulletin/msb-historical/money-and-banking--i6--yearly.csv';
 const SGS_DATASET_ID = 'd_5fe5a4bb4a1ecc4d8a56a095832e2b24';
 const SGS_10Y_SERIES = 'Government Securities - 10-Year Bond Yield';
 const SGS_2Y_SERIES = 'Government Securities - 2-Year Bond Yield';
@@ -355,47 +355,6 @@ function parseSelectDefinitions(html) {
   return selects;
 }
 
-function parseCsvLine(line) {
-  const out = [];
-  let current = '';
-  let inQuotes = false;
-
-  for (let i = 0; i < line.length; i += 1) {
-    const ch = line[i];
-    if (ch === '"') {
-      if (inQuotes && line[i + 1] === '"') {
-        current += '"';
-        i += 1;
-      } else {
-        inQuotes = !inQuotes;
-      }
-      continue;
-    }
-    if (ch === ',' && !inQuotes) {
-      out.push(current);
-      current = '';
-      continue;
-    }
-    current += ch;
-  }
-  out.push(current);
-  return out;
-}
-
-function parseSimpleCsv(text) {
-  const lines = String(text || '').replace(/\uFEFF/g, '').split(/\r?\n/).filter((line) => line.trim() !== '');
-  if (!lines.length) return [];
-  const headers = parseCsvLine(lines[0]);
-  return lines.slice(1).map((line) => {
-    const cols = parseCsvLine(line);
-    const row = {};
-    headers.forEach((header, i) => {
-      row[header] = cols[i] == null ? '' : cols[i];
-    });
-    return row;
-  });
-}
-
 function parseSoraRows(html) {
   const rows = [];
   const tableRows = parseSimpleHtmlTableRows(html);
@@ -538,47 +497,25 @@ async function fetchSoraSeries() {
   return kept;
 }
 
-function latestFromCsvRow(row) {
-  const candidates = Object.entries(row)
-    .map(([k, v]) => ({ period: k, value: toNumber(v), dt: parsePeriodToDate(k) }))
-    .filter((x) => x.dt && x.value != null)
-    .sort((a, b) => a.dt - b.dt);
-  return candidates[candidates.length - 1] || null;
-}
-
-async function fetchMasMsbI6() {
-  const res = await fetch(MAS_MSB_I6_CSV_URL, { headers: DEFAULT_JSON_HEADERS });
-  if (!res.ok) throw new Error(`MAS MSB CSV URL not reachable: ${MAS_MSB_I6_CSV_URL} (HTTP ${res.status})`);
-  const text = await res.text();
-  const rows = parseSimpleCsv(text);
-  if (!rows.length) throw new Error('MAS MSB CSV parsed but contains no rows');
-
-  const headers = Object.keys(rows[0]);
-  const rowLabel = (r) => headers.map((h) => String(r[h] || '')).join(' | ');
-
-  const granted = rows.find((r) => /building\s*&?\s*construction/i.test(rowLabel(r)) && /loan\s*limits.*granted/i.test(rowLabel(r)));
-  const utilised = rows.find((r) => /building\s*&?\s*construction/i.test(rowLabel(r)) && /loan\s*limits.*utili[sz]ed/i.test(rowLabel(r)));
-
-  if (!granted || !utilised) {
-    const preview = rows.slice(0, 5).map((r) => {
-      const copy = {};
-      for (const k of headers.slice(0, 6)) copy[k] = r[k];
-      return copy;
-    });
-    throw new Error(
-      [
-        'Unable to extract MAS MSB I.6 construction granted/utilised rows.',
-        `URL: ${MAS_MSB_I6_CSV_URL}`,
-        `Detected header row: ${headers.join(' | ')}`,
-        `First 5 parsed rows: ${JSON.stringify(preview, null, 2)}`
-      ].join('\n')
-    );
+function mergeMonthlyHistory(existingValues, fetchedValues) {
+  const byPeriod = new Map();
+  let updated = 0;
+  let appended = 0;
+  for (const item of Array.isArray(existingValues) ? existingValues : []) {
+    if (!item?.period) continue;
+    byPeriod.set(item.period, { period: item.period, prelim: Boolean(item.prelim), value: item.value });
   }
-
-  return { headers, granted, utilised };
+  for (const item of fetchedValues) {
+    if (!item?.period) continue;
+    if (byPeriod.has(item.period)) updated += 1;
+    else appended += 1;
+    byPeriod.set(item.period, { period: item.period, prelim: Boolean(item.prelim), value: item.value });
+  }
+  const merged = [...byPeriod.values()].sort((a, b) => a.period.localeCompare(b.period));
+  return { merged, updated, appended };
 }
 
-async function buildMacroIndicators(verifyOnly = false) {
+async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
   const series = {};
   const results = [];
 
@@ -847,22 +784,52 @@ async function buildMacroIndicators(verifyOnly = false) {
     return { latest_period: latest.date, latest_value: latest.value };
   });
 
-  await tryIndicator({ key: 'loan_limits_granted_building_construction', source: 'MAS MSB', dataset_ref: MAS_MSB_I6_CSV_URL }, async () => {
-    const msb = await fetchMasMsbI6();
-    const grantedLatest = latestFromCsvRow(msb.granted);
-    if (!grantedLatest) throw new Error('0 time columns detected');
+  let msbMonthlyPromise;
+  const getMsbMonthly = async () => {
+    if (!msbMonthlyPromise) msbMonthlyPromise = fetchMasMsbI6Monthly(DEFAULT_JSON_HEADERS);
+    return msbMonthlyPromise;
+  };
+
+  await tryIndicator({ key: 'loan_limits_granted_building_construction', source: 'MAS MSB', dataset_ref: MAS_MSB_I6_PAGE_URL }, async () => {
+    const msb = await getMsbMonthly();
+    const merged = mergeMonthlyHistory(existingSeries.loan_limits_granted_building_construction?.values, msb.grantedValues);
+    const grantedLatest = merged.merged[merged.merged.length - 1];
+    if (!grantedLatest) throw new Error('0 monthly values extracted');
     if (!verifyOnly) {
-      series.loan_limits_granted_building_construction = { freq: 'M', latest_period: grantedLatest.period, latest_value: grantedLatest.value, units: 'S$ million' };
+      series.loan_limits_granted_building_construction = {
+        freq: 'M',
+        latest_period: grantedLatest.period,
+        latest_value: grantedLatest.value,
+        units: 'S$ million',
+        values: merged.merged
+      };
+    }
+    if (VERIFY_MODE) {
+      const newestHeaders = [...msb.monthHeaders].slice(-3).reverse();
+      console.log(`[verify-mas-msb-i6] newest_headers=${newestHeaders.map((h) => `${h.rawLabel} -> ${h.period}, prelim=${h.prelim}`).join(' | ')}`);
+      console.log(`[verify-mas-msb-i6] granted latest=${grantedLatest.period} value=${grantedLatest.value}`);
+      console.log(`[verify-mas-msb-i6] granted counts extracted_months=${msb.monthHeaders.length} merged_updated=${merged.updated} merged_appended=${merged.appended}`);
     }
     return { latest_period: grantedLatest.period, latest_value: grantedLatest.value };
   });
 
-  await tryIndicator({ key: 'loan_limits_utilised_building_construction', source: 'MAS MSB', dataset_ref: MAS_MSB_I6_CSV_URL }, async () => {
-    const msb = await fetchMasMsbI6();
-    const utilisedLatest = latestFromCsvRow(msb.utilised);
-    if (!utilisedLatest) throw new Error('0 time columns detected');
+  await tryIndicator({ key: 'loan_limits_utilised_building_construction', source: 'MAS MSB', dataset_ref: MAS_MSB_I6_PAGE_URL }, async () => {
+    const msb = await getMsbMonthly();
+    const merged = mergeMonthlyHistory(existingSeries.loan_limits_utilised_building_construction?.values, msb.utilisedValues);
+    const utilisedLatest = merged.merged[merged.merged.length - 1];
+    if (!utilisedLatest) throw new Error('0 monthly values extracted');
     if (!verifyOnly) {
-      series.loan_limits_utilised_building_construction = { freq: 'M', latest_period: utilisedLatest.period, latest_value: utilisedLatest.value, units: 'S$ million' };
+      series.loan_limits_utilised_building_construction = {
+        freq: 'M',
+        latest_period: utilisedLatest.period,
+        latest_value: utilisedLatest.value,
+        units: '%',
+        values: merged.merged
+      };
+    }
+    if (VERIFY_MODE) {
+      console.log(`[verify-mas-msb-i6] utilised latest=${utilisedLatest.period} value=${utilisedLatest.value}`);
+      console.log(`[verify-mas-msb-i6] utilised counts extracted_months=${msb.monthHeaders.length} merged_updated=${merged.updated} merged_appended=${merged.appended}`);
     }
     return { latest_period: utilisedLatest.period, latest_value: utilisedLatest.value };
   });
@@ -891,7 +858,8 @@ async function main() {
   if (VERIFY_MODE) {
     quarterlyParserSelfTest();
     console.log('Running source verification only...');
-    const { updateRun } = await buildMacroIndicators(true);
+    const existing = JSON.parse(await fs.readFile(DATA_FILE, 'utf8'));
+    const { updateRun } = await buildMacroIndicators(true, existing?.macro_indicators?.series || {});
     if (updateRun.ok_count > 0) {
       console.log('Source verification completed with usable indicators.');
       return;
@@ -907,7 +875,7 @@ async function main() {
 
   const nowIso = new Date().toISOString();
   const existingSeries = existing?.macro_indicators?.series || {};
-  const { series: fetchedSeries, updateRun, results } = await buildMacroIndicators(false);
+  const { series: fetchedSeries, updateRun, results } = await buildMacroIndicators(false, existingSeries);
 
   const mergedSeries = { ...existingSeries };
   for (const [key, value] of Object.entries(fetchedSeries)) {
@@ -944,7 +912,7 @@ async function main() {
     sources: [
       { name: 'data.gov.sg', method: 'datastore_search', dataset_ids: DATASET_IDS },
       { name: 'MAS eServices', method: 'html_form_parse', url: MAS_SORA_URL },
-      { name: 'MAS MSB', method: 'csv_download', url: MAS_MSB_I6_CSV_URL }
+      { name: 'MAS MSB', method: 'html_table_parse', url: MAS_MSB_I6_PAGE_URL }
     ],
     series: mergedSeries
   };
