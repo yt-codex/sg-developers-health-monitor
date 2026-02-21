@@ -40,6 +40,58 @@ const REQUIRED_DATASETS = {
   ]
 };
 
+const MAX_HTTP_RETRIES = 5;
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function parseRetryAfterSeconds(retryAfterValue) {
+  if (!retryAfterValue) return null;
+  const asNumber = Number(retryAfterValue);
+  if (Number.isFinite(asNumber)) return Math.max(0, asNumber);
+
+  const asDate = new Date(retryAfterValue);
+  if (Number.isNaN(asDate.getTime())) return null;
+  return Math.max(0, Math.ceil((asDate.getTime() - Date.now()) / 1000));
+}
+
+async function fetchWithRetry(url, options = {}, { label = url, retries = MAX_HTTP_RETRIES } = {}) {
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= retries; attempt += 1) {
+    try {
+      const res = await fetch(url, options);
+      if (res.ok) return res;
+
+      const shouldRetry = res.status === 429 || res.status >= 500;
+      if (!shouldRetry || attempt === retries) {
+        throw new Error(`HTTP ${res.status} for ${label}`);
+      }
+
+      const retryAfterSeconds = parseRetryAfterSeconds(res.headers.get('retry-after'));
+      const backoffMs = retryAfterSeconds != null
+        ? retryAfterSeconds * 1000
+        : Math.min(30_000, 1000 * 2 ** (attempt - 1));
+
+      console.warn(
+        `[retry] ${label}: HTTP ${res.status} (attempt ${attempt}/${retries}), waiting ${backoffMs}ms before retry`
+      );
+      await sleep(backoffMs);
+    } catch (err) {
+      lastError = err;
+      if (attempt === retries) break;
+      const backoffMs = Math.min(30_000, 1000 * 2 ** (attempt - 1));
+      console.warn(
+        `[retry] ${label}: ${err.message} (attempt ${attempt}/${retries}), waiting ${backoffMs}ms before retry`
+      );
+      await sleep(backoffMs);
+    }
+  }
+
+  throw lastError || new Error(`Failed to fetch ${label}`);
+}
+
 function tokenize(text) {
   return String(text || '')
     .toLowerCase()
@@ -111,8 +163,7 @@ function detectSeriesField(records) {
 
 async function fetchDataset(datasetId, limit = 5000) {
   const url = `${CKAN_BASE}?resource_id=${datasetId}&limit=${limit}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status} for ${datasetId}`);
+  const res = await fetchWithRetry(url, {}, { label: datasetId });
   const json = await res.json();
   if (!json?.success || !Array.isArray(json?.result?.records)) {
     throw new Error(`Unexpected CKAN payload for ${datasetId}`);
