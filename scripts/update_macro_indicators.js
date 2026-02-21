@@ -52,9 +52,9 @@ const REQUIRED_DATASETS = {
 
 const MAX_HTTP_RETRIES = 5;
 const TIME_FIELD_PATTERNS = [
-  /^\d{4}\s[A-Za-z]{3}.*$/,
-  /^\d{4}-\d{2}$/,
-  /^\d{4}\s?Q[1-4]$/i
+  /^\d{4}\s+[A-Za-z]{3}(?:\s*\(p\))?$/i,
+  /^\d{4}-\d{2}(?:\s*\(p\))?$/i,
+  /^\d{4}\s*Q[1-4](?:\s*\(p\))?$/i
 ];
 
 let dataGovQueue = Promise.resolve();
@@ -131,30 +131,16 @@ async function enqueueDataGovRequest(task) {
   const run = async () => {
     const waitMs = Math.max(0, DATAGOV_REQUEST_INTERVAL_MS - (Date.now() - lastDataGovRequestAt));
     if (waitMs > 0) await sleep(waitMs);
-    const result = await task();
-    lastDataGovRequestAt = Date.now();
-    return result;
+    try {
+      return await task();
+    } finally {
+      lastDataGovRequestAt = Date.now();
+    }
   };
 
   const scheduled = dataGovQueue.then(run, run);
   dataGovQueue = scheduled.catch(() => undefined);
   return scheduled;
-}
-
-function discoverFieldIdsFromCkanFields(fields) {
-  const normalizedFields = Array.isArray(fields) ? fields : [];
-  const seriesField = normalizedFields.find((field) => {
-    const id = String(field?.id || '').trim();
-    const lower = id.toLowerCase();
-    return lower === 'data series' || (lower.includes('data') && lower.includes('series'));
-  });
-  const timeFieldIds = normalizedFields
-    .map((field) => String(field?.id || '').trim())
-    .filter((id) => id && TIME_FIELD_PATTERNS.some((pattern) => pattern.test(id)));
-  return {
-    seriesFieldId: seriesField?.id || null,
-    timeFieldIds
-  };
 }
 
 function tokenize(text) {
@@ -186,7 +172,7 @@ function toNumber(value) {
 }
 
 function parsePeriodToDate(period) {
-  const p = String(period).trim();
+  const p = String(period).trim().replace(/\s*\(p\)\s*$/i, '').trim();
   let m = p.match(/^(\d{4})\s*Q([1-4])$/i);
   if (m) {
     const year = Number(m[1]);
@@ -195,6 +181,12 @@ function parsePeriodToDate(period) {
   }
   m = p.match(/^(\d{4})[-/](\d{2})([-/](\d{2}))?$/);
   if (m) return new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[4] || '1')));
+  m = p.match(/^(\d{4})Q([1-4])$/i);
+  if (m) {
+    const year = Number(m[1]);
+    const quarter = Number(m[2]);
+    return new Date(Date.UTC(year, quarter * 3 - 1, 1));
+  }
   m = p.match(/^([A-Za-z]{3,})\s+(\d{4})$/);
   if (m) {
     const month = new Date(`${m[1].slice(0, 3)} 1, 2000`).getMonth();
@@ -215,6 +207,16 @@ function detectTimeColumns(record) {
     .sort((a, b) => a.dt - b.dt);
 }
 
+function findSampleRecordWithTimeColumns(records) {
+  for (const row of records) {
+    const timeColumns = detectTimeColumns(row);
+    if (timeColumns.length) {
+      return { row, timeColumns };
+    }
+  }
+  return { row: null, timeColumns: [] };
+}
+
 function extractLatestFromRecord(record) {
   const timeColumns = detectTimeColumns(record);
   for (let i = timeColumns.length - 1; i >= 0; i -= 1) {
@@ -226,144 +228,70 @@ function extractLatestFromRecord(record) {
 }
 
 
-function extractLatestFromRecordUsingFields(record, timeFieldIds) {
-  const candidates = (Array.isArray(timeFieldIds) ? timeFieldIds : [])
-    .map((period) => ({ period, value: toNumber(record?.[period]), dt: parsePeriodToDate(period) }))
-    .filter((x) => x.dt)
-    .sort((a, b) => a.dt - b.dt);
-
-  for (let i = candidates.length - 1; i >= 0; i -= 1) {
-    if (candidates[i].value != null) {
-      return { period: candidates[i].period, value: candidates[i].value };
-    }
-  }
-  return null;
-}
-
 function detectSeriesField(records) {
   const keys = Object.keys(records[0] || {});
-  const preferred = keys.find((k) => /data\s*series/i.test(k));
+  const preferred = keys.find((k) => /series/i.test(k));
   if (preferred) return preferred;
-  return keys.find((k) => /series|description|category|indicator/i.test(k));
+  return keys.find((k) => /description|category|indicator/i.test(k));
 }
 
-async function fetchDataset(datasetId, limit = 5000) {
-  const url = `${CKAN_BASE}?resource_id=${datasetId}&limit=${limit}`;
-  if (VERIFY_MODE) console.log(`[verify-url] ${datasetId} ${url}`);
-  const json = await enqueueDataGovRequest(() => fetchJsonWithRetry(url, {}, { label: datasetId }));
-  if (json?.success === true && Array.isArray(json?.result?.records)) {
-    return json.result.records;
+async function fetchDataset(datasetId, pageLimit = 10000) {
+  const records = [];
+  let offset = 0;
+  let total = null;
+
+  while (total == null || offset < total) {
+    const params = new URLSearchParams({
+      resource_id: datasetId,
+      limit: String(pageLimit),
+      offset: String(offset)
+    });
+    const url = `${CKAN_BASE}?${params.toString()}`;
+    if (VERIFY_MODE) console.log(`[verify-url] ${datasetId} ${url}`);
+    const json = await enqueueDataGovRequest(() => fetchJsonWithRetry(url, {}, { label: `${datasetId} (offset=${offset})` }));
+
+    if (typeof json?.code === 'number' && Array.isArray(json?.data?.rows)) {
+      throw new Error('wrong endpoint/schema');
+    }
+    if (!json?.success || !Array.isArray(json?.result?.records)) {
+      throw new Error(`Unexpected CKAN payload for ${datasetId}`);
+    }
+
+    const pageRecords = json.result.records;
+    if (total == null) total = Number(json?.result?.total || 0);
+    records.push(...pageRecords);
+    if (!pageRecords.length) break;
+    offset += pageRecords.length;
+    if (offset >= total) break;
   }
-  if (typeof json?.code === 'number' && Array.isArray(json?.data?.rows)) {
-    throw new Error('wrong endpoint/schema');
-  }
-  if (!json?.success || !Array.isArray(json?.result?.records)) {
-    throw new Error(`Unexpected CKAN payload for ${datasetId}`);
-  }
+
+  return records;
 }
 
-async function fetchDatasetByQuery(datasetId, query, limit = 200) {
-  const effectiveLimit = Math.max(200, limit);
-  const params = new URLSearchParams({ resource_id: datasetId, limit: String(effectiveLimit), q: query });
-  const url = `${CKAN_BASE}?${params.toString()}`;
-  if (VERIFY_MODE) console.log(`[verify-url] ${datasetId} ${url}`);
-  const json = await enqueueDataGovRequest(() => fetchJsonWithRetry(url, {}, { label: `${datasetId} (q=${query})` }));
-  if (json?.success === true && Array.isArray(json?.result?.records)) {
-    return json.result.records;
-  }
-  if (typeof json?.code === 'number' && Array.isArray(json?.data?.rows)) {
-    throw new Error('wrong endpoint/schema');
-  }
-  if (!json?.success || !Array.isArray(json?.result?.records)) {
-    throw new Error(`Unexpected CKAN payload for ${datasetId} (q=${query})`);
-  }
-}
-
-async function fetchDatasetWithFilters(datasetId, filters, limit = 100) {
-  const params = new URLSearchParams({
-    resource_id: datasetId,
-    filters: JSON.stringify(filters),
-    limit: String(limit)
-  });
-  const url = `${CKAN_BASE}?${params.toString()}`;
-  if (VERIFY_MODE) console.log(`[verify-url] ${datasetId} ${url}`);
-  const json = await enqueueDataGovRequest(
-    () => fetchJsonWithRetry(url, {}, { label: `${datasetId} (filters=${JSON.stringify(filters)})` })
-  );
-  if (json?.success === true && Array.isArray(json?.result?.records)) {
-    return json.result.records;
-  }
-  if (typeof json?.code === 'number' && Array.isArray(json?.data?.rows)) {
-    throw new Error('wrong endpoint/schema');
-  }
-  if (!json?.success || !Array.isArray(json?.result?.records)) {
-    throw new Error(`Unexpected CKAN payload for ${datasetId} with filters`);
-  }
-}
-
-async function discoverDatasetFields(datasetId) {
-  const params = new URLSearchParams({ resource_id: datasetId, limit: '1' });
-  const url = `${CKAN_BASE}?${params.toString()}`;
-  if (VERIFY_MODE) console.log(`[verify-url] ${datasetId} ${url}`);
-  const json = await enqueueDataGovRequest(() => fetchJsonWithRetry(url, {}, { label: `${datasetId} (limit=1)` }));
-  if (typeof json?.code === 'number' && Array.isArray(json?.data?.rows)) {
-    throw new Error('wrong endpoint/schema');
-  }
-  if (!json?.success || !json?.result) {
-    throw new Error(`Unexpected CKAN payload for ${datasetId} (limit=1)`);
-  }
-
-  const discovered = discoverFieldIdsFromCkanFields(json.result.fields || []);
-  const fallbackField = detectSeriesField(json.result.records || []);
-  const seriesFieldId = discovered.seriesFieldId || fallbackField || null;
-  const sampleTimeFields = discovered.timeFieldIds.slice(0, 3);
-  console.log(
-    `[ckan-discovery] ${datasetId} seriesFieldId=${seriesFieldId || 'n/a'} timeFieldIds=${sampleTimeFields.join(', ') || 'n/a'}`
-  );
-  if (!seriesFieldId) {
-    throw new Error(`Unable to detect Data Series field for ${datasetId} from limit=1 sample`);
-  }
-  return { seriesFieldId, timeFieldIds: discovered.timeFieldIds };
-}
-
-async function fetchSeriesRowByExactMatch(datasetId, requirement, discovery, filteredCallCache) {
-  const seriesField = discovery.seriesFieldId;
-  const seriesName = requirement.target;
-  const filterKey = `${datasetId}::${seriesField}::${seriesName}`;
-  if (!filteredCallCache.has(filterKey)) {
-    filteredCallCache.set(filterKey, fetchDatasetWithFilters(datasetId, { [seriesField]: seriesName }, 100));
-  }
-  const records = await filteredCallCache.get(filterKey);
-  if (!records.length) {
-    throw new Error(`0 records (filter mismatch) seriesFieldId=${seriesField} seriesName=${seriesName}`);
-  }
-  const exact = records.find((r) => String(r[seriesField] || '').trim() === seriesName);
-  if (exact) return { row: exact, seriesField, matchedName: seriesName };
-  throw new Error(`Missing required series in dataset ${datasetId}: ${requirement.target}`);
-}
-
-function findSeriesOrThrow(records, seriesField, requirement, datasetId) {
-  const seriesNames = [...new Set(records.map((r) => String(r[seriesField] || '').trim()).filter(Boolean))];
+function findSeriesMatch(records, seriesField, requirement) {
   const acceptedTargets = [requirement.target, ...(requirement.aliases || [])];
-  let found = records.find((r) => acceptedTargets.includes(String(r[seriesField] || '').trim()));
-  if (!found) {
-    const ranked = seriesNames
-      .map((name) => ({ name, score: scoreSimilarity(name, requirement.target) }))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 20)
-      .map((x) => x.name);
-    throw new Error(
-      [
-        `Missing required series in dataset ${datasetId}`,
-        `Required key: ${requirement.key}`,
-        `Required exact target: ${requirement.target}`,
-        ...(requirement.aliases?.length ? [`Accepted aliases: ${requirement.aliases.join(' | ')}`] : []),
-        `Closest 20 Data Series names:`,
-        ...ranked.map((n) => `  - ${n}`)
-      ].join('\n')
-    );
+  const exact = records.find((r) => acceptedTargets.includes(String(r[seriesField] || '').trim()));
+  if (exact) return { row: exact, matchedName: String(exact[seriesField] || '').trim(), matchType: 'exact' };
+
+  const targetTokens = new Set(tokenize(requirement.target));
+  const scored = records
+    .map((r) => {
+      const name = String(r[seriesField] || '').trim();
+      const nameTokens = new Set(tokenize(name));
+      let overlap = 0;
+      for (const token of targetTokens) {
+        if (nameTokens.has(token)) overlap += 1;
+      }
+      return { row: r, name, overlap, similarity: scoreSimilarity(name, requirement.target) };
+    })
+    .filter((x) => x.overlap > 0)
+    .sort((a, b) => (b.overlap - a.overlap) || (b.similarity - a.similarity));
+
+  if (scored.length) {
+    return { row: scored[0].row, matchedName: scored[0].name, matchType: 'token' };
   }
-  return found;
+
+  return null;
 }
 
 function pickByKeywords(records, seriesField, keywords, limit = 2) {
@@ -717,32 +645,37 @@ async function buildMacroIndicators(verifyOnly = false) {
   };
 
   const datasetCache = new Map();
-  const discoveryCache = new Map();
-  const filteredCallCache = new Map();
   const getDataset = async (datasetId) => {
     if (!datasetCache.has(datasetId)) {
-      datasetCache.set(datasetId, await fetchDataset(datasetId));
+      const records = await fetchDataset(datasetId);
+      if (VERIFY_MODE) {
+        const seriesField = detectSeriesField(records);
+        const sample = findSampleRecordWithTimeColumns(records);
+        console.log(`[verify-dataset] datasetId=${datasetId} rows=${records.length} seriesField=${seriesField || 'n/a'} sample_time_columns=${sample.timeColumns.length}`);
+      }
+      datasetCache.set(datasetId, records);
     }
     return datasetCache.get(datasetId);
   };
-  const getDiscovery = async (datasetId) => {
-    if (!discoveryCache.has(datasetId)) {
-      discoveryCache.set(datasetId, await discoverDatasetFields(datasetId));
-    }
-    return discoveryCache.get(datasetId);
-  };
 
   for (const [datasetId, requirements] of Object.entries(REQUIRED_DATASETS)) {
-    const discovery = await getDiscovery(datasetId);
+    const records = await getDataset(datasetId);
+    const seriesField = detectSeriesField(records);
     for (const requirement of requirements) {
       await tryIndicator(
         { key: requirement.key, source: 'data.gov.sg', dataset_ref: datasetId },
         async () => {
-          const { row } = await fetchSeriesRowByExactMatch(datasetId, requirement, discovery, filteredCallCache);
-          const latest = extractLatestFromRecordUsingFields(row, discovery.timeFieldIds);
-          if (!latest) throw new Error(`0 time fields seriesFieldId=${discovery.seriesFieldId} seriesName=${requirement.target}`);
+          if (!records.length) throw new Error('dataset returned 0 rows');
+          if (!seriesField) throw new Error('no Data Series field');
+          const match = findSeriesMatch(records, seriesField, requirement);
+          if (!match) throw new Error(`Missing required series in dataset ${datasetId}: ${requirement.target}`);
+          const latest = extractLatestFromRecord(match.row);
+          if (!latest) throw new Error(`0 time fields seriesField=${seriesField} seriesName=${requirement.target}`);
           const units = requirement.key.startsWith('loan_') ? 'S$ million' : '%';
           const freq = datasetId === 'd_f9fc9b5420d96bcab45bc31eeb8ae3c3' ? 'Q' : 'M';
+          if (VERIFY_MODE) {
+            console.log(`[verify-series] datasetId=${datasetId} required=${requirement.target} matched=${match.matchedName} (${match.matchType}) latest=${latest.period}=${latest.value}`);
+          }
           series[requirement.key] = { freq, latest_period: latest.period, latest_value: latest.value, units };
           return { latest_period: latest.period, latest_value: latest.value };
         }
