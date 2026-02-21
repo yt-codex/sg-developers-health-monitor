@@ -187,6 +187,26 @@ function detectSeriesFieldId(fields) {
   return ids.find((id) => /series/i.test(id)) || null;
 }
 
+function sortRecordsStable(records) {
+  return (records || [])
+    .map((record, index) => ({ record, index }))
+    .sort((a, b) => {
+      const aId = Number(a.record?._id);
+      const bId = Number(b.record?._id);
+      const aFinite = Number.isFinite(aId);
+      const bFinite = Number.isFinite(bId);
+      if (aFinite && bFinite && aId !== bId) return aId - bId;
+      if (aFinite && !bFinite) return -1;
+      if (!aFinite && bFinite) return 1;
+      return a.index - b.index;
+    })
+    .map((x) => x.record);
+}
+
+function findSeriesFieldId(fields) {
+  return detectSeriesFieldId(fields);
+}
+
 function tokenize(text) {
   return String(text || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(/\s+/).filter(Boolean);
 }
@@ -214,14 +234,56 @@ function findSeriesRow(records, seriesFieldId, seriesName) {
   return { error: 'series not found' };
 }
 
+function numericAt(row, periodFieldId) {
+  return toFiniteNumber(row?.[periodFieldId]);
+}
+
+function getLatestCommonPeriod(rows, timeFields) {
+  for (const field of timeFields || []) {
+    const allPresent = (rows || []).every((row) => numericAt(row, field.id) != null);
+    if (allPresent) return field.id;
+  }
+  return null;
+}
+
+function approxEqual(a, b, tol = 1e-6, relTol = 1e-3) {
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
+  const diff = Math.abs(a - b);
+  const scale = Math.max(Math.abs(a), Math.abs(b), 1);
+  return diff <= tol + relTol * scale;
+}
+
+function sumCheck(totalRow, componentRows, periodFieldId, absTol = 1, relTol = 1e-3) {
+  const totalVal = numericAt(totalRow, periodFieldId);
+  const components = (componentRows || []).map((row) => numericAt(row, periodFieldId));
+  if (totalVal == null || components.some((v) => v == null)) {
+    return { period: periodFieldId, total: totalVal, sum_components: null, diff: null, pass: false, missing: true };
+  }
+  const sumComponents = components.reduce((acc, value) => acc + value, 0);
+  const diff = totalVal - sumComponents;
+  return {
+    period: periodFieldId,
+    total: totalVal,
+    sum_components: sumComponents,
+    diff,
+    pass: approxEqual(totalVal, sumComponents, absTol, relTol)
+  };
+}
+
 module.exports = {
   DEFAULT_HEADERS,
   CKAN_PAGE_LIMIT,
   fetchAllRecords,
   detectTimeFields,
   parseQuarterlyFieldId,
+  sortRecordsStable,
+  findSeriesFieldId,
   detectSeriesFieldId,
   findSeriesRow,
+  getLatestCommonPeriod,
+  numericAt,
+  approxEqual,
+  sumCheck,
   extractLatest,
   toFiniteNumber,
   isMissingValue
