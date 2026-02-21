@@ -1,0 +1,38 @@
+name: Update macro indicators
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  update-macro:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Verify macro data sources
+        run: node scripts/update_macro_indicators.js --verify_sources
+
+      - name: Update macro indicators
+        run: node scripts/update_macro_indicators.js
+
+      - name: Commit updated macro indicators
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add data/macro_indicators.json
+          git diff --staged --quiet || git commit -m "chore(data): update macro indicators"
+          git push

@@ -12,7 +12,7 @@
       "series": [
         {
           "date": "2025-09-01",
-          "value": 3.0
+          "value": 3
         },
         {
           "date": "2025-10-01",
@@ -32,11 +32,12 @@
         }
       ],
       "thresholds": {
-        "watch": 3.0,
+        "watch": 3,
         "warning": 3.6,
         "critical": 4.2
       },
-      "why": "Higher rates increase debt service burden and raise refinancing risk for leveraged developers."
+      "why": "Higher rates increase debt service burden and raise refinancing risk for leveraged developers.",
+      "is_mock": true
     },
     {
       "id": "credit_spread_proxy",
@@ -70,7 +71,8 @@
         "warning": 220,
         "critical": 260
       },
-      "why": "Wider spreads can indicate tighter financing conditions and more expensive debt issuance."
+      "why": "Wider spreads can indicate tighter financing conditions and more expensive debt issuance.",
+      "is_mock": true
     },
     {
       "id": "construction_cost_proxy",
@@ -100,11 +102,12 @@
         }
       ],
       "thresholds": {
-        "watch": 4.0,
+        "watch": 4,
         "warning": 5.5,
-        "critical": 7.0
+        "critical": 7
       },
-      "why": "Persistent cost inflation compresses margins and elevates execution risk for ongoing projects."
+      "why": "Persistent cost inflation compresses margins and elevates execution risk for ongoing projects.",
+      "is_mock": true
     },
     {
       "id": "vacancy_proxy",
@@ -138,7 +141,8 @@
         "warning": 10.5,
         "critical": 12.5
       },
-      "why": "Rising vacancy can weaken rental income and asset valuations, reducing cash flow flexibility."
+      "why": "Rising vacancy can weaken rental income and asset valuations, reducing cash flow flexibility.",
+      "is_mock": true
     },
     {
       "id": "pmi_proxy",
@@ -168,11 +172,12 @@
         }
       ],
       "thresholds": {
-        "watch": 50.0,
-        "warning": 49.0,
+        "watch": 50,
+        "warning": 49,
         "critical": 47.5
       },
-      "why": "Slower business activity can pressure demand, leasing momentum and buyer confidence."
+      "why": "Slower business activity can pressure demand, leasing momentum and buyer confidence.",
+      "is_mock": true
     },
     {
       "id": "private_home_price_index",
@@ -206,7 +211,40 @@
         "warning": 0.2,
         "critical": -0.8
       },
-      "why": "Decelerating or negative price growth can weaken sell-through rates and inventory monetization."
+      "why": "Decelerating or negative price growth can weaken sell-through rates and inventory monetization.",
+      "is_mock": true
     }
-  ]
+  ],
+  "macro_indicators": {
+    "last_updated_utc": null,
+    "sources": [
+      {
+        "name": "data.gov.sg",
+        "method": "datastore_search",
+        "dataset_ids": [
+          "d_5fe5a4bb4a1ecc4d8a56a095832e2b24",
+          "d_29f7b431ad79f61f19a731a6a86b0247",
+          "d_ba3c493ad160125ce347d5572712f14f",
+          "d_f9fc9b5420d96bcab45bc31eeb8ae3c3",
+          "d_055b6549444dedb341c50805d9682a41",
+          "d_e47c0f0674b46981c4994d5257de5be4",
+          "d_4dca06508cd9d0a8076153443c17ea5f",
+          "d_e9cc9d297b1cf8024cf99db4b12505cc",
+          "d_df200b7f89f94e52964ff45cd7878a30",
+          "d_af0415517a3a3a94b3b74039934ef976"
+        ]
+      },
+      {
+        "name": "MAS eServices",
+        "method": "html_form_parse",
+        "url": "https://eservices.mas.gov.sg/statistics/dir/domesticinterestrates.aspx"
+      },
+      {
+        "name": "MAS MSB",
+        "method": "csv_download",
+        "url": "https://www.mas.gov.sg/-/media/MAS/Statistics/Time-Series-Data/Monthly-Statistical-Bulletin/CSV/I6.csv"
+      }
+    ],
+    "series": {}
+  }
 }
