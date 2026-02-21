@@ -5,6 +5,7 @@
   "description": "Data updater scripts for macro indicators",
   "scripts": {
     "update:macro": "node scripts/update_macro_indicators.js",
-    "verify:macro-sources": "node scripts/update_macro_indicators.js --verify_sources"
+    "verify:macro-sources": "node scripts/update_macro_indicators.js --verify_sources",
+    "test": "node --test"
   }
 }
