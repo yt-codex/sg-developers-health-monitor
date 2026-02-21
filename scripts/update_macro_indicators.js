@@ -786,7 +786,7 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
 
   let msbMonthlyPromise;
   const getMsbMonthly = async () => {
-    if (!msbMonthlyPromise) msbMonthlyPromise = fetchMasMsbXmlI6Monthly();
+    if (!msbMonthlyPromise) msbMonthlyPromise = fetchMasMsbXmlI6Monthly({ verifyMode: VERIFY_MODE });
     return msbMonthlyPromise;
   };
 
