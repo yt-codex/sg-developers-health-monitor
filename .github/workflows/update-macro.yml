@@ -23,10 +23,25 @@ jobs:
         run: npm install
 
       - name: Verify macro data sources
+        id: verify
+        continue-on-error: true
         run: node scripts/update_macro_indicators.js --verify_sources
 
       - name: Update macro indicators
+        id: update
+        continue-on-error: true
         run: node scripts/update_macro_indicators.js
+
+      - name: Enforce failure policy (only fail if both verify and update have zero successes)
+        run: |
+          verify_exit='${{ steps.verify.outcome }}'
+          update_exit='${{ steps.update.outcome }}'
+          echo "verify_outcome=${verify_exit}"
+          echo "update_outcome=${update_exit}"
+          if [ "${verify_exit}" = "failure" ] && [ "${update_exit}" = "failure" ]; then
+            echo "Both verify and update produced zero successful indicators."
+            exit 1
+          fi
 
       - name: Commit updated macro indicators
         run: |

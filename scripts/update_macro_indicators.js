@@ -193,22 +193,34 @@ function detectSeriesField(records) {
 
 async function fetchDataset(datasetId, limit = 5000) {
   const url = `${CKAN_BASE}?resource_id=${datasetId}&limit=${limit}`;
+  if (VERIFY_MODE) console.log(`[verify-url] ${datasetId} ${url}`);
   const json = await fetchJsonWithRetry(url, {}, { label: datasetId });
+  if (json?.success === true && Array.isArray(json?.result?.records)) {
+    return json.result.records;
+  }
+  if (typeof json?.code === 'number' && Array.isArray(json?.data?.rows)) {
+    throw new Error('wrong endpoint/schema');
+  }
   if (!json?.success || !Array.isArray(json?.result?.records)) {
     throw new Error(`Unexpected CKAN payload for ${datasetId}`);
   }
-  return json.result.records;
 }
 
 async function fetchDatasetByQuery(datasetId, query, limit = 200) {
   const effectiveLimit = Math.max(200, limit);
   const params = new URLSearchParams({ resource_id: datasetId, limit: String(effectiveLimit), q: query });
   const url = `${CKAN_BASE}?${params.toString()}`;
+  if (VERIFY_MODE) console.log(`[verify-url] ${datasetId} ${url}`);
   const json = await fetchJsonWithRetry(url, {}, { label: `${datasetId} (q=${query})` });
+  if (json?.success === true && Array.isArray(json?.result?.records)) {
+    return json.result.records;
+  }
+  if (typeof json?.code === 'number' && Array.isArray(json?.data?.rows)) {
+    throw new Error('wrong endpoint/schema');
+  }
   if (!json?.success || !Array.isArray(json?.result?.records)) {
     throw new Error(`Unexpected CKAN payload for ${datasetId} (q=${query})`);
   }
-  return json.result.records;
 }
 
 async function fetchDatasetWithFilters(datasetId, filters, limit = 100) {
@@ -218,17 +230,27 @@ async function fetchDatasetWithFilters(datasetId, filters, limit = 100) {
     limit: String(limit)
   });
   const url = `${CKAN_BASE}?${params.toString()}`;
+  if (VERIFY_MODE) console.log(`[verify-url] ${datasetId} ${url}`);
   const json = await fetchJsonWithRetry(url, {}, { label: `${datasetId} (filters=${JSON.stringify(filters)})` });
+  if (json?.success === true && Array.isArray(json?.result?.records)) {
+    return json.result.records;
+  }
+  if (typeof json?.code === 'number' && Array.isArray(json?.data?.rows)) {
+    throw new Error('wrong endpoint/schema');
+  }
   if (!json?.success || !Array.isArray(json?.result?.records)) {
     throw new Error(`Unexpected CKAN payload for ${datasetId} with filters`);
   }
-  return json.result.records;
 }
 
 async function detectSeriesFieldFromSample(datasetId) {
   const params = new URLSearchParams({ resource_id: datasetId, limit: '1' });
   const url = `${CKAN_BASE}?${params.toString()}`;
+  if (VERIFY_MODE) console.log(`[verify-url] ${datasetId} ${url}`);
   const json = await fetchJsonWithRetry(url, {}, { label: `${datasetId} (limit=1)` });
+  if (typeof json?.code === 'number' && Array.isArray(json?.data?.rows)) {
+    throw new Error('wrong endpoint/schema');
+  }
   if (!json?.success || !json?.result) {
     throw new Error(`Unexpected CKAN payload for ${datasetId} (limit=1)`);
   }
@@ -297,6 +319,39 @@ function addSeries(series, key, freq, latest, units, metadata = {}) {
     ...metadata
   };
   console.log(`- ${key}: ${latest.period} = ${latest.value}`);
+}
+
+function summarizeError(err) {
+  const message = String(err?.message || err || 'unknown error').split('\n')[0].trim();
+  const httpMatch = message.match(/HTTP\s+(\d{3})/i);
+  if (httpMatch) return `HTTP ${httpMatch[1]} ${message.replace(/.*HTTP\s+\d{3}\s*/i, '').trim()}`.trim();
+  return message;
+}
+
+function recordOk(results, payload) {
+  const result = { ...payload, status: 'ok' };
+  results.push(result);
+  console.log(`[OK] ${result.key} ${result.latest_period || '-'} ${result.latest_value ?? '-'}`);
+  return result;
+}
+
+function recordFail(results, payload) {
+  const result = { ...payload, status: 'failed' };
+  results.push(result);
+  console.log(`[FAIL] ${result.key} ${result.source} ${result.dataset_ref} ${result.error_summary}`);
+  return result;
+}
+
+function printRunSummary(results) {
+  const ok = results.filter((x) => x.status === 'ok');
+  const failed = results.filter((x) => x.status === 'failed');
+  console.log('--- Macro indicator extraction summary ---');
+  console.log(`OK: ${ok.length}`);
+  console.log(`FAILED: ${failed.length}`);
+  for (const item of failed) {
+    console.log(`${item.key} | ${item.source} | ${item.dataset_ref} | ${item.error_summary}`);
+  }
+  return { ok_count: ok.length, failed_count: failed.length, failed_items: failed };
 }
 
 function decodeHtmlEntities(text) {
@@ -581,152 +636,181 @@ async function fetchMasMsbI6() {
 
 async function buildMacroIndicators(verifyOnly = false) {
   const series = {};
+  const results = [];
 
-  for (const datasetId of DATASET_IDS) {
-    let records;
-    if (datasetId === 'd_5fe5a4bb4a1ecc4d8a56a095832e2b24' && verifyOnly) {
-      const queried = await Promise.all([
-        fetchDatasetByQuery(datasetId, 'SGS 10', 200),
-        fetchDatasetByQuery(datasetId, 'SGS 2', 200)
-      ]);
-      records = queried.flat();
-    } else {
-      records = await fetchDataset(datasetId);
+  const tryIndicator = async (meta, fn) => {
+    try {
+      const payload = await fn();
+      return recordOk(results, { ...meta, ...payload });
+    } catch (err) {
+      return recordFail(results, { ...meta, error_summary: summarizeError(err) });
     }
-    if (!records.length) throw new Error(`Dataset ${datasetId} returned 0 rows`);
-    const seriesField = detectSeriesField(records);
-    if (!seriesField) throw new Error(`Dataset ${datasetId} has no detectable series field`);
+  };
 
-    if (REQUIRED_DATASETS[datasetId]) {
-      for (const requirement of REQUIRED_DATASETS[datasetId]) {
-        const { row, seriesField: exactSeriesField, matchedName } = await fetchSeriesRowByExactMatch(datasetId, requirement);
-        const latest = extractLatestFromRecord(row);
-        if (!latest) throw new Error(`Latest extraction failed for ${datasetId} -> ${requirement.target}`);
-        if (verifyOnly) {
-          const timeColumns = detectTimeColumns(row);
-          const top5Recent = timeColumns.slice(-5).reverse().map((x) => x.key);
-          console.log(`[verify] ${datasetId} matched Data Series exact string: "${matchedName}"`);
-          console.log(`[verify] ${datasetId} Data Series field: ${exactSeriesField}`);
-          console.log(`[verify] ${datasetId} detected time columns: ${timeColumns.length}`);
-          console.log(`[verify] ${datasetId} top 5 recent time keys: ${top5Recent.join(' | ') || '(none)'}`);
-        }
+  const datasetCache = new Map();
+  const getDataset = async (datasetId) => {
+    if (!datasetCache.has(datasetId)) {
+      datasetCache.set(datasetId, await fetchDataset(datasetId));
+    }
+    return datasetCache.get(datasetId);
+  };
 
-        if (!verifyOnly) {
+  for (const [datasetId, requirements] of Object.entries(REQUIRED_DATASETS)) {
+    for (const requirement of requirements) {
+      await tryIndicator(
+        { key: requirement.key, source: 'data.gov.sg', dataset_ref: datasetId },
+        async () => {
+          const { row } = await fetchSeriesRowByExactMatch(datasetId, requirement);
+          const latest = extractLatestFromRecord(row);
+          if (!latest) throw new Error('0 time columns detected');
           const units = requirement.key.startsWith('loan_') ? 'S$ million' : '%';
           const freq = datasetId === 'd_f9fc9b5420d96bcab45bc31eeb8ae3c3' ? 'Q' : 'M';
-          addSeries(series, requirement.key, freq, latest, units);
+          series[requirement.key] = { freq, latest_period: latest.period, latest_value: latest.value, units };
+          return { latest_period: latest.period, latest_value: latest.value };
+        }
+      );
+    }
+  }
+
+  const optionalDatasetSpecs = [
+    {
+      datasetId: 'd_29f7b431ad79f61f19a731a6a86b0247', source: 'data.gov.sg',
+      build: (records, sf) => pickByKeywords(records, sf, ['steel', 'cement', 'sand', 'ready mixed'], 3).map((row) => ({
+        key: `construction_material_${String(row[sf]).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '')}`,
+        freq: 'M', units: 'index', latest: extractLatestFromRecord(row), metadata: { source_series_name: row[sf] }
+      }))
+    },
+    {
+      datasetId: 'd_ba3c493ad160125ce347d5572712f14f', source: 'data.gov.sg',
+      build: (records, sf) => pickByKeywords(records, sf, ['demand', 'construction'], 2).map((row) => ({
+        key: `construction_material_demand_${String(row[sf]).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '')}`,
+        freq: 'M', units: 'index', latest: extractLatestFromRecord(row), metadata: { source_series_name: row[sf] }
+      }))
+    },
+    {
+      datasetId: 'd_055b6549444dedb341c50805d9682a41', source: 'data.gov.sg',
+      build: (records, sf) => pickByKeywords(records, sf, ['private', 'residential', 'pipeline', 'uncompleted'], 2).map((row) => ({
+        key: `private_residential_pipeline_${String(row[sf]).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`,
+        freq: 'Q', units: 'units', latest: extractLatestFromRecord(row), metadata: { source_series_name: row[sf] }
+      }))
+    },
+    {
+      datasetId: 'd_e47c0f0674b46981c4994d5257de5be4', source: 'data.gov.sg',
+      build: (records, sf) => pickByKeywords(records, sf, ['commercial', 'industrial', 'pipeline'], 2).map((row) => ({
+        key: `commercial_industrial_pipeline_${String(row[sf]).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`,
+        freq: 'Q', units: 'units', latest: extractLatestFromRecord(row), metadata: { source_series_name: row[sf] }
+      }))
+    },
+    {
+      datasetId: 'd_4dca06508cd9d0a8076153443c17ea5f', source: 'data.gov.sg',
+      build: (records, sf) => pickByKeywords(records, sf, ['industrial', 'space', 'supply'], 2).map((row) => ({
+        key: `industrial_space_supply_${String(row[sf]).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`,
+        freq: 'Q', units: 'sqm', latest: extractLatestFromRecord(row), metadata: { source_series_name: row[sf] }
+      }))
+    },
+    {
+      datasetId: 'd_e9cc9d297b1cf8024cf99db4b12505cc', source: 'data.gov.sg',
+      build: (records, sf) => pickByKeywords(records, sf, ['private', 'available', 'office', 'retail', 'industrial'], 4)
+        .filter((row) => /private/i.test(String(row[sf])) && /available/i.test(String(row[sf])))
+        .map((row) => ({
+          key: `private_available_${String(row[sf]).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`,
+          freq: 'Q', units: 'sqm', latest: extractLatestFromRecord(row), metadata: { source_series_name: row[sf] }
+        }))
+    },
+    {
+      datasetId: 'd_df200b7f89f94e52964ff45cd7878a30', source: 'data.gov.sg',
+      build: (records, sf) => pickByKeywords(records, sf, ['construction', 'real estate'], 3).map((row) => ({
+        key: `gdp_industry_${String(row[sf]).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`,
+        freq: 'Q', units: 'S$ million', latest: extractLatestFromRecord(row), metadata: { source_series_name: row[sf] }
+      }))
+    }
+  ];
+
+  for (const spec of optionalDatasetSpecs) {
+    await tryIndicator({ key: `dataset_${spec.datasetId}`, source: spec.source, dataset_ref: spec.datasetId }, async () => {
+      const records = await getDataset(spec.datasetId);
+      if (!records.length) throw new Error('dataset returned 0 rows');
+      const seriesField = detectSeriesField(records);
+      if (!seriesField) throw new Error('no Data Series field');
+      const entries = spec.build(records, seriesField);
+      if (!entries.length) throw new Error('no matching series');
+      let latestSeen = null;
+      for (const entry of entries) {
+        if (!entry.latest) continue;
+        latestSeen = entry.latest;
+        if (!verifyOnly) {
+          series[entry.key] = {
+            freq: entry.freq,
+            latest_period: entry.latest.period,
+            latest_value: entry.latest.value,
+            units: entry.units,
+            ...(entry.metadata || {})
+          };
         }
       }
-    }
-
-    if (verifyOnly) continue;
-
-    if (datasetId === 'd_29f7b431ad79f61f19a731a6a86b0247') {
-      const picked = pickByKeywords(records, seriesField, ['steel', 'cement', 'sand', 'ready mixed'], 3);
-      for (const row of picked) {
-        const name = String(row[seriesField]).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
-        addSeries(series, `construction_material_${name}`, 'M', extractLatestFromRecord(row), 'index', {
-          source_series_name: row[seriesField]
-        });
-      }
-    }
-
-    if (datasetId === 'd_ba3c493ad160125ce347d5572712f14f') {
-      const picked = pickByKeywords(records, seriesField, ['demand', 'construction'], 2);
-      for (const row of picked) {
-        const key = String(row[seriesField]).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
-        addSeries(series, `construction_material_demand_${key}`, 'M', extractLatestFromRecord(row), 'index', {
-          source_series_name: row[seriesField]
-        });
-      }
-    }
-
-    if (datasetId === 'd_055b6549444dedb341c50805d9682a41') {
-      const picked = pickByKeywords(records, seriesField, ['private', 'residential', 'pipeline', 'uncompleted'], 2);
-      for (const row of picked) {
-        addSeries(series, `private_residential_pipeline_${String(row[seriesField]).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`, 'Q', extractLatestFromRecord(row), 'units', { source_series_name: row[seriesField] });
-      }
-    }
-
-    if (datasetId === 'd_e47c0f0674b46981c4994d5257de5be4') {
-      const picked = pickByKeywords(records, seriesField, ['commercial', 'industrial', 'pipeline'], 2);
-      for (const row of picked) {
-        addSeries(series, `commercial_industrial_pipeline_${String(row[seriesField]).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`, 'Q', extractLatestFromRecord(row), 'units', { source_series_name: row[seriesField] });
-      }
-    }
-
-    if (datasetId === 'd_4dca06508cd9d0a8076153443c17ea5f') {
-      const picked = pickByKeywords(records, seriesField, ['industrial', 'space', 'supply'], 2);
-      for (const row of picked) {
-        addSeries(series, `industrial_space_supply_${String(row[seriesField]).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`, 'Q', extractLatestFromRecord(row), 'sqm', { source_series_name: row[seriesField] });
-      }
-    }
-
-    if (datasetId === 'd_e9cc9d297b1cf8024cf99db4b12505cc') {
-      const picked = pickByKeywords(records, seriesField, ['private', 'available', 'office', 'retail', 'industrial'], 4)
-        .filter((row) => /private/i.test(String(row[seriesField])) && /available/i.test(String(row[seriesField])));
-      for (const row of picked) {
-        addSeries(series, `private_available_${String(row[seriesField]).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`, 'Q', extractLatestFromRecord(row), 'sqm', { source_series_name: row[seriesField] });
-      }
-    }
-
-    if (datasetId === 'd_df200b7f89f94e52964ff45cd7878a30') {
-      const picked = pickByKeywords(records, seriesField, ['construction', 'real estate'], 3);
-      for (const row of picked) {
-        addSeries(series, `gdp_industry_${String(row[seriesField]).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`, 'Q', extractLatestFromRecord(row), 'S$ million', { source_series_name: row[seriesField] });
-      }
-    }
+      if (!latestSeen) throw new Error('0 time columns detected');
+      return { latest_period: latestSeen.period, latest_value: latestSeen.value };
+    });
   }
 
-  const soraRows = await fetchSoraSeries();
-  console.log(`[verify] SORA parsed rows: ${soraRows.length}`);
-  if (!verifyOnly) {
-    series.sora_overnight = {
-      freq: 'D',
-      window_days: 180,
-      values: soraRows,
-      units: '%pa'
-    };
+  await tryIndicator({ key: 'sora_overnight', source: 'MAS eServices', dataset_ref: MAS_SORA_URL }, async () => {
+    const soraRows = await fetchSoraSeries();
+    if (!soraRows.length) throw new Error('html parse 0 rows');
     const latest = soraRows[soraRows.length - 1];
-    console.log(`- sora_overnight: ${latest.date} = ${latest.value}`);
-  }
+    if (!verifyOnly) {
+      series.sora_overnight = { freq: 'D', window_days: 180, values: soraRows, units: '%pa' };
+    }
+    return { latest_period: latest.date, latest_value: latest.value };
+  });
 
-  const msb = await fetchMasMsbI6();
-  const grantedLatest = latestFromCsvRow(msb.granted);
-  const utilisedLatest = latestFromCsvRow(msb.utilised);
-  if (!grantedLatest || !utilisedLatest) {
-    throw new Error('MAS MSB latest extraction failed for granted/utilised building & construction rows');
-  }
-  console.log('[verify] MAS MSB I.6 rows extracted for granted/utilised Building & Construction');
+  await tryIndicator({ key: 'loan_limits_granted_building_construction', source: 'MAS MSB', dataset_ref: MAS_MSB_I6_CSV_URL }, async () => {
+    const msb = await fetchMasMsbI6();
+    const grantedLatest = latestFromCsvRow(msb.granted);
+    if (!grantedLatest) throw new Error('0 time columns detected');
+    if (!verifyOnly) {
+      series.loan_limits_granted_building_construction = { freq: 'M', latest_period: grantedLatest.period, latest_value: grantedLatest.value, units: 'S$ million' };
+    }
+    return { latest_period: grantedLatest.period, latest_value: grantedLatest.value };
+  });
 
-  if (!verifyOnly) {
-    addSeries(series, 'loan_limits_granted_building_construction', 'M', grantedLatest, 'S$ million');
-    addSeries(series, 'loan_limits_utilised_building_construction', 'M', utilisedLatest, 'S$ million');
-  }
+  await tryIndicator({ key: 'loan_limits_utilised_building_construction', source: 'MAS MSB', dataset_ref: MAS_MSB_I6_CSV_URL }, async () => {
+    const msb = await fetchMasMsbI6();
+    const utilisedLatest = latestFromCsvRow(msb.utilised);
+    if (!utilisedLatest) throw new Error('0 time columns detected');
+    if (!verifyOnly) {
+      series.loan_limits_utilised_building_construction = { freq: 'M', latest_period: utilisedLatest.period, latest_value: utilisedLatest.value, units: 'S$ million' };
+    }
+    return { latest_period: utilisedLatest.period, latest_value: utilisedLatest.value };
+  });
 
-  if (!verifyOnly) {
-    if (series.sgs_10y && series.sgs_2y) {
+  await tryIndicator({ key: 'term_spread_10y_2y', source: 'derived', dataset_ref: 'sgs_10y-sgs_2y' }, async () => {
+    if (!series.sgs_10y || !series.sgs_2y) throw new Error('no matching series');
+    const latestValue = Number((series.sgs_10y.latest_value - series.sgs_2y.latest_value).toFixed(4));
+    if (!verifyOnly) {
       series.term_spread_10y_2y = {
         freq: 'M',
         latest_period: series.sgs_10y.latest_period,
-        latest_value: Number((series.sgs_10y.latest_value - series.sgs_2y.latest_value).toFixed(4)),
+        latest_value: latestValue,
         units: 'pp'
       };
-      console.log(`- term_spread_10y_2y: ${series.term_spread_10y_2y.latest_period} = ${series.term_spread_10y_2y.latest_value}`);
-    } else {
-      throw new Error('Cannot compute term_spread_10y_2y because sgs_10y or sgs_2y is missing');
     }
-  }
+    return { latest_period: series.sgs_10y.latest_period, latest_value: latestValue };
+  });
 
-  return series;
+  const updateRun = printRunSummary(results);
+  return { series, updateRun, results };
 }
 
 async function main() {
   if (VERIFY_MODE) {
     console.log('Running source verification only...');
-    await buildMacroIndicators(true);
-    console.log('Source verification passed.');
-    return;
+    const { updateRun } = await buildMacroIndicators(true);
+    if (updateRun.ok_count > 0) {
+      console.log('Source verification completed with usable indicators.');
+      return;
+    }
+    process.exitCode = 1;
+    throw new Error('All indicators failed verification');
   }
 
   const existing = JSON.parse(await fs.readFile(DATA_FILE, 'utf8'));
@@ -734,19 +818,57 @@ async function main() {
     existing.indicators = existing.indicators.map((indicator) => ({ ...indicator, is_mock: true }));
   }
 
-  const series = await buildMacroIndicators(false);
+  const nowIso = new Date().toISOString();
+  const existingSeries = existing?.macro_indicators?.series || {};
+  const { series: fetchedSeries, updateRun, results } = await buildMacroIndicators(false);
+
+  const mergedSeries = { ...existingSeries };
+  for (const [key, value] of Object.entries(fetchedSeries)) {
+    mergedSeries[key] = {
+      ...(existingSeries[key] || {}),
+      ...value,
+      status: 'ok',
+      last_ok_utc: nowIso
+    };
+    delete mergedSeries[key].error_summary;
+  }
+
+  for (const result of results.filter((r) => r.status === 'failed')) {
+    mergedSeries[result.key] = {
+      ...(mergedSeries[result.key] || {}),
+      status: 'failed',
+      error_summary: result.error_summary
+    };
+  }
+
   existing.macro_indicators = {
-    last_updated_utc: new Date().toISOString(),
+    ...(existing.macro_indicators || {}),
+    last_updated_utc: nowIso,
+    update_run: {
+      ok_count: updateRun.ok_count,
+      failed_count: updateRun.failed_count,
+      failed_items: updateRun.failed_items.map((item) => ({
+        name: item.key,
+        source: item.source,
+        dataset_ref: item.dataset_ref,
+        error_summary: item.error_summary
+      }))
+    },
     sources: [
       { name: 'data.gov.sg', method: 'datastore_search', dataset_ids: DATASET_IDS },
       { name: 'MAS eServices', method: 'html_form_parse', url: MAS_SORA_URL },
       { name: 'MAS MSB', method: 'csv_download', url: MAS_MSB_I6_CSV_URL }
     ],
-    series
+    series: mergedSeries
   };
 
   await fs.writeFile(DATA_FILE, `${JSON.stringify(existing, null, 2)}\n`, 'utf8');
-  console.log(`Updated ${path.relative(process.cwd(), DATA_FILE)} with ${Object.keys(series).length} series.`);
+  console.log(`Updated ${path.relative(process.cwd(), DATA_FILE)} with ${Object.keys(fetchedSeries).length} successful series updates.`);
+
+  if (updateRun.ok_count === 0) {
+    process.exitCode = 1;
+    throw new Error('Update completed but zero indicators were successfully updated');
+  }
 }
 
 main().catch((err) => {
