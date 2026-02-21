@@ -14,17 +14,22 @@ const {
   extractLatest
 } = require('./lib/datagov');
 const { MAS_I6_API_URL, fetchMasI6LoanLimits } = require('./lib/mas_api');
-const { DEFAULT_TABLE_ID: SINGSTAT_TABLE_ID, fetchSingStatRequiredSeries } = require('./lib/singstat_tablebuilder');
+const {
+  RATES_TABLE_ID: SINGSTAT_RATES_TABLE_ID,
+  UNIT_LABOUR_TABLE_ID: SINGSTAT_UNIT_LABOUR_TABLE_ID,
+  fetchSingStatRequiredSeries,
+  fetchUnitLabourCostConstructionSeries
+} = require('./lib/singstat_tablebuilder');
 
 const VERIFY_MODE = process.argv.includes('--verify_sources');
 const IS_GITHUB_ACTIONS = process.env.GITHUB_ACTIONS === 'true';
 const DATA_FILE = path.join(process.cwd(), 'data', 'macro_indicators.json');
-const SINGSTAT_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_TABLE_ID}`;
+const SINGSTAT_RATES_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_RATES_TABLE_ID}`;
+const SINGSTAT_UNIT_LABOUR_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_UNIT_LABOUR_TABLE_ID}`;
 
 const DATASET_IDS = [
   'd_29f7b431ad79f61f19a731a6a86b0247',
   'd_ba3c493ad160125ce347d5572712f14f',
-  'd_f9fc9b5420d96bcab45bc31eeb8ae3c3',
   'd_055b6549444dedb341c50805d9682a41',
   'd_e47c0f0674b46981c4994d5257de5be4',
   'd_4dca06508cd9d0a8076153443c17ea5f',
@@ -34,9 +39,6 @@ const DATASET_IDS = [
 ];
 
 const REQUIRED_DATASETS = {
-  d_f9fc9b5420d96bcab45bc31eeb8ae3c3: [
-    { key: 'unit_labour_cost_construction', target: 'Unit Labour Cost Of Construction' }
-  ],
   d_af0415517a3a3a94b3b74039934ef976: [
     { key: 'loan_bc_total', target: 'Loans To Businesses - Building And Construction - Total' },
     { key: 'loan_bc_construction', target: 'Loans To Businesses - Building And Construction - Construction' },
@@ -145,7 +147,7 @@ async function extractRatesFromSingStatTableBuilder() {
   }
 
   return {
-    datasetRef: SINGSTAT_DATASET_REF,
+    datasetRef: SINGSTAT_RATES_DATASET_REF,
     matchedLabels: {
       SORA: series.SORA.rows[0]?.series_name,
       SGS_2Y: series.SGS_2Y.rows[0]?.series_name,
@@ -303,7 +305,7 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
     return singStatBundlePromise;
   };
 
-  await tryIndicator({ key: 'sgs_10y', source: 'SingStat TableBuilder', dataset_ref: SINGSTAT_DATASET_REF, series_name: 'Government Securities - 10-Year Bond Yield' }, async () => {
+  await tryIndicator({ key: 'sgs_10y', source: 'SingStat TableBuilder', dataset_ref: SINGSTAT_RATES_DATASET_REF, series_name: 'Government Securities - 10-Year Bond Yield' }, async () => {
     const rates = await getSingStatBundle();
     if (!verifyOnly) series.sgs_10y = rates.sgs_10y;
     if (VERIFY_MODE) {
@@ -312,7 +314,7 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
     return { latest_period: rates.sgs_10y.latest_period, latest_value: rates.sgs_10y.latest_value };
   });
 
-  await tryIndicator({ key: 'sgs_2y', source: 'SingStat TableBuilder', dataset_ref: SINGSTAT_DATASET_REF, series_name: 'Government Securities - 2-Year Bond Yield' }, async () => {
+  await tryIndicator({ key: 'sgs_2y', source: 'SingStat TableBuilder', dataset_ref: SINGSTAT_RATES_DATASET_REF, series_name: 'Government Securities - 2-Year Bond Yield' }, async () => {
     const rates = await getSingStatBundle();
     if (!verifyOnly) series.sgs_2y = rates.sgs_2y;
     if (VERIFY_MODE) {
@@ -534,7 +536,28 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
     });
   }
 
-  await tryIndicator({ key: 'sora_overnight', source: 'SingStat TableBuilder', dataset_ref: SINGSTAT_DATASET_REF, series_name: 'Singapore Overnight Rate Average' }, async () => {
+  let singStatUnitLabourPromise;
+  const getSingStatUnitLabourBundle = async () => {
+    if (!singStatUnitLabourPromise) singStatUnitLabourPromise = fetchUnitLabourCostConstructionSeries();
+    return singStatUnitLabourPromise;
+  };
+
+  await tryIndicator({ key: 'unit_labour_cost_construction', source: 'SingStat TableBuilder', dataset_ref: SINGSTAT_UNIT_LABOUR_DATASET_REF, series_name: 'Unit labour cost of construction' }, async () => {
+    const bundle = await getSingStatUnitLabourBundle();
+    const unit = bundle.UNIT_LABOUR_COST_CONSTRUCTION;
+    if (!unit?.latest) throw new Error('SingStat parse 0 rows for unit labour cost of construction');
+    if (!verifyOnly) {
+      series.unit_labour_cost_construction = {
+        freq: 'M',
+        latest_period: unit.latest.date,
+        latest_value: unit.latest.value,
+        units: 'index'
+      };
+    }
+    return { latest_period: unit.latest.date, latest_value: unit.latest.value };
+  });
+
+  await tryIndicator({ key: 'sora_overnight', source: 'SingStat TableBuilder', dataset_ref: SINGSTAT_RATES_DATASET_REF, series_name: 'Singapore Overnight Rate Average' }, async () => {
     const rates = await getSingStatBundle();
     if (!rates.sora_overnight.values.length) throw new Error('SingStat parse 0 rows for SORA');
     const latest = rates.sora_overnight.values[rates.sora_overnight.values.length - 1];
@@ -672,7 +695,15 @@ async function main() {
     },
     sources: [
       { name: 'data.gov.sg', method: 'datastore_search', dataset_ids: DATASET_IDS },
-      { name: 'SingStat TableBuilder', method: 'json_api_parse', table_id: SINGSTAT_TABLE_ID, table_url: `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_TABLE_ID}` },
+      {
+        name: 'SingStat TableBuilder',
+        method: 'json_api_parse',
+        table_ids: [SINGSTAT_RATES_TABLE_ID, SINGSTAT_UNIT_LABOUR_TABLE_ID],
+        table_urls: [
+          `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_RATES_TABLE_ID}`,
+          `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_UNIT_LABOUR_TABLE_ID}`
+        ]
+      },
       { name: 'MAS I.6 JSON API', method: 'json_api_parse', url: MAS_I6_API_URL }
     ],
     series: mergedSeries
