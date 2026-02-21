@@ -3,7 +3,6 @@
 const fs = require('fs/promises');
 const path = require('path');
 const {
-  DEFAULT_HEADERS,
   fetchAllRecords,
   detectTimeFields,
   parseQuarterlyFieldId,
@@ -12,22 +11,17 @@ const {
   sortRecordsStable,
   getLatestCommonPeriod,
   sumCheck,
-  extractLatest,
-  toFiniteNumber
+  extractLatest
 } = require('./lib/datagov');
 const { MAS_I6_API_URL, fetchMasI6LoanLimits } = require('./lib/mas_api');
+const { DEFAULT_TABLE_ID: SINGSTAT_TABLE_ID, fetchSingStatRequiredSeries } = require('./lib/singstat_tablebuilder');
 
 const VERIFY_MODE = process.argv.includes('--verify_sources');
 const IS_GITHUB_ACTIONS = process.env.GITHUB_ACTIONS === 'true';
 const DATA_FILE = path.join(process.cwd(), 'data', 'macro_indicators.json');
-const MAS_SORA_URL = 'https://eservices.mas.gov.sg/statistics/dir/domesticinterestrates.aspx';
-const SGS_DATASET_ID = 'd_5fe5a4bb4a1ecc4d8a56a095832e2b24';
-const SGS_10Y_SERIES = 'Government Securities - 10-Year Bond Yield';
-const SGS_2Y_SERIES = 'Government Securities - 2-Year Bond Yield';
-const DEFAULT_JSON_HEADERS = { ...DEFAULT_HEADERS };
+const SINGSTAT_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_TABLE_ID}`;
 
 const DATASET_IDS = [
-  'd_5fe5a4bb4a1ecc4d8a56a095832e2b24',
   'd_29f7b431ad79f61f19a731a6a86b0247',
   'd_ba3c493ad160125ce347d5572712f14f',
   'd_f9fc9b5420d96bcab45bc31eeb8ae3c3',
@@ -89,16 +83,6 @@ async function loadLocalEnvIfPresent() {
   dataGovApiKey = process.env.DATA_GOV_SG_API_KEY || '';
 }
 
-function tokenize(text) {
-  return String(text || '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean);
-}
-
-const toNumber = toFiniteNumber;
 
 function inferFrequencyFromTimeFields(timeFields) {
   const monthlyCount = timeFields.filter((x) => x.periodType === 'M').length;
@@ -140,43 +124,47 @@ function quarterlyParserSelfTest() {
   }
 }
 
-async function extractSgs2y10y() {
-  const { records, timeFields, seriesField } = await fetchDataset(SGS_DATASET_ID);
-  if (!records.length) throw new Error('No records returned');
-  const monthColumns = timeFields.filter((x) => x.periodType === 'M').map((x) => x.id);
-  if (!monthColumns.length) throw new Error('No month columns detected');
-  if (!seriesField) throw new Error('no Data Series field');
-  const match10 = findSeriesRow(records, seriesField, SGS_10Y_SERIES);
-  const match2 = findSeriesRow(records, seriesField, SGS_2Y_SERIES);
-  if (!match10.row) throw new Error(`${SGS_10Y_SERIES}: ${match10.error || 'series not found'}`);
-  if (!match2.row) throw new Error(`${SGS_2Y_SERIES}: ${match2.error || 'series not found'}`);
+async function extractRatesFromSingStatTableBuilder() {
+  const series = await fetchSingStatRequiredSeries();
 
-  const latest10 = extractLatest(match10.row, timeFields.filter((x) => x.periodType === 'M'));
-  const latest2 = extractLatest(match2.row, timeFields.filter((x) => x.periodType === 'M'));
-  if (!latest10) throw new Error(`No numeric values found for: ${SGS_10Y_SERIES}`);
-  if (!latest2) throw new Error(`No numeric values found for: ${SGS_2Y_SERIES}`);
+  const latest10 = series.SGS_10Y?.latest;
+  const latest2 = series.SGS_2Y?.latest;
+  const latestSora = series.SORA?.latest;
+  if (!latest10 || !latest2 || !latestSora) {
+    throw new Error('SingStat payload did not include latest values for all required series');
+  }
 
   let spread = null;
-  let spreadPeriod = null;
-  for (const col of monthColumns) {
-    const v10 = toNumber(match10.row[col]);
-    const v2 = toNumber(match2.row[col]);
-    if (v10 != null && v2 != null) {
-      spread = Number((v10 - v2).toFixed(4));
-      spreadPeriod = col;
-      break;
-    }
+  let spreadDate = null;
+  const monthly10y = new Map(series.SGS_10Y.rows.map((row) => [row.date, row.value]));
+  for (const row of series.SGS_2Y.rows) {
+    const ten = monthly10y.get(row.date);
+    if (ten == null) continue;
+    spread = Number((ten - row.value).toFixed(4));
+    spreadDate = row.date;
   }
 
   return {
-    sgs_10y: { freq: 'M', latest_period: latest10.latest_period, latest_value: latest10.latest_value, units: '%' },
-    sgs_2y: { freq: 'M', latest_period: latest2.latest_period, latest_value: latest2.latest_value, units: '%' },
+    datasetRef: SINGSTAT_DATASET_REF,
+    matchedLabels: {
+      SORA: series.SORA.rows[0]?.series_name,
+      SGS_2Y: series.SGS_2Y.rows[0]?.series_name,
+      SGS_10Y: series.SGS_10Y.rows[0]?.series_name
+    },
+    sora_overnight: {
+      freq: 'M',
+      values: series.SORA.rows.map((row) => ({ date: row.date, value: row.value })),
+      latest_period: latestSora.date,
+      latest_value: latestSora.value,
+      units: '%'
+    },
+    sgs_10y: { freq: 'M', latest_period: latest10.date, latest_value: latest10.value, units: '%' },
+    sgs_2y: { freq: 'M', latest_period: latest2.date, latest_value: latest2.value, units: '%' },
     term_spread_10y_2y: spread != null
-      ? { freq: 'M', latest_period: spreadPeriod, latest_value: spread, units: 'pp' }
+      ? { freq: 'M', latest_period: spreadDate, latest_value: spread, units: 'pp' }
       : null
   };
 }
-
 
 function pickByKeywords(records, seriesField, keywords, limit = 2) {
   return records
@@ -269,205 +257,6 @@ function printRunSummary(results) {
   return { ok_count: ok.length, failed_count: failed.length, failed_items: failed };
 }
 
-function decodeHtmlEntities(text) {
-  return String(text || '')
-    .replace(/&nbsp;/gi, ' ')
-    .replace(/&amp;/gi, '&')
-    .replace(/&lt;/gi, '<')
-    .replace(/&gt;/gi, '>')
-    .replace(/&#39;/gi, "'")
-    .replace(/&quot;/gi, '"');
-}
-
-function stripHtmlTags(text) {
-  return decodeHtmlEntities(String(text || '').replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ').trim();
-}
-
-function parseSimpleHtmlTableRows(html) {
-  const rows = [];
-  const rowMatches = String(html || '').match(/<tr\b[^>]*>[\s\S]*?<\/tr>/gi) || [];
-  for (const rowHtml of rowMatches) {
-    const cellMatches = rowHtml.match(/<t[dh]\b[^>]*>[\s\S]*?<\/t[dh]>/gi) || [];
-    const cells = cellMatches.map((cellHtml) => stripHtmlTags(cellHtml));
-    if (cells.length) rows.push(cells);
-  }
-  return rows;
-}
-
-function parseSelectDefinitions(html) {
-  const selects = [];
-  const selectRegex = /<select\b([^>]*)>([\s\S]*?)<\/select>/gi;
-  let selectMatch;
-  while ((selectMatch = selectRegex.exec(html)) !== null) {
-    const attrs = selectMatch[1] || '';
-    const body = selectMatch[2] || '';
-    const name = ((attrs.match(/\bname\s*=\s*"([^"]*)"/i) || [])[1]
-      || (attrs.match(/\bname\s*=\s*'([^']*)'/i) || [])[1]
-      || '').trim();
-    const id = ((attrs.match(/\bid\s*=\s*"([^"]*)"/i) || [])[1]
-      || (attrs.match(/\bid\s*=\s*'([^']*)'/i) || [])[1]
-      || '').trim();
-
-    const options = [];
-    const optionRegex = /<option\b([^>]*)>([\s\S]*?)<\/option>/gi;
-    let optionMatch;
-    while ((optionMatch = optionRegex.exec(body)) !== null) {
-      const optionAttrs = optionMatch[1] || '';
-      const text = stripHtmlTags(optionMatch[2] || '');
-      const value = ((optionAttrs.match(/\bvalue\s*=\s*"([^"]*)"/i) || [])[1]
-        || (optionAttrs.match(/\bvalue\s*=\s*'([^']*)'/i) || [])[1]
-        || text).trim();
-      const selected = /\bselected\b/i.test(optionAttrs);
-      options.push({ value, text, selected });
-    }
-
-    selects.push({ name, id, options });
-  }
-  return selects;
-}
-
-function parseSoraRows(html) {
-  const rows = [];
-  const tableRows = parseSimpleHtmlTableRows(html);
-  tableRows.forEach((cells) => {
-    if (cells.length < 2) return;
-    const dateText = cells.find((c) => /\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}/.test(c) || /\d{4}-\d{2}-\d{2}/.test(c));
-    const valueText = cells.find((c) => /^-?[\d,.]+$/.test(c.replace('%', '').trim()));
-    if (!dateText || !valueText) return;
-    const normalizedDate = dateText.includes('-')
-      ? dateText
-      : (() => {
-          const parts = dateText.split(/[\/]/).map((p) => p.trim());
-          if (parts.length !== 3) return null;
-          const [d, m, y] = parts;
-          const fullYear = y.length === 2 ? `20${y}` : y;
-          return `${fullYear}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
-        })();
-    if (!normalizedDate) return;
-    const num = toNumber(valueText.replace('%', ''));
-    if (num == null) return;
-    rows.push({ date: normalizedDate, value: num });
-  });
-  const dedup = new Map(rows.map((r) => [r.date, r]));
-  return [...dedup.values()].sort((a, b) => a.date.localeCompare(b.date));
-}
-
-function buildSoraPostPayload(html) {
-  const payload = {};
-  const hiddenInputRegex = /<input\b([^>]*\btype\s*=\s*["']hidden["'][^>]*)>/gi;
-  let hiddenMatch;
-  while ((hiddenMatch = hiddenInputRegex.exec(html)) !== null) {
-    const attrs = hiddenMatch[1] || '';
-    const name = (attrs.match(/\bname\s*=\s*"([^"]*)"/i) || attrs.match(/\bname\s*=\s*'([^']*)'/i) || [])[1];
-    const value = (attrs.match(/\bvalue\s*=\s*"([^"]*)"/i) || attrs.match(/\bvalue\s*=\s*'([^']*)'/i) || [])[1] || '';
-    if (name) payload[name] = decodeHtmlEntities(value);
-  }
-
-  const selects = parseSelectDefinitions(html);
-
-  const now = new Date();
-  const start = new Date(now);
-  start.setDate(start.getDate() - 14);
-
-  const setSelectValue = (regex, desiredTextRegex, fallbackValue) => {
-    const el = selects.find((s) => regex.test(s.name || s.id || ''));
-    if (!el || !el.name) return;
-    let chosen = fallbackValue;
-    if (desiredTextRegex) {
-      const opt = el.options.find((o) => desiredTextRegex.test(o.text));
-      if (opt) chosen = opt.value;
-    }
-    if (chosen == null) {
-      const selectedOption = el.options.find((o) => o.selected) || el.options[0];
-      if (selectedOption) chosen = selectedOption.value;
-    }
-    if (chosen != null) payload[el.name] = chosen;
-  };
-
-  const startYearSelector = /start.*year|from.*year/i;
-  const endYearSelector = /end.*year|to.*year/i;
-  const startMonthSelector = /start.*month|from.*month/i;
-  const endMonthSelector = /end.*month|to.*month/i;
-  const frequencySelector = /freq|frequency/i;
-  const seriesSelector = /series|rate|stat/i;
-
-  setSelectValue(startYearSelector, null, String(start.getUTCFullYear()));
-  setSelectValue(endYearSelector, null, String(now.getUTCFullYear()));
-  setSelectValue(startMonthSelector, null, String(start.getUTCMonth() + 1));
-  setSelectValue(endMonthSelector, null, String(now.getUTCMonth() + 1));
-  setSelectValue(frequencySelector, /daily/i, null);
-  setSelectValue(seriesSelector, /sora/i, null);
-
-  const hasSelector = (regex) =>
-    selects.some((s) => regex.test(s.name || s.id || ''));
-  const expectedControls = [
-    ['start year', startYearSelector],
-    ['end year', endYearSelector],
-    ['start month', startMonthSelector],
-    ['end month', endMonthSelector],
-    ['frequency', frequencySelector],
-    ['series', seriesSelector]
-  ];
-  const missingControls = expectedControls.filter(([, regex]) => !hasSelector(regex)).map(([label]) => label);
-  if (missingControls.length) {
-    throw new Error(`SORA page missing expected selector controls: ${missingControls.join(', ')}`);
-  }
-
-  const submitInputMatch = html.match(/<input\b([^>]*\btype\s*=\s*["']submit["'][^>]*)>/i);
-  const submitButtonMatch = html.match(/<button\b([^>]*\btype\s*=\s*["']submit["'][^>]*)>/i);
-  const submitAttrs = (submitInputMatch && submitInputMatch[1]) || (submitButtonMatch && submitButtonMatch[1]) || '';
-  const submitName = (submitAttrs.match(/\bname\s*=\s*"([^"]*)"/i) || submitAttrs.match(/\bname\s*=\s*'([^']*)'/i) || [])[1];
-  const submitValue = (submitAttrs.match(/\bvalue\s*=\s*"([^"]*)"/i) || submitAttrs.match(/\bvalue\s*=\s*'([^']*)'/i) || [])[1] || 'Submit';
-  if (submitName) payload[submitName] = decodeHtmlEntities(submitValue);
-
-  return payload;
-}
-
-async function fetchSoraSeries() {
-  const getRes = await fetch(MAS_SORA_URL, {
-    headers: {
-      ...DEFAULT_JSON_HEADERS
-    }
-  });
-  if (!getRes.ok) throw new Error(`SORA GET failed: HTTP ${getRes.status}`);
-  const landingHtml = await getRes.text();
-  if (!/__VIEWSTATE/i.test(landingHtml) || !/__EVENTVALIDATION/i.test(landingHtml)) {
-    throw new Error('SORA page missing expected ASP.NET hidden fields (__VIEWSTATE / __EVENTVALIDATION).');
-  }
-  if (!/sora/i.test(landingHtml)) {
-    throw new Error('SORA page does not contain expected SORA label.');
-  }
-
-  const payload = buildSoraPostPayload(landingHtml);
-  const postRes = await fetch(MAS_SORA_URL, {
-    method: 'POST',
-    headers: {
-      ...DEFAULT_JSON_HEADERS,
-      'content-type': 'application/x-www-form-urlencoded'
-    },
-    body: new URLSearchParams(payload)
-  });
-  if (!postRes.ok) throw new Error(`SORA POST failed: HTTP ${postRes.status}`);
-  const postHtml = await postRes.text();
-  const rows = parseSoraRows(postHtml);
-
-  if (!rows.length) {
-    throw new Error(
-      [
-        'SORA parsing yielded 0 rows.',
-        `Response length: ${postHtml.length}`,
-        `First 400 chars: ${postHtml.slice(0, 400).replace(/\s+/g, ' ')}`,
-        `Posted parameter keys: ${Object.keys(payload).join(', ')}`
-      ].join('\n')
-    );
-  }
-
-  const cutoff = new Date();
-  cutoff.setUTCDate(cutoff.getUTCDate() - 180);
-  const kept = rows.filter((r) => new Date(`${r.date}T00:00:00Z`) >= cutoff);
-  return kept;
-}
-
 function mergeMonthlyHistory(existingValues, fetchedValues) {
   const byPeriod = new Map();
   let updated = 0;
@@ -508,35 +297,35 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
     return datasetCache.get(datasetId);
   };
 
-  let sgsBundlePromise;
-  const getSgsBundle = async () => {
-    if (!sgsBundlePromise) sgsBundlePromise = extractSgs2y10y();
-    return sgsBundlePromise;
+  let singStatBundlePromise;
+  const getSingStatBundle = async () => {
+    if (!singStatBundlePromise) singStatBundlePromise = extractRatesFromSingStatTableBuilder();
+    return singStatBundlePromise;
   };
 
-  await tryIndicator({ key: 'sgs_10y', source: 'data.gov.sg', dataset_ref: SGS_DATASET_ID, series_name: SGS_10Y_SERIES }, async () => {
-    const sgs = await getSgsBundle();
-    if (!verifyOnly) series.sgs_10y = sgs.sgs_10y;
+  await tryIndicator({ key: 'sgs_10y', source: 'SingStat TableBuilder', dataset_ref: SINGSTAT_DATASET_REF, series_name: 'Government Securities - 10-Year Bond Yield' }, async () => {
+    const rates = await getSingStatBundle();
+    if (!verifyOnly) series.sgs_10y = rates.sgs_10y;
     if (VERIFY_MODE) {
-      console.log(`[verify-series] datasetId=${SGS_DATASET_ID} required=${SGS_10Y_SERIES} latest=${sgs.sgs_10y.latest_period}=${sgs.sgs_10y.latest_value}`);
+      console.log(`[verify-series] datasetRef=${rates.datasetRef} required=${rates.matchedLabels.SGS_10Y} latest=${rates.sgs_10y.latest_period}=${rates.sgs_10y.latest_value}`);
     }
-    return { latest_period: sgs.sgs_10y.latest_period, latest_value: sgs.sgs_10y.latest_value };
+    return { latest_period: rates.sgs_10y.latest_period, latest_value: rates.sgs_10y.latest_value };
   });
 
-  await tryIndicator({ key: 'sgs_2y', source: 'data.gov.sg', dataset_ref: SGS_DATASET_ID, series_name: SGS_2Y_SERIES }, async () => {
-    const sgs = await getSgsBundle();
-    if (!verifyOnly) series.sgs_2y = sgs.sgs_2y;
+  await tryIndicator({ key: 'sgs_2y', source: 'SingStat TableBuilder', dataset_ref: SINGSTAT_DATASET_REF, series_name: 'Government Securities - 2-Year Bond Yield' }, async () => {
+    const rates = await getSingStatBundle();
+    if (!verifyOnly) series.sgs_2y = rates.sgs_2y;
     if (VERIFY_MODE) {
-      console.log(`[verify-series] datasetId=${SGS_DATASET_ID} required=${SGS_2Y_SERIES} latest=${sgs.sgs_2y.latest_period}=${sgs.sgs_2y.latest_value}`);
+      console.log(`[verify-series] datasetRef=${rates.datasetRef} required=${rates.matchedLabels.SGS_2Y} latest=${rates.sgs_2y.latest_period}=${rates.sgs_2y.latest_value}`);
     }
-    return { latest_period: sgs.sgs_2y.latest_period, latest_value: sgs.sgs_2y.latest_value };
+    return { latest_period: rates.sgs_2y.latest_period, latest_value: rates.sgs_2y.latest_value };
   });
 
   await tryIndicator({ key: 'term_spread_10y_2y', source: 'derived', dataset_ref: 'sgs_10y-sgs_2y' }, async () => {
-    const sgs = await getSgsBundle();
-    if (!sgs.term_spread_10y_2y) throw new Error('no overlapping monthly observations for SGS 10Y and 2Y');
-    if (!verifyOnly) series.term_spread_10y_2y = sgs.term_spread_10y_2y;
-    return { latest_period: sgs.term_spread_10y_2y.latest_period, latest_value: sgs.term_spread_10y_2y.latest_value };
+    const rates = await getSingStatBundle();
+    if (!rates.term_spread_10y_2y) throw new Error('no overlapping monthly observations for SGS 10Y and 2Y');
+    if (!verifyOnly) series.term_spread_10y_2y = rates.term_spread_10y_2y;
+    return { latest_period: rates.term_spread_10y_2y.latest_period, latest_value: rates.term_spread_10y_2y.latest_value };
   });
 
   for (const [datasetId, requirements] of Object.entries(REQUIRED_DATASETS)) {
@@ -745,12 +534,15 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
     });
   }
 
-  await tryIndicator({ key: 'sora_overnight', source: 'MAS eServices', dataset_ref: MAS_SORA_URL }, async () => {
-    const soraRows = await fetchSoraSeries();
-    if (!soraRows.length) throw new Error('html parse 0 rows');
-    const latest = soraRows[soraRows.length - 1];
+  await tryIndicator({ key: 'sora_overnight', source: 'SingStat TableBuilder', dataset_ref: SINGSTAT_DATASET_REF, series_name: 'Singapore Overnight Rate Average' }, async () => {
+    const rates = await getSingStatBundle();
+    if (!rates.sora_overnight.values.length) throw new Error('SingStat parse 0 rows for SORA');
+    const latest = rates.sora_overnight.values[rates.sora_overnight.values.length - 1];
     if (!verifyOnly) {
-      series.sora_overnight = { freq: 'D', window_days: 180, values: soraRows, units: '%pa' };
+      series.sora_overnight = rates.sora_overnight;
+    }
+    if (VERIFY_MODE) {
+      console.log(`[verify-series] datasetRef=${rates.datasetRef} required=${rates.matchedLabels.SORA} latest=${latest.date}=${latest.value}`);
     }
     return { latest_period: latest.date, latest_value: latest.value };
   });
@@ -880,7 +672,7 @@ async function main() {
     },
     sources: [
       { name: 'data.gov.sg', method: 'datastore_search', dataset_ids: DATASET_IDS },
-      { name: 'MAS eServices', method: 'html_form_parse', url: MAS_SORA_URL },
+      { name: 'SingStat TableBuilder', method: 'json_api_parse', table_id: SINGSTAT_TABLE_ID, table_url: `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_TABLE_ID}` },
       { name: 'MAS I.6 JSON API', method: 'json_api_parse', url: MAS_I6_API_URL }
     ],
     series: mergedSeries

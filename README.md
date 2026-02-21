@@ -23,7 +23,8 @@ Static multi-page dashboard for GitHub Pages that monitors vulnerability signals
 │   ├── update_macro_indicators.js
 │   └── lib/
 │       ├── datagov.js
-│       └── mas_api.js
+│       ├── mas_api.js
+│       └── singstat_tablebuilder.js
 ├── .github/workflows/
 │   ├── update_data.yml
 │   └── update-macro.yml
@@ -67,14 +68,24 @@ Then open `http://localhost:8000/index.html`.
 ```bash
 npm run verify:macro-sources
 npm run update:macro
+npm test
 ```
 
 - `verify:macro-sources` checks upstream macro data sources and logs diagnostics.
 - `update:macro` refreshes `data/macro_indicators.json`.
+- `test` runs integration tests, including the SingStat TableBuilder TS/M700071 source contract check.
+
+
+## Macro rate source details (SORA / SGS)
+- Indicators `sora_overnight`, `sgs_2y`, and `sgs_10y` are sourced from **SingStat TableBuilder TS/M700071** via its JSON API endpoint (no HTML table scraping).
+- Frequency is treated as **monthly (M)** for all three indicators.
+- Date labels in the source are parsed from `YYYY Mon` to ISO date using the **first day of month** convention (e.g., `2025 Dec -> 2025-12-01`).
+- Missing values/periods are skipped during parsing; downstream series store only valid numeric points sorted in ascending date order.
 
 ## Environment variables
 - `DATA_GOV_SG_API_KEY` (required for authenticated `data.gov.sg` access)
 - `GITHUB_ACTIONS` (set by GitHub Actions automatically; used by updater behavior)
+- `SINGSTAT_TABLEBUILDER_API_BASE` (optional override for SingStat API base URL)
 
 For local development, either export in shell:
 
