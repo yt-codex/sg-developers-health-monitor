@@ -216,7 +216,7 @@
     }
   ],
   "macro_indicators": {
-    "last_updated_utc": null,
+    "last_updated_utc": "2026-02-21T08:07:56.238Z",
     "sources": [
       {
         "name": "data.gov.sg",
@@ -242,9 +242,180 @@
       {
         "name": "MAS MSB",
         "method": "csv_download",
-        "url": "https://www.mas.gov.sg/-/media/MAS/Statistics/Time-Series-Data/Monthly-Statistical-Bulletin/CSV/I6.csv"
+        "url": "https://www.mas.gov.sg/-/media/mas-media-library/statistics/monthly-statistical-bulletin/msb-historical/money-and-banking--i6--yearly.csv"
       }
     ],
-    "series": {}
+    "series": {
+      "sgs_10y": {
+        "freq": "M",
+        "latest_period": "2025Dec",
+        "latest_value": 2.22,
+        "units": "%",
+        "status": "ok",
+        "last_ok_utc": "2026-02-21T08:07:56.238Z"
+      },
+      "sgs_2y": {
+        "freq": "M",
+        "latest_period": "2025Dec",
+        "latest_value": 1.48,
+        "units": "%",
+        "status": "ok",
+        "last_ok_utc": "2026-02-21T08:07:56.238Z"
+      },
+      "term_spread_10y_2y": {
+        "freq": "M",
+        "latest_period": "2025Dec",
+        "latest_value": 0.74,
+        "units": "pp",
+        "status": "ok",
+        "last_ok_utc": "2026-02-21T08:07:56.238Z"
+      },
+      "unit_labour_cost_construction": {
+        "status": "failed",
+        "error_summary": "0 time fields seriesField=DataSeries seriesName=Unit Labour Cost Of Construction"
+      },
+      "loan_bc_total": {
+        "status": "failed",
+        "error_summary": "0 time fields seriesField=DataSeries seriesName=Loans To Businesses - Building And Construction - Total"
+      },
+      "loan_bc_construction": {
+        "status": "failed",
+        "error_summary": "0 time fields seriesField=DataSeries seriesName=Loans To Businesses - Building And Construction - Construction"
+      },
+      "loan_bc_real_property": {
+        "status": "failed",
+        "error_summary": "0 time fields seriesField=DataSeries seriesName=Loans To Businesses - Building And Construction - Real Property And Development Of Land"
+      },
+      "dataset_d_29f7b431ad79f61f19a731a6a86b0247": {
+        "status": "failed",
+        "error_summary": "0 time columns detected"
+      },
+      "dataset_d_ba3c493ad160125ce347d5572712f14f": {
+        "status": "failed",
+        "error_summary": "no matching series"
+      },
+      "dataset_d_055b6549444dedb341c50805d9682a41": {
+        "status": "failed",
+        "error_summary": "no matching series"
+      },
+      "dataset_d_e47c0f0674b46981c4994d5257de5be4": {
+        "status": "failed",
+        "error_summary": "no matching series"
+      },
+      "dataset_d_4dca06508cd9d0a8076153443c17ea5f": {
+        "status": "failed",
+        "error_summary": "no matching series"
+      },
+      "dataset_d_e9cc9d297b1cf8024cf99db4b12505cc": {
+        "status": "failed",
+        "error_summary": "0 time columns detected"
+      },
+      "dataset_d_df200b7f89f94e52964ff45cd7878a30": {
+        "status": "failed",
+        "error_summary": "0 time columns detected"
+      },
+      "sora_overnight": {
+        "status": "failed",
+        "error_summary": "SORA page missing expected selector controls: frequency, series"
+      },
+      "loan_limits_granted_building_construction": {
+        "status": "failed",
+        "error_summary": "Unable to extract MAS MSB I.6 construction granted/utilised rows."
+      },
+      "loan_limits_utilised_building_construction": {
+        "status": "failed",
+        "error_summary": "Unable to extract MAS MSB I.6 construction granted/utilised rows."
+      }
+    },
+    "update_run": {
+      "ok_count": 3,
+      "failed_count": 14,
+      "failed_items": [
+        {
+          "name": "unit_labour_cost_construction",
+          "source": "data.gov.sg",
+          "dataset_ref": "d_f9fc9b5420d96bcab45bc31eeb8ae3c3",
+          "error_summary": "0 time fields seriesField=DataSeries seriesName=Unit Labour Cost Of Construction"
+        },
+        {
+          "name": "loan_bc_total",
+          "source": "data.gov.sg",
+          "dataset_ref": "d_af0415517a3a3a94b3b74039934ef976",
+          "error_summary": "0 time fields seriesField=DataSeries seriesName=Loans To Businesses - Building And Construction - Total"
+        },
+        {
+          "name": "loan_bc_construction",
+          "source": "data.gov.sg",
+          "dataset_ref": "d_af0415517a3a3a94b3b74039934ef976",
+          "error_summary": "0 time fields seriesField=DataSeries seriesName=Loans To Businesses - Building And Construction - Construction"
+        },
+        {
+          "name": "loan_bc_real_property",
+          "source": "data.gov.sg",
+          "dataset_ref": "d_af0415517a3a3a94b3b74039934ef976",
+          "error_summary": "0 time fields seriesField=DataSeries seriesName=Loans To Businesses - Building And Construction - Real Property And Development Of Land"
+        },
+        {
+          "name": "dataset_d_29f7b431ad79f61f19a731a6a86b0247",
+          "source": "data.gov.sg",
+          "dataset_ref": "d_29f7b431ad79f61f19a731a6a86b0247",
+          "error_summary": "0 time columns detected"
+        },
+        {
+          "name": "dataset_d_ba3c493ad160125ce347d5572712f14f",
+          "source": "data.gov.sg",
+          "dataset_ref": "d_ba3c493ad160125ce347d5572712f14f",
+          "error_summary": "no matching series"
+        },
+        {
+          "name": "dataset_d_055b6549444dedb341c50805d9682a41",
+          "source": "data.gov.sg",
+          "dataset_ref": "d_055b6549444dedb341c50805d9682a41",
+          "error_summary": "no matching series"
+        },
+        {
+          "name": "dataset_d_e47c0f0674b46981c4994d5257de5be4",
+          "source": "data.gov.sg",
+          "dataset_ref": "d_e47c0f0674b46981c4994d5257de5be4",
+          "error_summary": "no matching series"
+        },
+        {
+          "name": "dataset_d_4dca06508cd9d0a8076153443c17ea5f",
+          "source": "data.gov.sg",
+          "dataset_ref": "d_4dca06508cd9d0a8076153443c17ea5f",
+          "error_summary": "no matching series"
+        },
+        {
+          "name": "dataset_d_e9cc9d297b1cf8024cf99db4b12505cc",
+          "source": "data.gov.sg",
+          "dataset_ref": "d_e9cc9d297b1cf8024cf99db4b12505cc",
+          "error_summary": "0 time columns detected"
+        },
+        {
+          "name": "dataset_d_df200b7f89f94e52964ff45cd7878a30",
+          "source": "data.gov.sg",
+          "dataset_ref": "d_df200b7f89f94e52964ff45cd7878a30",
+          "error_summary": "0 time columns detected"
+        },
+        {
+          "name": "sora_overnight",
+          "source": "MAS eServices",
+          "dataset_ref": "https://eservices.mas.gov.sg/statistics/dir/domesticinterestrates.aspx",
+          "error_summary": "SORA page missing expected selector controls: frequency, series"
+        },
+        {
+          "name": "loan_limits_granted_building_construction",
+          "source": "MAS MSB",
+          "dataset_ref": "https://www.mas.gov.sg/-/media/mas-media-library/statistics/monthly-statistical-bulletin/msb-historical/money-and-banking--i6--yearly.csv",
+          "error_summary": "Unable to extract MAS MSB I.6 construction granted/utilised rows."
+        },
+        {
+          "name": "loan_limits_utilised_building_construction",
+          "source": "MAS MSB",
+          "dataset_ref": "https://www.mas.gov.sg/-/media/mas-media-library/statistics/monthly-statistical-bulletin/msb-historical/money-and-banking--i6--yearly.csv",
+          "error_summary": "Unable to extract MAS MSB I.6 construction granted/utilised rows."
+        }
+      ]
+    }
   }
 }
