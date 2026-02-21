@@ -1,11 +1,31 @@
+const fs = require('fs/promises');
+const path = require('path');
+
 const MAS_I6_API_URL = 'https://www.mas.gov.sg/api/v1/MAS/chart/table_i_6_commercial_banks_loan_limits_granted_to_non_bank_customers_by_industry';
 
 const REQUIRED_FIELDS = ['year', 'month', 'bc_lmtgrtd', 'bc_utl', 'p_ind'];
 
 const DEFAULT_HEADERS = {
-  accept: 'application/json',
-  'user-agent': 'macro-indicator-bot/1.0'
+  accept: 'application/json,text/plain,*/*',
+  'accept-language': 'en-US,en;q=0.9',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+  referer: 'https://www.mas.gov.sg/statistics/monthly-statistical-bulletin/i-6-commercial-banks-loan-limits-granted-to-non-bank-customers-by-industry',
+  'cache-control': 'no-cache',
+  pragma: 'no-cache'
 };
+
+function makeRetryableError(message) {
+  const err = new Error(message);
+  err.retryable = true;
+  return err;
+}
+
+async function writeNonJsonArtifact(rawText) {
+  const outDir = path.join(process.cwd(), 'artifacts');
+  await fs.mkdir(outDir, { recursive: true });
+  const outFile = path.join(outDir, 'mas_i6_nonjson.html');
+  await fs.writeFile(outFile, rawText, 'utf8');
+}
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -42,7 +62,8 @@ async function fetchJsonWithRetry(url, opts = {}) {
     headers = {},
     method = 'GET',
     body,
-    maxRetries = 5
+    maxRetries = 5,
+    verifyMode = false
   } = opts;
 
   let lastError;
@@ -59,7 +80,17 @@ async function fetchJsonWithRetry(url, opts = {}) {
 
       const status = res.status;
       const contentType = res.headers.get('content-type') || '';
+      const finalUrl = res.url || url;
       const rawText = await res.text();
+      const bodyTrimmed = rawText.trim();
+      const bodyStartsWithHtml = /^<!doctype|^<html/i.test(bodyTrimmed);
+      const contentTypeIsJson = /application\/json/i.test(contentType);
+      const isNonJson = !contentTypeIsJson || bodyStartsWithHtml;
+
+      console.log(`[mas-i6-fetch] status=${status} content_type=${contentType || '(none)'} response_url=${finalUrl}`);
+      if (isNonJson) {
+        console.log(`[mas-i6-fetch] body_head_nonjson=${bodyTrimmed.slice(0, 120)}`);
+      }
 
       if (!res.ok) {
         const retriable = status === 429 || (status >= 500 && status <= 599);
@@ -69,16 +100,23 @@ async function fetchJsonWithRetry(url, opts = {}) {
         }
         lastError = new Error(message);
       } else {
+        if (isNonJson) {
+          if (verifyMode) {
+            await writeNonJsonArtifact(rawText);
+          }
+          throw makeRetryableError('received non-JSON response from MAS I.6 endpoint');
+        }
         try {
           const json = JSON.parse(rawText);
-          return { json, status, contentType };
+          return { json, status, contentType, responseUrl: finalUrl };
         } catch (err) {
-          throw new Error(`JSON parse failed: ${err.message}`);
+          throw makeRetryableError(`JSON parse failed: ${err.message}`);
         }
       }
     } catch (err) {
       lastError = err;
       if (attempt >= maxRetries) break;
+      if (!err?.retryable) break;
     }
 
     const backoffMs = Math.min(16_000, 500 * 2 ** (attempt - 1));
@@ -86,17 +124,6 @@ async function fetchJsonWithRetry(url, opts = {}) {
   }
 
   throw new Error(`MAS API request failed after ${maxRetries} attempts: ${lastError?.message || 'unknown error'}`);
-}
-
-function buildFallbackUrl() {
-  const now = new Date();
-  const yyyyMm = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`;
-
-  const attempts = [
-    new URLSearchParams({ frequency: 'Monthly', from: '2021-07', to: yyyyMm }),
-    new URLSearchParams({ freq: 'monthly', from: '2021-07', to: yyyyMm })
-  ];
-  return attempts.map((params) => `${MAS_I6_API_URL}?${params.toString()}`);
 }
 
 function locateRowsArray(payload) {
@@ -175,6 +202,12 @@ function logPayloadDiagnostics({ verifyMode, status, contentType, json, rows }) 
     if (rowCount > 1) {
       console.log(`[verify-mas-api-i6] row[1]=${JSON.stringify(rows[1], null, 0)}`);
     }
+    console.log(`[verify-mas-api-i6] json.name=${json?.name ?? '(missing)'}`);
+    const jsonElements = Array.isArray(json?.elements) ? json.elements : [];
+    console.log(`[verify-mas-api-i6] json.elements.length=${jsonElements.length}`);
+    if (jsonElements.length > 0) {
+      console.log(`[verify-mas-api-i6] json.elements[0]=${JSON.stringify(jsonElements[0])}`);
+    }
     console.log(`[verify-mas-api-i6] required_fields_present=${hasFields.join(',') || '(none)'}`);
     return;
   }
@@ -183,12 +216,15 @@ function logPayloadDiagnostics({ verifyMode, status, contentType, json, rows }) 
 }
 
 async function fetchMasI6LoanLimits({ verifyMode = false } = {}) {
-  const attemptUrls = [MAS_I6_API_URL, ...buildFallbackUrl()];
+  const attemptUrls = [
+    MAS_I6_API_URL,
+    `${MAS_I6_API_URL}?t=${Date.now()}`
+  ];
   let lastError;
 
   for (const url of attemptUrls) {
     try {
-      const { json, status, contentType } = await fetchJsonWithRetry(url);
+      const { json, status, contentType } = await fetchJsonWithRetry(url, { verifyMode });
       const rows = locateRowsArray(json);
       logPayloadDiagnostics({ verifyMode, status, contentType, json, rows });
 
