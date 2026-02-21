@@ -96,6 +96,59 @@ function candidateDataRows(payload) {
   return rows;
 }
 
+function parseNumericValueCandidate(rawValue) {
+  return toFiniteNumber(rawValue);
+}
+
+function findValueInPeriodCell(cell) {
+  if (cell == null) return null;
+  if (typeof cell !== 'object' || Array.isArray(cell)) return parseNumericValueCandidate(cell);
+
+  const preferredValueKeys = ['value', 'data', 'obsValue', 'cellValue', 'amount'];
+  for (const key of preferredValueKeys) {
+    const parsed = parseNumericValueCandidate(cell[key]);
+    if (parsed != null) return parsed;
+  }
+
+  for (const [key, raw] of Object.entries(cell)) {
+    if (/label|period|time|month|year|date|key|code|name/i.test(key)) continue;
+    const parsed = parseNumericValueCandidate(raw);
+    if (parsed != null) return parsed;
+  }
+
+  return null;
+}
+
+function periodLabelForCell(cell) {
+  if (!cell || typeof cell !== 'object') return null;
+  const candidateKeys = ['label', 'period', 'time', 'month', 'date', 'key', 'column', 'col', 'name'];
+  for (const key of candidateKeys) {
+    const value = cell[key];
+    if (typeof value === 'string' && parseMonthLabel(value)) return value;
+  }
+  for (const value of Object.values(cell)) {
+    if (typeof value === 'string' && parseMonthLabel(value)) return value;
+  }
+  return null;
+}
+
+function extractValueForPeriod(row, periodLabel) {
+  const direct = parseNumericValueCandidate(row?.[periodLabel]);
+  if (direct != null) return direct;
+
+  for (const value of Object.values(row || {})) {
+    if (!Array.isArray(value)) continue;
+    for (const cell of value) {
+      const label = periodLabelForCell(cell);
+      if (!label || parseMonthLabel(label) !== parseMonthLabel(periodLabel)) continue;
+      const parsed = findValueInPeriodCell(cell);
+      if (parsed != null) return parsed;
+    }
+  }
+
+  return null;
+}
+
 function parseTableBuilderPivotJson(payload) {
   const rows = candidateDataRows(payload);
   if (!rows.length) {
@@ -122,7 +175,7 @@ function parseTableBuilderPivotJson(payload) {
     for (const periodLabel of periodSet) {
       const date = parseMonthLabel(periodLabel);
       if (!date) continue;
-      const value = toFiniteNumber(row?.[periodLabel]);
+      const value = extractValueForPeriod(row, periodLabel);
       if (value == null) continue;
       deduped.set(`${seriesName}|${date}`, { date, series_name: seriesName, value });
     }
