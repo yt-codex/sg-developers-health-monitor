@@ -9,8 +9,11 @@ const VERIFY_MODE = process.argv.includes('--verify_sources');
 const DATA_FILE = path.join(process.cwd(), 'data', 'macro_indicators.json');
 const CKAN_BASE = 'https://data.gov.sg/api/action/datastore_search';
 const MAS_SORA_URL = 'https://eservices.mas.gov.sg/statistics/dir/domesticinterestrates.aspx';
-// NOTE: this URL can change if MAS reorganises MSB publication paths.
-const MAS_MSB_I6_CSV_URL = 'https://www.mas.gov.sg/-/media/MAS/Statistics/Time-Series-Data/Monthly-Statistical-Bulletin/CSV/I6.csv';
+const MAS_MSB_I6_CSV_URL = 'https://www.mas.gov.sg/-/media/mas-media-library/statistics/monthly-statistical-bulletin/msb-historical/money-and-banking--i6--yearly.csv';
+const DEFAULT_JSON_HEADERS = {
+  accept: 'application/json',
+  'user-agent': 'macro-indicator-bot/1.0'
+};
 
 const DATASET_IDS = [
   'd_5fe5a4bb4a1ecc4d8a56a095832e2b24',
@@ -100,6 +103,21 @@ async function fetchWithRetry(url, options = {}, { label = url, retries = MAX_HT
   throw lastError || new Error(`Failed to fetch ${label}`);
 }
 
+async function fetchJsonWithRetry(url, options = {}, meta = {}) {
+  const res = await fetchWithRetry(
+    url,
+    {
+      ...options,
+      headers: {
+        ...DEFAULT_JSON_HEADERS,
+        ...(options.headers || {})
+      }
+    },
+    meta
+  );
+  return res.json();
+}
+
 function tokenize(text) {
   return String(text || '')
     .toLowerCase()
@@ -177,8 +195,7 @@ function detectSeriesField(records) {
 
 async function fetchDataset(datasetId, limit = 5000) {
   const url = `${CKAN_BASE}?resource_id=${datasetId}&limit=${limit}`;
-  const res = await fetchWithRetry(url, {}, { label: datasetId });
-  const json = await res.json();
+  const json = await fetchJsonWithRetry(url, {}, { label: datasetId });
   if (!json?.success || !Array.isArray(json?.result?.records)) {
     throw new Error(`Unexpected CKAN payload for ${datasetId}`);
   }
@@ -189,12 +206,51 @@ async function fetchDatasetByQuery(datasetId, query, limit = 200) {
   const effectiveLimit = Math.max(200, limit);
   const params = new URLSearchParams({ resource_id: datasetId, limit: String(effectiveLimit), q: query });
   const url = `${CKAN_BASE}?${params.toString()}`;
-  const res = await fetchWithRetry(url, {}, { label: `${datasetId} (q=${query})` });
-  const json = await res.json();
+  const json = await fetchJsonWithRetry(url, {}, { label: `${datasetId} (q=${query})` });
   if (!json?.success || !Array.isArray(json?.result?.records)) {
     throw new Error(`Unexpected CKAN payload for ${datasetId} (q=${query})`);
   }
   return json.result.records;
+}
+
+async function fetchDatasetWithFilters(datasetId, filters, limit = 100) {
+  const params = new URLSearchParams({
+    resource_id: datasetId,
+    filters: JSON.stringify(filters),
+    limit: String(limit)
+  });
+  const url = `${CKAN_BASE}?${params.toString()}`;
+  const json = await fetchJsonWithRetry(url, {}, { label: `${datasetId} (filters=${JSON.stringify(filters)})` });
+  if (!json?.success || !Array.isArray(json?.result?.records)) {
+    throw new Error(`Unexpected CKAN payload for ${datasetId} with filters`);
+  }
+  return json.result.records;
+}
+
+async function detectSeriesFieldFromSample(datasetId) {
+  const params = new URLSearchParams({ resource_id: datasetId, limit: '1' });
+  const url = `${CKAN_BASE}?${params.toString()}`;
+  const json = await fetchJsonWithRetry(url, {}, { label: `${datasetId} (limit=1)` });
+  if (!json?.success || !json?.result) {
+    throw new Error(`Unexpected CKAN payload for ${datasetId} (limit=1)`);
+  }
+
+  const field = (json.result.fields || []).find((x) => /data\s*series/i.test(x?.id || x?.name || ''));
+  if (field?.id) return field.id;
+
+  const fallbackField = detectSeriesField(json.result.records || []);
+  if (fallbackField) return fallbackField;
+  throw new Error(`Unable to detect Data Series field for ${datasetId} from limit=1 sample`);
+}
+
+async function fetchSeriesRowByExactMatch(datasetId, requirement) {
+  const seriesField = await detectSeriesFieldFromSample(datasetId);
+  for (const target of [requirement.target, ...(requirement.aliases || [])]) {
+    const records = await fetchDatasetWithFilters(datasetId, { [seriesField]: target }, 100);
+    const exact = records.find((r) => String(r[seriesField] || '').trim() === target);
+    if (exact) return { row: exact, seriesField, matchedName: target };
+  }
+  throw new Error(`Missing required series in dataset ${datasetId}: ${requirement.target}`);
 }
 
 function findSeriesOrThrow(records, seriesField, requirement, datasetId) {
@@ -303,12 +359,34 @@ function buildSoraPostPayload(html) {
     payload[name] = chosen;
   };
 
-  setSelectValue(/start.*year|from.*year/i, null, String(start.getUTCFullYear()));
-  setSelectValue(/end.*year|to.*year/i, null, String(now.getUTCFullYear()));
-  setSelectValue(/start.*month|from.*month/i, null, String(start.getUTCMonth() + 1));
-  setSelectValue(/end.*month|to.*month/i, null, String(now.getUTCMonth() + 1));
-  setSelectValue(/freq|frequency/i, /daily/i, null);
-  setSelectValue(/series|rate|stat/i, /sora/i, null);
+  const startYearSelector = /start.*year|from.*year/i;
+  const endYearSelector = /end.*year|to.*year/i;
+  const startMonthSelector = /start.*month|from.*month/i;
+  const endMonthSelector = /end.*month|to.*month/i;
+  const frequencySelector = /freq|frequency/i;
+  const seriesSelector = /series|rate|stat/i;
+
+  setSelectValue(startYearSelector, null, String(start.getUTCFullYear()));
+  setSelectValue(endYearSelector, null, String(now.getUTCFullYear()));
+  setSelectValue(startMonthSelector, null, String(start.getUTCMonth() + 1));
+  setSelectValue(endMonthSelector, null, String(now.getUTCMonth() + 1));
+  setSelectValue(frequencySelector, /daily/i, null);
+  setSelectValue(seriesSelector, /sora/i, null);
+
+  const hasSelector = (regex) =>
+    $('select').toArray().some((s) => regex.test($(s).attr('name') || $(s).attr('id') || ''));
+  const expectedControls = [
+    ['start year', startYearSelector],
+    ['end year', endYearSelector],
+    ['start month', startMonthSelector],
+    ['end month', endMonthSelector],
+    ['frequency', frequencySelector],
+    ['series', seriesSelector]
+  ];
+  const missingControls = expectedControls.filter(([, regex]) => !hasSelector(regex)).map(([label]) => label);
+  if (missingControls.length) {
+    throw new Error(`SORA page missing expected selector controls: ${missingControls.join(', ')}`);
+  }
 
   const submit = $('input[type="submit"],button[type="submit"]').first();
   const submitName = submit.attr('name');
@@ -318,7 +396,11 @@ function buildSoraPostPayload(html) {
 }
 
 async function fetchSoraSeries() {
-  const getRes = await fetch(MAS_SORA_URL);
+  const getRes = await fetch(MAS_SORA_URL, {
+    headers: {
+      ...DEFAULT_JSON_HEADERS
+    }
+  });
   if (!getRes.ok) throw new Error(`SORA GET failed: HTTP ${getRes.status}`);
   const landingHtml = await getRes.text();
   if (!/__VIEWSTATE/i.test(landingHtml) || !/__EVENTVALIDATION/i.test(landingHtml)) {
@@ -331,7 +413,10 @@ async function fetchSoraSeries() {
   const payload = buildSoraPostPayload(landingHtml);
   const postRes = await fetch(MAS_SORA_URL, {
     method: 'POST',
-    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    headers: {
+      ...DEFAULT_JSON_HEADERS,
+      'content-type': 'application/x-www-form-urlencoded'
+    },
     body: new URLSearchParams(payload)
   });
   if (!postRes.ok) throw new Error(`SORA POST failed: HTTP ${postRes.status}`);
@@ -364,17 +449,17 @@ function latestFromCsvRow(row) {
 }
 
 async function fetchMasMsbI6() {
-  const res = await fetch(MAS_MSB_I6_CSV_URL);
+  const res = await fetch(MAS_MSB_I6_CSV_URL, { headers: DEFAULT_JSON_HEADERS });
   if (!res.ok) throw new Error(`MAS MSB CSV URL not reachable: ${MAS_MSB_I6_CSV_URL} (HTTP ${res.status})`);
   const text = await res.text();
   const rows = parse(text, { columns: true, skip_empty_lines: true });
   if (!rows.length) throw new Error('MAS MSB CSV parsed but contains no rows');
 
   const headers = Object.keys(rows[0]);
-  const rowLabel = (r) => headers.slice(0, 3).map((h) => String(r[h] || '')).join(' | ');
+  const rowLabel = (r) => headers.map((h) => String(r[h] || '')).join(' | ');
 
-  const granted = rows.find((r) => /building\s*&?\s*construction/i.test(rowLabel(r)) && /granted/i.test(rowLabel(r)));
-  const utilised = rows.find((r) => /building\s*&?\s*construction/i.test(rowLabel(r)) && /utili[sz]ed/i.test(rowLabel(r)));
+  const granted = rows.find((r) => /building\s*&?\s*construction/i.test(rowLabel(r)) && /loan\s*limits.*granted/i.test(rowLabel(r)));
+  const utilised = rows.find((r) => /building\s*&?\s*construction/i.test(rowLabel(r)) && /loan\s*limits.*utili[sz]ed/i.test(rowLabel(r)));
 
   if (!granted || !utilised) {
     const preview = rows.slice(0, 5).map((r) => {
@@ -415,13 +500,14 @@ async function buildMacroIndicators(verifyOnly = false) {
 
     if (REQUIRED_DATASETS[datasetId]) {
       for (const requirement of REQUIRED_DATASETS[datasetId]) {
-        const row = findSeriesOrThrow(records, seriesField, requirement, datasetId);
+        const { row, seriesField: exactSeriesField, matchedName } = await fetchSeriesRowByExactMatch(datasetId, requirement);
         const latest = extractLatestFromRecord(row);
         if (!latest) throw new Error(`Latest extraction failed for ${datasetId} -> ${requirement.target}`);
         if (verifyOnly) {
           const timeColumns = detectTimeColumns(row);
           const top5Recent = timeColumns.slice(-5).reverse().map((x) => x.key);
-          console.log(`[verify] ${datasetId} matched Data Series exact string: "${requirement.target}"`);
+          console.log(`[verify] ${datasetId} matched Data Series exact string: "${matchedName}"`);
+          console.log(`[verify] ${datasetId} Data Series field: ${exactSeriesField}`);
           console.log(`[verify] ${datasetId} detected time columns: ${timeColumns.length}`);
           console.log(`[verify] ${datasetId} top 5 recent time keys: ${top5Recent.join(' | ') || '(none)'}`);
         }
