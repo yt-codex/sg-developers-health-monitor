@@ -1,0 +1,14 @@
+{
+  "name": "sg-developers-health-monitor",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Data updater scripts for macro indicators",
+  "scripts": {
+    "update:macro": "node scripts/update_macro_indicators.js",
+    "verify:macro-sources": "node scripts/update_macro_indicators.js --verify_sources"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "csv-parse": "^5.5.6"
+  }
+}
