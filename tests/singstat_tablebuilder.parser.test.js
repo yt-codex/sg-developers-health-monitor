@@ -42,3 +42,45 @@ test('parses TableBuilder pivot JSON fixture into tidy rows and matches required
   ]);
   assert.equal(unitMatch.UNIT_LABOUR_COST_CONSTRUCTION.length, 3);
 });
+
+test('parses nested period cell payloads where values are objects instead of direct month columns', () => {
+  const payload = {
+    Data: [
+      {
+        rowText: 'Government Securities - 2-Year Bond Yield',
+        cells: [
+          { period: '2025 Dec', value: '2.88' },
+          { period: '2026 Jan', value: '2.91' }
+        ]
+      },
+      {
+        rowText: 'Government Securities - 10-Year Bond Yield',
+        cells: [
+          { period: '2025 Dec', value: '2.95' },
+          { period: '2026 Jan', value: '2.98' }
+        ]
+      },
+      {
+        rowText: 'Singapore Overnight Rate Average',
+        cells: [
+          { period: '2025 Dec', value: '2.77' },
+          { period: '2026 Jan', value: '2.79' }
+        ]
+      }
+    ],
+    metaData: { columns: [{ label: '2026 Jan' }, { label: '2025 Dec' }] }
+  };
+
+  const tidy = parseTableBuilderPivotJson(payload);
+  assert.equal(tidy.length, 6);
+
+  const selected = matchRequiredSeries(tidy, [
+    { key: 'SORA', label: 'Singapore Overnight Rate Average', normalized: normalizeLabel('Singapore Overnight Rate Average') },
+    { key: 'SGS_2Y', label: 'Government Securities - 2-Year Bond Yield', normalized: normalizeLabel('Government Securities - 2-Year Bond Yield') },
+    { key: 'SGS_10Y', label: 'Government Securities - 10-Year Bond Yield', normalized: normalizeLabel('Government Securities - 10-Year Bond Yield') }
+  ]);
+
+  assert.equal(selected.SGS_2Y.length, 2);
+  assert.equal(selected.SGS_10Y.length, 2);
+  assert.equal(selected.SORA.length, 2);
+});
