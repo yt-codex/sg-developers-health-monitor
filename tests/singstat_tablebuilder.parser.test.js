@@ -5,8 +5,19 @@ const assert = require('node:assert/strict');
 const {
   parseTableBuilderPivotJson,
   matchRequiredSeries,
-  normalizeLabel
+  normalizeLabel,
+  parseMonthLabel
 } = require('../scripts/lib/singstat_tablebuilder');
+
+
+test('parseMonthLabel supports monthly, quarterly, and yearly period labels', () => {
+  assert.equal(parseMonthLabel('2025 Dec'), '2025-12-01');
+  assert.equal(parseMonthLabel('2025 Q4'), '2025-10-01');
+  assert.equal(parseMonthLabel('Q1 2026'), '2026-01-01');
+  assert.equal(parseMonthLabel('2025 3Q'), '2025-07-01');
+  assert.equal(parseMonthLabel('2024'), '2024-01-01');
+  assert.equal(parseMonthLabel('invalid'), null);
+});
 
 test('parses TableBuilder pivot JSON fixture into tidy rows and matches required labels strictly', () => {
   const fixturePath = path.join(__dirname, 'fixtures', 'singstat_tablebuilder_pivot_sample.json');
@@ -83,4 +94,23 @@ test('parses nested period cell payloads where values are objects instead of dir
   assert.equal(selected.SGS_2Y.length, 2);
   assert.equal(selected.SGS_10Y.length, 2);
   assert.equal(selected.SORA.length, 2);
+});
+
+
+test('parses quarterly period columns when SingStat table does not expose YYYY Mon columns', () => {
+  const payload = {
+    Data: [
+      {
+        rowText: 'Unit labour cost of construction',
+        '2024 Q4': '5501.7',
+        '2025 Q1': '5532.1'
+      }
+    ]
+  };
+
+  const tidy = parseTableBuilderPivotJson(payload);
+  assert.deepEqual(tidy, [
+    { date: '2024-10-01', series_name: 'Unit labour cost of construction', value: 5501.7 },
+    { date: '2025-01-01', series_name: 'Unit labour cost of construction', value: 5532.1 }
+  ]);
 });
