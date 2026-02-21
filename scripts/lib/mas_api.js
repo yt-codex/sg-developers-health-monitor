@@ -3,7 +3,7 @@ const path = require('path');
 
 const MAS_I6_API_URL = 'https://www.mas.gov.sg/api/v1/MAS/chart/table_i_6_commercial_banks_loan_limits_granted_to_non_bank_customers_by_industry';
 
-const REQUIRED_FIELDS = ['year', 'month', 'bc_lmtgrtd', 'bc_utl', 'p_ind'];
+const REQUIRED_FIELDS = ['year', 'month', 'bc_lmtgrtd', 'bc_utl'];
 
 const DEFAULT_HEADERS = {
   accept: 'application/json,text/plain,*/*',
@@ -127,6 +127,8 @@ async function fetchJsonWithRetry(url, opts = {}) {
 }
 
 function locateRowsArray(payload) {
+  if (Array.isArray(payload?.elements)) return payload.elements;
+  if (payload && payload.elements && Array.isArray(payload.elements)) return payload.elements;
   if (Array.isArray(payload?.data)) return payload.data;
   if (Array.isArray(payload?.result)) return payload.result;
   if (Array.isArray(payload?.items)) return payload.items;
@@ -142,6 +144,7 @@ function parseMasI6Data(payload) {
   const firstRow = rows[0];
   const missingFields = REQUIRED_FIELDS.filter((field) => !Object.prototype.hasOwnProperty.call(firstRow || {}, field));
   if (missingFields.length) {
+    console.log(`[mas-i6-parse] missing_required_fields_on_first_row=${missingFields.join(',')}`);
     throw new Error(`missing required fields: ${missingFields.join(',')}`);
   }
 
@@ -160,8 +163,8 @@ function parseMasI6Data(payload) {
     const point = {
       period,
       prelim: row?.p_ind === 'P',
-      grantedValue,
-      utilisedValue,
+      value_granted: grantedValue,
+      value_utilised: utilisedValue,
       updateDate: row?.update_date,
       _rawRow: row
     };
@@ -175,12 +178,14 @@ function parseMasI6Data(payload) {
   const sortAsc = (a, b) => a.period.localeCompare(b.period);
   const deduped = [...byPeriod.values()].sort(sortAsc);
 
-  const grantedValues = deduped.map((row) => ({ period: row.period, prelim: row.prelim, value: row.grantedValue }));
-  const utilisedValues = deduped.map((row) => ({ period: row.period, prelim: row.prelim, value: row.utilisedValue }));
+  const grantedValues = deduped.map((row) => ({ period: row.period, prelim: row.prelim, value: row.value_granted }));
+  const utilisedValues = deduped.map((row) => ({ period: row.period, prelim: row.prelim, value: row.value_utilised }));
 
   return {
     rows,
     extractedRowCount: rows.length,
+    extractedGrantedCount: grantedValues.length,
+    extractedUtilisedCount: utilisedValues.length,
     grantedValues,
     utilisedValues
   };
@@ -231,12 +236,11 @@ async function fetchMasI6LoanLimits({ verifyMode = false } = {}) {
       const parsed = parseMasI6Data(json);
 
       if (verifyMode) {
-        const latestThree = parsed.grantedValues.slice(-3);
-        const utilisedLatestThree = parsed.utilisedValues.slice(-3);
-        const lastSixPrelimCount = parsed.grantedValues.slice(-6).filter((row) => row.prelim).length;
-        console.log(`[verify-mas-api-i6] latest3_bc_lmtgrtd=${latestThree.map((row) => `${row.period}:${row.value}`).join(' | ')}`);
-        console.log(`[verify-mas-api-i6] latest3_bc_utl=${utilisedLatestThree.map((row) => `${row.period}:${row.value}`).join(' | ')}`);
-        console.log(`[verify-mas-api-i6] prelim_count_last6=${lastSixPrelimCount}`);
+        const latestThreeGranted = parsed.grantedValues.slice(-3);
+        const latestThreeUtilised = parsed.utilisedValues.slice(-3);
+        console.log(`[verify-mas-api-i6] extractedGrantedCount=${parsed.extractedGrantedCount} extractedUtilisedCount=${parsed.extractedUtilisedCount}`);
+        console.log(`[verify-mas-api-i6] latest3_bc_lmtgrtd=${latestThreeGranted.map((row) => `${row.period}:${row.value}`).join(' | ')}`);
+        console.log(`[verify-mas-api-i6] latest3_bc_utl=${latestThreeUtilised.map((row) => `${row.period}:${row.value}`).join(' | ')}`);
       }
 
       return { ...parsed, urlUsed: url };
