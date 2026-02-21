@@ -140,35 +140,6 @@ function quarterlyParserSelfTest() {
   }
 }
 
-function parsePeriodToDate(period) {
-  const p = String(period).trim().replace(/\s*\(p\)\s*$/i, '').trim();
-  let m = p.match(/^(\d{4})\s*Q([1-4])$/i);
-  if (m) {
-    const year = Number(m[1]);
-    const quarter = Number(m[2]);
-    return new Date(Date.UTC(year, quarter * 3 - 1, 1));
-  }
-  m = p.match(/^(\d{4})[-/](\d{2})([-/](\d{2}))?$/);
-  if (m) return new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[4] || '1')));
-  m = p.match(/^(\d{4})Q([1-4])$/i);
-  if (m) {
-    const year = Number(m[1]);
-    const quarter = Number(m[2]);
-    return new Date(Date.UTC(year, quarter * 3 - 1, 1));
-  }
-  m = p.match(/^([A-Za-z]{3,})\s+(\d{4})$/);
-  if (m) {
-    const month = new Date(`${m[1].slice(0, 3)} 1, 2000`).getMonth();
-    if (!Number.isNaN(month)) return new Date(Date.UTC(Number(m[2]), month, 1));
-  }
-  m = p.match(/^(\d{4})\s+([A-Za-z]{3,})$/);
-  if (m) {
-    const month = new Date(`${m[2].slice(0, 3)} 1, 2000`).getMonth();
-    if (!Number.isNaN(month)) return new Date(Date.UTC(Number(m[1]), month, 1));
-  }
-  return null;
-}
-
 async function extractSgs2y10y() {
   const { records, timeFields, seriesField } = await fetchDataset(SGS_DATASET_ID);
   if (!records.length) throw new Error('No records returned');
