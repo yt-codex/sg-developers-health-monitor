@@ -57,3 +57,35 @@ Workflow: `.github/workflows/update_data.yml`
 - Updates data timestamps and commits changes.
 
 You can extend it to fetch public RSS/macro sources and normalize into `/data/*.json` before commit.
+
+## data.gov.sg API Key
+All `data.gov.sg` dataset calls in the macro updater require `DATA_GOV_SG_API_KEY`.
+
+### Local runs
+- Create a `.env` file at the repo root:
+
+  ```bash
+  DATA_GOV_SG_API_KEY=your_key_here
+  ```
+
+- Or export it in your shell:
+
+  ```bash
+  export DATA_GOV_SG_API_KEY="..."
+  ```
+
+The macro updater exits non-zero if the key is missing (unless you run with `--allow-unauthenticated` for local debugging only).
+
+### GitHub Actions
+Set the repository secret in:
+
+`Settings → Secrets and variables → Actions → New repository secret`
+
+- Name: `DATA_GOV_SG_API_KEY`
+
+Workflows pass this secret via `env` so authenticated `data.gov.sg` requests work in CI.
+
+### Security notes
+- Never commit the API key.
+- Do not echo the key in logs.
+- Source verification logs only whether a key is present (`yes`/`no`), never the key value.

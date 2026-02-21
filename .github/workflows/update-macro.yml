@@ -11,6 +11,8 @@ permissions:
 jobs:
   update-macro:
     runs-on: ubuntu-latest
+    env:
+      DATA_GOV_SG_API_KEY: ${{ secrets.DATA_GOV_SG_API_KEY }}
     steps:
       - uses: actions/checkout@v4
 

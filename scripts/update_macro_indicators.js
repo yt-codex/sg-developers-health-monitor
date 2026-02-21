@@ -2,20 +2,22 @@
 
 const fs = require('fs/promises');
 const path = require('path');
+const {
+  fetchWithRetry,
+  fetchCkanDatastoreSearch,
+  DEFAULT_HEADERS
+} = require('./lib/datagov');
 
 const VERIFY_MODE = process.argv.includes('--verify_sources');
+const ALLOW_UNAUTHENTICATED = process.argv.includes('--allow-unauthenticated');
+const IS_GITHUB_ACTIONS = process.env.GITHUB_ACTIONS === 'true';
 const DATA_FILE = path.join(process.cwd(), 'data', 'macro_indicators.json');
-const CKAN_BASE = 'https://data.gov.sg/api/action/datastore_search';
 const MAS_SORA_URL = 'https://eservices.mas.gov.sg/statistics/dir/domesticinterestrates.aspx';
 const MAS_MSB_I6_CSV_URL = 'https://www.mas.gov.sg/-/media/mas-media-library/statistics/monthly-statistical-bulletin/msb-historical/money-and-banking--i6--yearly.csv';
 const SGS_DATASET_ID = 'd_5fe5a4bb4a1ecc4d8a56a095832e2b24';
 const SGS_10Y_SERIES = 'Government Securities - 10-Year Bond Yield';
 const SGS_2Y_SERIES = 'Government Securities - 2-Year Bond Yield';
-const DEFAULT_JSON_HEADERS = {
-  accept: 'application/json',
-  'user-agent': 'macro-indicator-bot/1.0'
-};
-const DATAGOV_REQUEST_INTERVAL_MS = 1200;
+const DEFAULT_JSON_HEADERS = { ...DEFAULT_HEADERS };
 
 const DATASET_IDS = [
   'd_5fe5a4bb4a1ecc4d8a56a095832e2b24',
@@ -41,66 +43,53 @@ const REQUIRED_DATASETS = {
   ]
 };
 
-const MAX_HTTP_RETRIES = 5;
 const TIME_FIELD_PATTERNS = [
   /^\d{4}\s+[A-Za-z]{3}(?:\s*\(p\))?$/i,
   /^\d{4}-\d{2}(?:\s*\(p\))?$/i,
   /^\d{4}\s*Q[1-4](?:\s*\(p\))?$/i
 ];
 
-let dataGovQueue = Promise.resolve();
-let lastDataGovRequestAt = 0;
+let dataGovApiKey = process.env.DATA_GOV_SG_API_KEY || '';
 
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+function parseEnvLine(line) {
+  const trimmed = line.trim();
+  if (!trimmed || trimmed.startsWith('#')) return null;
+  const eq = trimmed.indexOf('=');
+  if (eq === -1) return null;
+
+  const key = trimmed.slice(0, eq).trim();
+  if (!key) return null;
+  let value = trimmed.slice(eq + 1).trim();
+  if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+    value = value.slice(1, -1);
+  }
+  return [key, value];
 }
 
-function parseRetryAfterSeconds(retryAfterValue) {
-  if (!retryAfterValue) return null;
-  const asNumber = Number(retryAfterValue);
-  if (Number.isFinite(asNumber)) return Math.max(0, asNumber);
-
-  const asDate = new Date(retryAfterValue);
-  if (Number.isNaN(asDate.getTime())) return null;
-  return Math.max(0, Math.ceil((asDate.getTime() - Date.now()) / 1000));
-}
-
-async function fetchWithRetry(url, options = {}, { label = url, retries = MAX_HTTP_RETRIES } = {}) {
-  let lastError = null;
-
-  for (let attempt = 1; attempt <= retries; attempt += 1) {
-    try {
-      const res = await fetch(url, options);
-      if (res.ok) return res;
-
-      const shouldRetry = res.status === 429 || res.status >= 500;
-      if (!shouldRetry || attempt === retries) {
-        throw new Error(`HTTP ${res.status} for ${label}`);
+async function loadLocalEnvIfPresent() {
+  if (IS_GITHUB_ACTIONS) return;
+  const envPath = path.join(process.cwd(), '.env');
+  try {
+    const content = await fs.readFile(envPath, 'utf8');
+    for (const line of content.split(/\r?\n/)) {
+      const parsed = parseEnvLine(line);
+      if (!parsed) continue;
+      const [key, value] = parsed;
+      if (process.env[key] == null || process.env[key] === '') {
+        process.env[key] = value;
       }
-
-      const retryAfterSeconds = parseRetryAfterSeconds(res.headers.get('retry-after'));
-      const backoffMs = retryAfterSeconds != null
-        ? retryAfterSeconds * 1000
-        : (res.status === 429
-          ? Math.min(8000, 1000 * 2 ** (attempt - 1))
-          : Math.min(30_000, 1000 * 2 ** (attempt - 1)));
-
-      console.warn(
-        `[retry] ${label}: HTTP ${res.status} (attempt ${attempt}/${retries}), waiting ${backoffMs}ms before retry`
-      );
-      await sleep(backoffMs);
-    } catch (err) {
-      lastError = err;
-      if (attempt === retries) break;
-      const backoffMs = Math.min(30_000, 1000 * 2 ** (attempt - 1));
-      console.warn(
-        `[retry] ${label}: ${err.message} (attempt ${attempt}/${retries}), waiting ${backoffMs}ms before retry`
-      );
-      await sleep(backoffMs);
+    }
+  } catch (err) {
+    if (err.code !== 'ENOENT') {
+      throw new Error(`Unable to load .env file: ${err.message}`);
     }
   }
 
-  throw lastError || new Error(`Failed to fetch ${label}`);
+  dataGovApiKey = process.env.DATA_GOV_SG_API_KEY || '';
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function fetchJsonWithRetry(url, options = {}, meta = {}) {
@@ -116,22 +105,6 @@ async function fetchJsonWithRetry(url, options = {}, meta = {}) {
     meta
   );
   return res.json();
-}
-
-async function enqueueDataGovRequest(task) {
-  const run = async () => {
-    const waitMs = Math.max(0, DATAGOV_REQUEST_INTERVAL_MS - (Date.now() - lastDataGovRequestAt));
-    if (waitMs > 0) await sleep(waitMs);
-    try {
-      return await task();
-    } finally {
-      lastDataGovRequestAt = Date.now();
-    }
-  };
-
-  const scheduled = dataGovQueue.then(run, run);
-  dataGovQueue = scheduled.catch(() => undefined);
-  return scheduled;
 }
 
 function tokenize(text) {
@@ -310,14 +283,15 @@ async function fetchDataset(datasetId, pageLimit = 10000) {
   let total = null;
 
   while (total == null || offset < total) {
-    const params = new URLSearchParams({
-      resource_id: datasetId,
-      limit: String(pageLimit),
-      offset: String(offset)
+    const json = await fetchCkanDatastoreSearch({
+      resourceId: datasetId,
+      limit: pageLimit,
+      offset,
+      apiKey: dataGovApiKey,
+      allowUnauthenticated: ALLOW_UNAUTHENTICATED,
+      label: `${datasetId} (offset=${offset})`,
+      verifyMode: VERIFY_MODE
     });
-    const url = `${CKAN_BASE}?${params.toString()}`;
-    if (VERIFY_MODE) console.log(`[verify-url] ${datasetId} ${url}`);
-    const json = await enqueueDataGovRequest(() => fetchJsonWithRetry(url, {}, { label: `${datasetId} (offset=${offset})` }));
 
     if (typeof json?.code === 'number' && Array.isArray(json?.data?.rows)) {
       throw new Error('wrong endpoint/schema');
@@ -900,6 +874,21 @@ async function buildMacroIndicators(verifyOnly = false) {
 }
 
 async function main() {
+  await loadLocalEnvIfPresent();
+
+  const hasApiKey = Boolean((process.env.DATA_GOV_SG_API_KEY || '').trim());
+  dataGovApiKey = process.env.DATA_GOV_SG_API_KEY || '';
+  if (VERIFY_MODE) {
+    console.log(`[auth] data.gov.sg API key present: ${hasApiKey ? 'yes' : 'no'}`);
+  }
+
+  if (!hasApiKey && !ALLOW_UNAUTHENTICATED) {
+    if (IS_GITHUB_ACTIONS) {
+      throw new Error('Missing DATA_GOV_SG_API_KEY in GitHub Actions. Add repository secret DATA_GOV_SG_API_KEY and pass it to workflow env.');
+    }
+    throw new Error('Missing DATA_GOV_SG_API_KEY. Create a local .env with DATA_GOV_SG_API_KEY=... or export it in your shell. Use --allow-unauthenticated only for local debugging.');
+  }
+
   if (VERIFY_MODE) {
     console.log('Running source verification only...');
     const { updateRun } = await buildMacroIndicators(true);
