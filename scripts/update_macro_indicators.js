@@ -808,10 +808,8 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
       };
     }
     if (VERIFY_MODE) {
-      const newestHeaders = [...msb.monthHeaders].slice(-3).reverse();
-      console.log(`[verify-mas-msb-i6] newest_headers=${newestHeaders.map((h) => `${h.rawLabel} -> ${h.period}, prelim=${h.prelim}`).join(' | ')}`);
       console.log(`[OK] loan_limits_granted_building_construction latest_period=${grantedLatest.period} latest_value=${grantedLatest.value} prelim=${Boolean(grantedLatest.prelim)}`);
-      console.log(`[verify-mas-msb-i6] granted counts extracted_months=${msb.monthHeaders.length} merged_updated=${merged.updated} merged_appended=${merged.appended}`);
+      console.log(`[verify-mas-msb-i6] granted counts extracted_rows=${msb.extractedRowCount} merged_updated=${merged.updated} merged_appended=${merged.appended}`);
     }
     return { latest_period: grantedLatest.period, latest_value: grantedLatest.value };
   });
@@ -832,7 +830,7 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
     }
     if (VERIFY_MODE) {
       console.log(`[OK] loan_limits_utilised_building_construction latest_period=${utilisedLatest.period} latest_value=${utilisedLatest.value} prelim=${Boolean(utilisedLatest.prelim)}`);
-      console.log(`[verify-mas-msb-i6] utilised counts extracted_months=${msb.monthHeaders.length} merged_updated=${merged.updated} merged_appended=${merged.appended}`);
+      console.log(`[verify-mas-msb-i6] utilised counts extracted_rows=${msb.extractedRowCount} merged_updated=${merged.updated} merged_appended=${merged.appended}`);
     }
     return { latest_period: utilisedLatest.period, latest_value: utilisedLatest.value };
   });
@@ -915,7 +913,7 @@ async function main() {
     sources: [
       { name: 'data.gov.sg', method: 'datastore_search', dataset_ids: DATASET_IDS },
       { name: 'MAS eServices', method: 'html_form_parse', url: MAS_SORA_URL },
-      { name: 'MAS MSB I.6 page', method: 'html_table_parse_transposed_table', url: MAS_MSB_I6_PAGE_URL }
+      { name: 'MAS MSB I.6 page', method: 'playwright_download_csv_parse', url: MAS_MSB_I6_PAGE_URL }
     ],
     series: mergedSeries
   };

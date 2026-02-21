@@ -1,5 +1,6 @@
-const MAS_MSB_I6_PAGE_URL = 'https://www.mas.gov.sg/statistics/monthly-statistical-bulletin/i-6-commercial-banks-loan-limits-granted-to-non-bank-customers-by-industry';
-const MAINTENANCE_TEXT = 'Sorry, this service is currently unavailable';
+const fs = require('fs/promises');
+const path = require('path');
+const { MAS_MSB_I6_PAGE_URL, downloadMasI6Csv } = require('./mas_i6_download_csv');
 
 const MONTHS = {
   jan: 1,
@@ -16,419 +17,234 @@ const MONTHS = {
   dec: 12
 };
 
-class MasMsbI6TemporaryError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = 'MasMsbI6TemporaryError';
+const END_OF_PERIOD_HEADER = 'End of Period';
+const GRANTED_HEADER = 'Building and Construction - Limits Granted (S$M)';
+const UTILISED_HEADER = 'Building and Construction - Utilised (%)';
+
+function sanitizeText(text) {
+  return String(text || '').replace(/\s+/g, ' ').trim();
+}
+
+function parseCsv(csvText) {
+  const rows = [];
+  let row = [];
+  let field = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < csvText.length; i += 1) {
+    const ch = csvText[i];
+
+    if (inQuotes) {
+      if (ch === '"') {
+        if (csvText[i + 1] === '"') {
+          field += '"';
+          i += 1;
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        field += ch;
+      }
+      continue;
+    }
+
+    if (ch === '"') {
+      inQuotes = true;
+      continue;
+    }
+
+    if (ch === ',') {
+      row.push(field);
+      field = '';
+      continue;
+    }
+
+    if (ch === '\n') {
+      row.push(field);
+      rows.push(row);
+      row = [];
+      field = '';
+      continue;
+    }
+
+    if (ch !== '\r') {
+      field += ch;
+    }
   }
+
+  row.push(field);
+  if (row.length > 1 || sanitizeText(row[0])) {
+    rows.push(row);
+  }
+
+  return rows;
 }
 
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function decodeHtmlEntities(text) {
-  return String(text || '')
-    .replace(/&nbsp;/gi, ' ')
-    .replace(/&amp;/gi, '&')
-    .replace(/&quot;/gi, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&lt;/gi, '<')
-    .replace(/&gt;/gi, '>')
-    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)));
-}
-
-function stripHtmlTags(text) {
-  return decodeHtmlEntities(String(text || '').replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ').trim();
-}
-
-function sanitizeLabel(text) {
-  return stripHtmlTags(text).replace(/\s+/g, ' ').trim();
-}
-
-function normalizeLabel(text) {
-  return sanitizeLabel(text).toLowerCase();
-}
-
-function parseMonthHeader(rawLabel) {
-  const cleaned = sanitizeLabel(rawLabel);
-  const m = cleaned.match(/^([A-Za-z]{3,})\s+(\d{4})\s*(?:\((p)\))?$/i);
-  if (!m) return null;
-  const month = MONTHS[m[1].slice(0, 3).toLowerCase()];
-  if (!month) return null;
-  return {
-    rawLabel: cleaned,
-    period: `${m[2]}-${String(month).padStart(2, '0')}`,
-    prelim: Boolean(m[3])
-  };
-}
-
-function parseNumericCell(value) {
-  const cleaned = sanitizeLabel(value);
+function parseNumberCell(raw) {
+  const cleaned = sanitizeText(raw);
   if (!cleaned || cleaned === '-' || /^na$/i.test(cleaned) || /^n\/a$/i.test(cleaned)) return null;
-  const num = Number(cleaned.replace(/,/g, ''));
-  return Number.isFinite(num) ? num : null;
+  const parsed = Number(cleaned.replace(/,/g, ''));
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
-function rowToSeries(values, headers, rowName) {
-  const result = [];
-  for (let i = 0; i < headers.length; i += 1) {
-    const parsed = parseNumericCell(values[i + 1]);
-    if (parsed == null) continue;
-    result.push({ period: headers[i].period, prelim: headers[i].prelim, value: parsed });
-  }
-  if (!result.length) throw new Error(`No numeric values found for ${rowName}`);
-  return result;
-}
+function parseEndOfPeriod(raw) {
+  const cleaned = sanitizeText(raw);
+  if (!cleaned) return null;
+  const prelim = /\(P\)/i.test(cleaned);
+  const base = cleaned.replace(/\s*\(P\)\s*/gi, '').trim();
 
-function extractSeriesFromMatrix(matrix) {
-  const rows = matrix
-    .map((row) => (Array.isArray(row) ? row.map((cell) => sanitizeLabel(cell)) : null))
-    .filter((row) => row && row.some(Boolean));
+  let match = base.match(/^([A-Za-z]{3})\s+(\d{4})$/);
+  if (!match) match = base.match(/^([A-Za-z]{3})-(\d{2}|\d{4})$/);
+  if (!match) match = base.match(/^([A-Za-z]{3})\s*-(\d{2}|\d{4})$/);
+  if (!match) return null;
 
-  const headerRow = rows.find((row) => normalizeLabel(row[0]) === 'end of period');
-  if (!headerRow) return null;
-  const headers = headerRow.slice(1).map(parseMonthHeader).filter(Boolean);
-  if (!headers.length) return null;
+  const monthNum = MONTHS[match[1].toLowerCase()];
+  if (!monthNum) return null;
 
-  const anchorIndex = rows.findIndex((row) => row[0] === 'Building and Construction');
-  if (anchorIndex === -1) return null;
-
-  const byLabel = new Map();
-  for (let i = anchorIndex + 1; i < rows.length; i += 1) {
-    const label = rows[i][0];
-    if (!label) continue;
-    if (/^total loans/i.test(label)) continue;
-    if (label === 'Limits Granted (S$M)' || label === 'Utilised (%)') {
-      byLabel.set(label, rows[i]);
-    }
-    if (byLabel.size === 2) break;
-  }
-
-  const granted = byLabel.get('Limits Granted (S$M)');
-  const utilised = byLabel.get('Utilised (%)');
-  if (!granted || !utilised) return null;
+  let year = Number(match[2]);
+  if (!Number.isFinite(year)) return null;
+  if (year < 100) year += 2000;
 
   return {
-    monthHeaders: headers,
-    grantedValues: rowToSeries(granted, headers, 'Limits Granted (S$M)'),
-    utilisedValues: rowToSeries(utilised, headers, 'Utilised (%)')
+    period: `${year}-${String(monthNum).padStart(2, '0')}`,
+    prelim
   };
 }
 
-function collectStrings(node, acc = new Set(), depth = 0) {
-  if (depth > 8 || node == null) return acc;
-  if (typeof node === 'string') {
-    acc.add(node);
-    return acc;
-  }
-  if (Array.isArray(node)) {
-    for (const item of node) collectStrings(item, acc, depth + 1);
-    return acc;
-  }
-  if (typeof node === 'object') {
-    for (const value of Object.values(node)) collectStrings(value, acc, depth + 1);
-  }
-  return acc;
+function findHeaderIndex(rows) {
+  return rows.findIndex((row) => row.some((cell) => sanitizeText(cell) === END_OF_PERIOD_HEADER));
 }
 
-function extractJsonBlobsFromHtml(html) {
-  const blobs = [];
-  const scriptRegex = /<script\b([^>]*)>([\s\S]*?)<\/script>/gi;
-  let m;
-  while ((m = scriptRegex.exec(String(html || ''))) !== null) {
-    const attrs = m[1] || '';
-    const body = (m[2] || '').trim();
-    if (/\bsrc\s*=/.test(attrs) || !body) continue;
-    if (!/__NEXT_DATA__|__INITIAL_STATE__|runtimeConfig|End of Period|Building and Construction/i.test(body)) continue;
-
-    const trimmed = body.startsWith('window.__INITIAL_STATE__')
-      ? body.replace(/^window\.__INITIAL_STATE__\s*=\s*/, '').replace(/;\s*$/, '')
-      : body;
-
-    if (/^\{[\s\S]*\}$|^\[[\s\S]*\]$/.test(trimmed)) {
-      try {
-        blobs.push(JSON.parse(trimmed));
-      } catch (_) {
-        // ignore
-      }
-    }
-  }
-
-  const nextData = String(html || '').match(/<script[^>]*id=["']__NEXT_DATA__["'][^>]*>([\s\S]*?)<\/script>/i);
-  if (nextData) {
-    try {
-      blobs.push(JSON.parse(nextData[1]));
-    } catch (_) {
-      // ignore
-    }
-  }
-
-  return blobs;
+function detectHeaders(headerRow) {
+  return headerRow.map((cell) => sanitizeText(cell));
 }
 
-function normalizeCandidateUrl(value, baseUrl) {
-  const text = String(value || '').trim().replace(/\\\//g, '/');
-  if (!text) return null;
-  if (!/api|msb|bulletin|statistics/i.test(text)) return null;
+function parseMasI6Csv(csvText) {
+  const rows = parseCsv(csvText);
+  if (!rows.length) throw new Error('CSV parser returned 0 rows');
 
-  const cleaned = text.replace(/^['"]|['"]$/g, '');
-  try {
-    return new URL(cleaned, baseUrl).toString();
-  } catch (_) {
-    return null;
+  const headerIndex = findHeaderIndex(rows);
+  if (headerIndex === -1) throw new Error('Could not find header row containing "End of Period"');
+
+  const headers = detectHeaders(rows[headerIndex]);
+  const periodCol = headers.findIndex((h) => h === END_OF_PERIOD_HEADER);
+  const grantedCol = headers.findIndex((h) => h === GRANTED_HEADER);
+  const utilisedCol = headers.findIndex((h) => h === UTILISED_HEADER);
+
+  if (periodCol === -1 || grantedCol === -1 || utilisedCol === -1) {
+    const first30 = headers.slice(0, 30).join(' | ');
+    throw new Error(
+      `Required MAS I.6 columns not found. Need: "${GRANTED_HEADER}" and "${UTILISED_HEADER}". First headers: ${first30}`
+    );
   }
-}
 
-function extractScriptSrcUrls(html, baseUrl) {
-  const urls = new Set();
-  for (const m of String(html || '').matchAll(/<script\b[^>]*\bsrc\s*=\s*["']([^"']+)["'][^>]*>/gi)) {
-    try {
-      urls.add(new URL(m[1], baseUrl).toString());
-    } catch (_) {
-      // ignore
-    }
+  const grantedValues = [];
+  const utilisedValues = [];
+  const parsedPeriods = [];
+
+  for (let i = headerIndex + 1; i < rows.length; i += 1) {
+    const row = rows[i];
+    const periodInfo = parseEndOfPeriod(row[periodCol]);
+    if (!periodInfo) continue;
+
+    const grantedNum = parseNumberCell(row[grantedCol]);
+    const utilisedNum = parseNumberCell(row[utilisedCol]);
+    if (grantedNum != null) grantedValues.push({ period: periodInfo.period, prelim: periodInfo.prelim, value: grantedNum });
+    if (utilisedNum != null) utilisedValues.push({ period: periodInfo.period, prelim: periodInfo.prelim, value: utilisedNum });
+    parsedPeriods.push(periodInfo);
   }
-  return [...urls];
-}
 
-function extractCandidatesFromTextBlob(text, baseUrl) {
-  const candidates = new Set();
-  const regex = /(https?:\/\/[^"'\s)]+|\/[a-z0-9._~!$&'()*+,;=:@%\/-]*(?:api|msb|bulletin|statistics)[a-z0-9._~!$&'()*+,;=:@%\/-]*)/gi;
-  for (const m of String(text || '').matchAll(regex)) {
-    const candidate = normalizeCandidateUrl(m[1], baseUrl);
-    if (candidate) candidates.add(candidate);
-  }
-  return [...candidates];
-}
+  if (!grantedValues.length) throw new Error(`No numeric values parsed for column: ${GRANTED_HEADER}`);
+  if (!utilisedValues.length) throw new Error(`No numeric values parsed for column: ${UTILISED_HEADER}`);
 
-function matrixFromObjectArray(arr) {
-  if (!Array.isArray(arr) || !arr.length || !arr.every((x) => x && typeof x === 'object' && !Array.isArray(x))) return null;
-  return arr.map((obj) => Object.values(obj));
-}
+  grantedValues.sort((a, b) => a.period.localeCompare(b.period));
+  utilisedValues.sort((a, b) => a.period.localeCompare(b.period));
 
-function findSeriesInPayload(payload) {
-  const queue = [payload];
-  const seen = new Set();
-  while (queue.length) {
-    const node = queue.shift();
-    if (!node || typeof node !== 'object') continue;
-    if (seen.has(node)) continue;
-    seen.add(node);
+  const newestPeriods = [...parsedPeriods]
+    .sort((a, b) => a.period.localeCompare(b.period))
+    .slice(-3)
+    .reverse();
 
-    if (Array.isArray(node)) {
-      const directMatrix = node.every(Array.isArray) ? node : null;
-      const objectMatrix = directMatrix ? null : matrixFromObjectArray(node);
-      const matrix = directMatrix || objectMatrix;
-      if (matrix) {
-        const extracted = extractSeriesFromMatrix(matrix);
-        if (extracted) return extracted;
-      }
-    }
-
-    for (const value of Object.values(node)) {
-      if (value && typeof value === 'object') queue.push(value);
-    }
-  }
-  return null;
-}
-
-async function fetchJsonLike(url, headers) {
-  const res = await fetch(url, { headers });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const contentType = res.headers.get('content-type') || '';
-  const text = await res.text();
-  if (/json|javascript|text\/plain/i.test(contentType) || /^[\[{]/.test(text.trim())) {
-    try {
-      return JSON.parse(text);
-    } catch (_) {
-      return { raw: text };
-    }
-  }
-  return { raw: text };
-}
-
-async function discoverAndFetchApiSeries(html, { headers, verifyMode = false } = {}) {
-  const debug = {
-    candidateCount: 0,
-    triedEndpoints: [],
-    foundViaApi: false,
-    foundViaEmbeddedJson: false
+  return {
+    grantedValues,
+    utilisedValues,
+    extractedRowCount: parsedPeriods.length,
+    newestPeriods,
+    detectedHeaders: headers
   };
-
-  const candidates = new Set();
-  extractCandidatesFromTextBlob(html, MAS_MSB_I6_PAGE_URL).forEach((x) => candidates.add(x));
-
-  const jsonBlobs = extractJsonBlobsFromHtml(html);
-  for (const blob of jsonBlobs) {
-    const embedded = findSeriesInPayload(blob);
-    if (embedded) {
-      debug.foundViaEmbeddedJson = true;
-      return { ...embedded, source: 'embedded-json', debug };
-    }
-    collectStrings(blob).forEach((s) => extractCandidatesFromTextBlob(s, MAS_MSB_I6_PAGE_URL).forEach((x) => candidates.add(x)));
-  }
-
-  const scriptUrls = extractScriptSrcUrls(html, MAS_MSB_I6_PAGE_URL);
-  const prioritized = scriptUrls.filter((url) => /main|runtime|chunk|bundle/i.test(url));
-  const bundleTargets = prioritized.length ? prioritized.slice(0, 3) : scriptUrls.slice(0, 2);
-  for (const scriptUrl of bundleTargets) {
-    try {
-      const scriptText = await (await fetch(scriptUrl, { headers })).text();
-      extractCandidatesFromTextBlob(scriptText, MAS_MSB_I6_PAGE_URL).forEach((x) => candidates.add(x));
-    } catch (_) {
-      // best effort only
-    }
-  }
-
-  debug.candidateCount = candidates.size;
-  for (const endpoint of candidates) {
-    debug.triedEndpoints.push(endpoint);
-    try {
-      const payload = await fetchJsonLike(endpoint, { ...headers, accept: 'application/json,text/plain,*/*' });
-      const extracted = findSeriesInPayload(payload);
-      if (extracted) {
-        debug.foundViaApi = true;
-        return { ...extracted, source: `api:${endpoint}`, debug };
-      }
-    } catch (_) {
-      // continue trying next candidate
-    }
-  }
-
-  if (verifyMode) {
-    console.log(`[verify-mas-msb-i6] api_candidate_count=${debug.candidateCount}`);
-    console.log(`[verify-mas-msb-i6] api_candidates_tried=${debug.triedEndpoints.join(', ') || 'none'}`);
-  }
-
-  return { result: null, debug };
 }
 
-async function scrapeWithPlaywright({ headers, verifyMode = false } = {}) {
-  let playwright;
-  try {
-    playwright = require('playwright');
-  } catch (err) {
-    throw new Error(`Playwright unavailable for fallback: ${err.message}`);
+async function dumpArtifactsOnFailure({ downloadPath, csvText, parseError, detectedHeaders, verifyMode }) {
+  if (!verifyMode) return;
+  const artifactsDir = path.join(process.cwd(), 'artifacts');
+  await fs.mkdir(artifactsDir, { recursive: true });
+
+  if (downloadPath) {
+    try {
+      const artifactPath = path.join(artifactsDir, 'mas_i6_failed.csv');
+      await fs.copyFile(downloadPath, artifactPath);
+      console.log(`[verify-mas-msb-i6] saved_failed_csv=${artifactPath}`);
+    } catch (err) {
+      console.log(`[verify-mas-msb-i6] failed_to_save_csv_artifact=${err.message}`);
+    }
   }
 
-  const browser = await playwright.chromium.launch({ headless: true });
-  const context = await browser.newContext({ extraHTTPHeaders: headers });
-  const page = await context.newPage();
-  let appeared = false;
+  if (csvText) {
+    const first5 = csvText
+      .split(/\r?\n/)
+      .slice(0, 5)
+      .map((line) => sanitizeText(line).slice(0, 240));
+    console.log(`[verify-mas-msb-i6] csv_first_5_lines=${first5.join(' || ')}`);
+  }
 
-  try {
-    await page.goto(MAS_MSB_I6_PAGE_URL, { waitUntil: 'domcontentloaded', timeout: 30_000 });
-    await page.waitForSelector('#transposed-table', { timeout: 30_000 });
-    appeared = true;
+  if (Array.isArray(detectedHeaders) && detectedHeaders.length) {
+    console.log(`[verify-mas-msb-i6] detected_headers=${detectedHeaders.slice(0, 30).join(' | ')}`);
+  }
 
-    const tableData = await page.evaluate(() => {
-      const table = document.querySelector('#transposed-table');
-      if (!table) return null;
-      const readText = (el) => (el?.textContent || '').replace(/\s+/g, ' ').trim();
-      const headerRow = [...table.querySelectorAll('thead tr')]
-        .map((tr) => [...tr.querySelectorAll('th,td')].map(readText))
-        .find((row) => row[0] === 'End of Period');
-      if (!headerRow) return null;
-
-      const bodyRows = [...table.querySelectorAll('tbody tr')].map((tr) => [...tr.querySelectorAll('th,td')].map(readText));
-      const anchor = bodyRows.findIndex((row) => row[0] === 'Building and Construction');
-      if (anchor === -1) return null;
-
-      let granted;
-      let utilised;
-      for (let i = anchor + 1; i < bodyRows.length; i += 1) {
-        const label = bodyRows[i][0];
-        if (label === 'Limits Granted (S$M)') granted = bodyRows[i];
-        if (label === 'Utilised (%)') utilised = bodyRows[i];
-        if (granted && utilised) break;
-      }
-
-      if (!granted || !utilised) return null;
-      return { headerRow, granted, utilised };
-    });
-
-    if (!tableData) throw new Error('Failed to parse #transposed-table in Playwright fallback');
-
-    const headersParsed = tableData.headerRow.slice(1).map(parseMonthHeader).filter(Boolean);
-    if (!headersParsed.length) throw new Error('No month headers parsed in Playwright fallback');
-
-    return {
-      source: 'playwright-dom',
-      monthHeaders: headersParsed,
-      grantedValues: rowToSeries(tableData.granted, headersParsed, 'Limits Granted (S$M)'),
-      utilisedValues: rowToSeries(tableData.utilised, headersParsed, 'Utilised (%)'),
-      debug: {
-        playwrightTableAppeared: appeared
-      }
-    };
-  } finally {
-    if (verifyMode) {
-      console.log(`[verify-mas-msb-i6] playwright_table_appeared=${appeared}`);
-    }
-    await context.close();
-    await browser.close();
+  if (parseError) {
+    console.log(`[verify-mas-msb-i6] parse_error=${parseError.message}`);
   }
 }
 
 async function fetchMasMsbI6Monthly({ verifyMode = false } = {}) {
-  const headers = {
-    accept: 'text/html,*/*',
-    'user-agent': 'macro-indicator-bot/1.0'
-  };
+  const outputPath = verifyMode ? path.join(process.cwd(), 'artifacts', 'mas_i6.csv') : '/tmp/mas_i6.csv';
+  let csvText = '';
+  let detectedHeaders = [];
 
-  const backoffs = [0, 700, 1400];
-  let lastError;
+  try {
+    const download = await downloadMasI6Csv({ outputPath, verifyMode });
+    csvText = await fs.readFile(download.outputPath, 'utf8');
+    const parsed = parseMasI6Csv(csvText);
 
-  for (let attempt = 0; attempt < backoffs.length; attempt += 1) {
-    if (backoffs[attempt] > 0) await sleep(backoffs[attempt]);
-
-    try {
-      const res = await fetch(MAS_MSB_I6_PAGE_URL, { headers });
-      if (!res.ok) throw new Error(`MAS MSB I.6 page not reachable: HTTP ${res.status}`);
-      const html = await res.text();
-      if (html.includes(MAINTENANCE_TEXT)) {
-        throw new MasMsbI6TemporaryError(`MAS MSB I.6 page temporary failure: ${MAINTENANCE_TEXT}`);
-      }
-
-      const stage1 = await discoverAndFetchApiSeries(html, { headers, verifyMode });
-      if (stage1?.monthHeaders?.length) {
-        if (verifyMode) {
-          console.log(`[verify-mas-msb-i6] extraction_source=${stage1.source}`);
-          console.log(`[verify-mas-msb-i6] api_candidate_count=${stage1.debug.candidateCount}`);
-          console.log(`[verify-mas-msb-i6] api_candidates_tried=${stage1.debug.triedEndpoints.join(', ') || 'none'}`);
-        }
-        return stage1;
-      }
-
-      if (verifyMode) {
-        console.log(`[verify-mas-msb-i6] api_candidate_count=${stage1.debug.candidateCount}`);
-        console.log(`[verify-mas-msb-i6] api_candidates_tried=${stage1.debug.triedEndpoints.join(', ') || 'none'}`);
-        console.log('[verify-mas-msb-i6] stage1_failed=true');
-      }
-
-      try {
-        const stage2 = await scrapeWithPlaywright({ headers, verifyMode });
-        if (verifyMode) {
-          console.log(`[verify-mas-msb-i6] extraction_source=${stage2.source}`);
-        }
-        return stage2;
-      } catch (fallbackErr) {
-        const err = new Error(`MAS MSB I.6 extraction failed after API+Playwright attempts: ${fallbackErr.message}`);
-        err.cause = fallbackErr;
-        throw err;
-      }
-    } catch (err) {
-      if (err instanceof MasMsbI6TemporaryError) throw err;
-      lastError = err;
+    if (verifyMode) {
+      const grantedLatest = parsed.grantedValues[parsed.grantedValues.length - 1];
+      const utilisedLatest = parsed.utilisedValues[parsed.utilisedValues.length - 1];
+      console.log(`[verify-mas-msb-i6] extracted_row_count=${parsed.extractedRowCount}`);
+      console.log(`[verify-mas-msb-i6] newest_3_periods=${parsed.newestPeriods.map((p) => `${p.period}, prelim=${p.prelim}`).join(' | ')}`);
+      console.log(`[verify-mas-msb-i6] granted_latest=${grantedLatest.period} value=${grantedLatest.value} prelim=${grantedLatest.prelim}`);
+      console.log(`[verify-mas-msb-i6] utilised_latest=${utilisedLatest.period} value=${utilisedLatest.value} prelim=${utilisedLatest.prelim}`);
+      console.log(`[verify-mas-msb-i6] csv_downloaded_size_bytes=${download.sizeBytes}`);
     }
-  }
 
-  throw lastError || new Error('Failed to fetch MAS MSB I.6 page');
+    return parsed;
+  } catch (err) {
+    try {
+      if (!detectedHeaders.length && csvText) {
+        const rows = parseCsv(csvText);
+        const headerIndex = findHeaderIndex(rows);
+        if (headerIndex !== -1) detectedHeaders = detectHeaders(rows[headerIndex]);
+      }
+    } catch (_) {
+      // ignore secondary parse diagnostics failures
+    }
+    await dumpArtifactsOnFailure({ downloadPath: outputPath, csvText, parseError: err, detectedHeaders, verifyMode });
+    throw err;
+  }
 }
 
 module.exports = {
   MAS_MSB_I6_PAGE_URL,
-  MasMsbI6TemporaryError,
-  fetchMasMsbI6Monthly
+  fetchMasMsbI6Monthly,
+  parseMasI6Csv,
+  parseEndOfPeriod
 };
