@@ -130,7 +130,7 @@ function toNumber(value) {
 
 function parsePeriodToDate(period) {
   const p = String(period).trim();
-  let m = p.match(/^(\d{4})\s+Q([1-4])$/i);
+  let m = p.match(/^(\d{4})\s*Q([1-4])$/i);
   if (m) {
     const year = Number(m[1]);
     const quarter = Number(m[2]);
@@ -140,26 +140,32 @@ function parsePeriodToDate(period) {
   if (m) return new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[4] || '1')));
   m = p.match(/^([A-Za-z]{3,})\s+(\d{4})$/);
   if (m) {
-    const month = new Date(`${m[1]} 1, 2000`).getMonth();
+    const month = new Date(`${m[1].slice(0, 3)} 1, 2000`).getMonth();
     if (!Number.isNaN(month)) return new Date(Date.UTC(Number(m[2]), month, 1));
   }
   m = p.match(/^(\d{4})\s+([A-Za-z]{3,})$/);
   if (m) {
-    const month = new Date(`${m[2]} 1, 2000`).getMonth();
+    const month = new Date(`${m[2].slice(0, 3)} 1, 2000`).getMonth();
     if (!Number.isNaN(month)) return new Date(Date.UTC(Number(m[1]), month, 1));
   }
   return null;
 }
 
-function extractLatestFromRecord(record) {
-  const entries = Object.entries(record)
-    .map(([k, v]) => ({ period: k, value: toNumber(v), dt: parsePeriodToDate(k) }))
-    .filter((x) => x.dt && x.value != null)
+function detectTimeColumns(record) {
+  return Object.keys(record)
+    .map((key) => ({ key, dt: parsePeriodToDate(key) }))
+    .filter((x) => x.dt)
     .sort((a, b) => a.dt - b.dt);
+}
 
-  if (!entries.length) return null;
-  const latest = entries[entries.length - 1];
-  return { period: latest.period, value: latest.value };
+function extractLatestFromRecord(record) {
+  const timeColumns = detectTimeColumns(record);
+  for (let i = timeColumns.length - 1; i >= 0; i -= 1) {
+    const period = timeColumns[i].key;
+    const value = toNumber(record[period]);
+    if (value != null) return { period, value };
+  }
+  return null;
 }
 
 function detectSeriesField(records) {
@@ -175,6 +181,18 @@ async function fetchDataset(datasetId, limit = 5000) {
   const json = await res.json();
   if (!json?.success || !Array.isArray(json?.result?.records)) {
     throw new Error(`Unexpected CKAN payload for ${datasetId}`);
+  }
+  return json.result.records;
+}
+
+async function fetchDatasetByQuery(datasetId, query, limit = 200) {
+  const effectiveLimit = Math.max(200, limit);
+  const params = new URLSearchParams({ resource_id: datasetId, limit: String(effectiveLimit), q: query });
+  const url = `${CKAN_BASE}?${params.toString()}`;
+  const res = await fetchWithRetry(url, {}, { label: `${datasetId} (q=${query})` });
+  const json = await res.json();
+  if (!json?.success || !Array.isArray(json?.result?.records)) {
+    throw new Error(`Unexpected CKAN payload for ${datasetId} (q=${query})`);
   }
   return json.result.records;
 }
@@ -381,7 +399,16 @@ async function buildMacroIndicators(verifyOnly = false) {
   const series = {};
 
   for (const datasetId of DATASET_IDS) {
-    const records = await fetchDataset(datasetId);
+    let records;
+    if (datasetId === 'd_5fe5a4bb4a1ecc4d8a56a095832e2b24' && verifyOnly) {
+      const queried = await Promise.all([
+        fetchDatasetByQuery(datasetId, 'SGS 10', 200),
+        fetchDatasetByQuery(datasetId, 'SGS 2', 200)
+      ]);
+      records = queried.flat();
+    } else {
+      records = await fetchDataset(datasetId);
+    }
     if (!records.length) throw new Error(`Dataset ${datasetId} returned 0 rows`);
     const seriesField = detectSeriesField(records);
     if (!seriesField) throw new Error(`Dataset ${datasetId} has no detectable series field`);
@@ -391,7 +418,13 @@ async function buildMacroIndicators(verifyOnly = false) {
         const row = findSeriesOrThrow(records, seriesField, requirement, datasetId);
         const latest = extractLatestFromRecord(row);
         if (!latest) throw new Error(`Latest extraction failed for ${datasetId} -> ${requirement.target}`);
-        console.log(`[verify] ${datasetId} matched "${requirement.target}"`);
+        if (verifyOnly) {
+          const timeColumns = detectTimeColumns(row);
+          const top5Recent = timeColumns.slice(-5).reverse().map((x) => x.key);
+          console.log(`[verify] ${datasetId} matched Data Series exact string: "${requirement.target}"`);
+          console.log(`[verify] ${datasetId} detected time columns: ${timeColumns.length}`);
+          console.log(`[verify] ${datasetId} top 5 recent time keys: ${top5Recent.join(' | ') || '(none)'}`);
+        }
 
         if (!verifyOnly) {
           const units = requirement.key.startsWith('loan_') ? 'S$ million' : '%';
