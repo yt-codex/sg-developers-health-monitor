@@ -22,10 +22,9 @@ Conservative hygiene pass focused on deleting only items with strong evidence of
 - **Why kept:** It is directly imported by `scripts/update_macro_indicators.js` and used by the `verify:macro-sources` / `update:macro` paths. Dynamic and fallback paths make conservative deletion unsafe.
 - **Follow-up check:** If desired, add focused unit tests for helper branches, then prune only branches proven unreachable.
 
-### 2) Playwright-related workflow steps in `.github/workflows/update-macro.yml`
-- **Why suspicious:** Workflow installs Playwright/browser binaries, but no local Playwright dependency exists in `package.json`.
-- **Why kept:** CI workflow explicitly references Playwright install/cache steps; this is deployment/CI behavior and must not be deleted without CI policy confirmation.
-- **Follow-up check:** Validate whether browser automation is still needed for macro source verification.
+### 2) Workflow dependency cleanup in `.github/workflows/update-macro.yml`
+- **Resolution:** Removed Playwright environment variable, cache step, and browser install step after confirming no repository code depends on Playwright.
+- **Result:** Macro update workflow now runs only Node setup, dependency install, and macro verify/update commands.
 
 ## Dependency changes
 - **No dependency removals performed.**
