@@ -216,7 +216,7 @@
     }
   ],
   "macro_indicators": {
-    "last_updated_utc": "2026-02-21T08:07:56.238Z",
+    "last_updated_utc": "2026-02-21T08:30:49.795Z",
     "sources": [
       {
         "name": "data.gov.sg",
@@ -252,7 +252,7 @@
         "latest_value": 2.22,
         "units": "%",
         "status": "ok",
-        "last_ok_utc": "2026-02-21T08:07:56.238Z"
+        "last_ok_utc": "2026-02-21T08:30:49.795Z"
       },
       "sgs_2y": {
         "freq": "M",
@@ -260,7 +260,7 @@
         "latest_value": 1.48,
         "units": "%",
         "status": "ok",
-        "last_ok_utc": "2026-02-21T08:07:56.238Z"
+        "last_ok_utc": "2026-02-21T08:30:49.795Z"
       },
       "term_spread_10y_2y": {
         "freq": "M",
@@ -268,23 +268,39 @@
         "latest_value": 0.74,
         "units": "pp",
         "status": "ok",
-        "last_ok_utc": "2026-02-21T08:07:56.238Z"
+        "last_ok_utc": "2026-02-21T08:30:49.795Z"
       },
       "unit_labour_cost_construction": {
-        "status": "failed",
-        "error_summary": "0 time fields seriesField=DataSeries seriesName=Unit Labour Cost Of Construction"
+        "status": "ok",
+        "freq": "Q",
+        "latest_period": "20253Q",
+        "latest_value": 137.8,
+        "units": "%",
+        "last_ok_utc": "2026-02-21T08:30:49.795Z"
       },
       "loan_bc_total": {
-        "status": "failed",
-        "error_summary": "0 time fields seriesField=DataSeries seriesName=Loans To Businesses - Building And Construction - Total"
+        "status": "ok",
+        "freq": "M",
+        "latest_period": "2025Dec",
+        "latest_value": 182422.9,
+        "units": "S$ million",
+        "last_ok_utc": "2026-02-21T08:30:49.795Z"
       },
       "loan_bc_construction": {
-        "status": "failed",
-        "error_summary": "0 time fields seriesField=DataSeries seriesName=Loans To Businesses - Building And Construction - Construction"
+        "status": "ok",
+        "freq": "M",
+        "latest_period": "2025Dec",
+        "latest_value": 9282.8,
+        "units": "S$ million",
+        "last_ok_utc": "2026-02-21T08:30:49.795Z"
       },
       "loan_bc_real_property": {
-        "status": "failed",
-        "error_summary": "0 time fields seriesField=DataSeries seriesName=Loans To Businesses - Building And Construction - Real Property And Development Of Land"
+        "status": "ok",
+        "freq": "M",
+        "latest_period": "2025Dec",
+        "latest_value": 173140.1,
+        "units": "S$ million",
+        "last_ok_utc": "2026-02-21T08:30:49.795Z"
       },
       "dataset_d_29f7b431ad79f61f19a731a6a86b0247": {
         "status": "failed",
@@ -325,42 +341,102 @@
       "loan_limits_utilised_building_construction": {
         "status": "failed",
         "error_summary": "Unable to extract MAS MSB I.6 construction granted/utilised rows."
+      },
+      "construction_material_steel_reinforcement_bars_16_32mm_high_tensile": {
+        "freq": "M",
+        "latest_period": "2025Dec",
+        "latest_value": 660,
+        "units": "index",
+        "source_series_name": "Steel Reinforcement Bars (16-32mm High Tensile)",
+        "status": "ok",
+        "last_ok_utc": "2026-02-21T08:30:49.795Z"
+      },
+      "construction_material_cement_in_bulk_ordinary_portland_cement": {
+        "freq": "M",
+        "latest_period": "2025Dec",
+        "latest_value": 110,
+        "units": "index",
+        "source_series_name": "Cement In Bulk (Ordinary Portland Cement)",
+        "status": "ok",
+        "last_ok_utc": "2026-02-21T08:30:49.795Z"
+      },
+      "construction_material_concreting_sand": {
+        "freq": "M",
+        "latest_period": "2025Dec",
+        "latest_value": 27,
+        "units": "index",
+        "source_series_name": "Concreting Sand",
+        "status": "ok",
+        "last_ok_utc": "2026-02-21T08:30:49.795Z"
+      },
+      "private_available_private_sector_office_space_available": {
+        "freq": "Q",
+        "latest_period": "20254Q",
+        "latest_value": 6905,
+        "units": "sqm",
+        "source_series_name": "Private Sector Office Space Available",
+        "status": "ok",
+        "last_ok_utc": "2026-02-21T08:30:49.795Z"
+      },
+      "private_available_private_sector_retail_space_available": {
+        "freq": "Q",
+        "latest_period": "20254Q",
+        "latest_value": 4754,
+        "units": "sqm",
+        "source_series_name": "Private Sector Retail Space Available",
+        "status": "ok",
+        "last_ok_utc": "2026-02-21T08:30:49.795Z"
+      },
+      "private_available_private_sector_business_park_space_available": {
+        "freq": "Q",
+        "latest_period": "20254Q",
+        "latest_value": 2191,
+        "units": "sqm",
+        "source_series_name": "Private Sector Business Park Space Available",
+        "status": "ok",
+        "last_ok_utc": "2026-02-21T08:30:49.795Z"
+      },
+      "private_available_private_sector_multiple_user_factory_space_available": {
+        "freq": "Q",
+        "latest_period": "20254Q",
+        "latest_value": 10051,
+        "units": "sqm",
+        "source_series_name": "Private Sector Multiple-User Factory Space Available",
+        "status": "ok",
+        "last_ok_utc": "2026-02-21T08:30:49.795Z"
+      },
+      "gdp_industry__construction": {
+        "freq": "Q",
+        "latest_period": "20253Q",
+        "latest_value": 7056.5,
+        "units": "S$ million",
+        "source_series_name": "        Construction",
+        "status": "ok",
+        "last_ok_utc": "2026-02-21T08:30:49.795Z"
+      },
+      "gdp_industry__real_estate_professional_services_and_administrative_support_services": {
+        "freq": "Q",
+        "latest_period": "20253Q",
+        "latest_value": 20058.6,
+        "units": "S$ million",
+        "source_series_name": "        Real Estate, Professional Services And Administrative & Support Services",
+        "status": "ok",
+        "last_ok_utc": "2026-02-21T08:30:49.795Z"
+      },
+      "gdp_industry__real_estate": {
+        "freq": "Q",
+        "latest_period": "20253Q",
+        "latest_value": 5532.1,
+        "units": "S$ million",
+        "source_series_name": "            Real Estate",
+        "status": "ok",
+        "last_ok_utc": "2026-02-21T08:30:49.795Z"
       }
     },
     "update_run": {
-      "ok_count": 3,
-      "failed_count": 14,
+      "ok_count": 10,
+      "failed_count": 7,
       "failed_items": [
-        {
-          "name": "unit_labour_cost_construction",
-          "source": "data.gov.sg",
-          "dataset_ref": "d_f9fc9b5420d96bcab45bc31eeb8ae3c3",
-          "error_summary": "0 time fields seriesField=DataSeries seriesName=Unit Labour Cost Of Construction"
-        },
-        {
-          "name": "loan_bc_total",
-          "source": "data.gov.sg",
-          "dataset_ref": "d_af0415517a3a3a94b3b74039934ef976",
-          "error_summary": "0 time fields seriesField=DataSeries seriesName=Loans To Businesses - Building And Construction - Total"
-        },
-        {
-          "name": "loan_bc_construction",
-          "source": "data.gov.sg",
-          "dataset_ref": "d_af0415517a3a3a94b3b74039934ef976",
-          "error_summary": "0 time fields seriesField=DataSeries seriesName=Loans To Businesses - Building And Construction - Construction"
-        },
-        {
-          "name": "loan_bc_real_property",
-          "source": "data.gov.sg",
-          "dataset_ref": "d_af0415517a3a3a94b3b74039934ef976",
-          "error_summary": "0 time fields seriesField=DataSeries seriesName=Loans To Businesses - Building And Construction - Real Property And Development Of Land"
-        },
-        {
-          "name": "dataset_d_29f7b431ad79f61f19a731a6a86b0247",
-          "source": "data.gov.sg",
-          "dataset_ref": "d_29f7b431ad79f61f19a731a6a86b0247",
-          "error_summary": "0 time columns detected"
-        },
         {
           "name": "dataset_d_ba3c493ad160125ce347d5572712f14f",
           "source": "data.gov.sg",
@@ -384,18 +460,6 @@
           "source": "data.gov.sg",
           "dataset_ref": "d_4dca06508cd9d0a8076153443c17ea5f",
           "error_summary": "no matching series"
-        },
-        {
-          "name": "dataset_d_e9cc9d297b1cf8024cf99db4b12505cc",
-          "source": "data.gov.sg",
-          "dataset_ref": "d_e9cc9d297b1cf8024cf99db4b12505cc",
-          "error_summary": "0 time columns detected"
-        },
-        {
-          "name": "dataset_d_df200b7f89f94e52964ff45cd7878a30",
-          "source": "data.gov.sg",
-          "dataset_ref": "d_df200b7f89f94e52964ff45cd7878a30",
-          "error_summary": "0 time columns detected"
         },
         {
           "name": "sora_overnight",
