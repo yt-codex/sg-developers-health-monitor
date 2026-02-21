@@ -216,13 +216,12 @@
     }
   ],
   "macro_indicators": {
-    "last_updated_utc": "2026-02-21T18:45:39.832Z",
+    "last_updated_utc": "2026-02-21T19:04:24.171Z",
     "sources": [
       {
         "name": "data.gov.sg",
         "method": "datastore_search",
         "dataset_ids": [
-          "d_5fe5a4bb4a1ecc4d8a56a095832e2b24",
           "d_29f7b431ad79f61f19a731a6a86b0247",
           "d_ba3c493ad160125ce347d5572712f14f",
           "d_f9fc9b5420d96bcab45bc31eeb8ae3c3",
@@ -235,9 +234,10 @@
         ]
       },
       {
-        "name": "MAS eServices",
-        "method": "html_form_parse",
-        "url": "https://eservices.mas.gov.sg/statistics/dir/domesticinterestrates.aspx"
+        "name": "SingStat TableBuilder",
+        "method": "json_api_parse",
+        "table_id": "TS/M700071",
+        "table_url": "https://tablebuilder.singstat.gov.sg/table/TS/M700071"
       },
       {
         "name": "MAS I.6 JSON API",
@@ -251,24 +251,27 @@
         "latest_period": "2025Dec",
         "latest_value": 2.22,
         "units": "%",
-        "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "status": "failed",
+        "last_ok_utc": "2026-02-21T18:45:39.832Z",
+        "error_summary": "HTTP 404 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/TS/M700071)"
       },
       "sgs_2y": {
         "freq": "M",
         "latest_period": "2025Dec",
         "latest_value": 1.48,
         "units": "%",
-        "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "status": "failed",
+        "last_ok_utc": "2026-02-21T18:45:39.832Z",
+        "error_summary": "HTTP 404 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/TS/M700071)"
       },
       "term_spread_10y_2y": {
         "freq": "M",
         "latest_period": "2025Dec",
         "latest_value": 0.74,
         "units": "pp",
-        "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "status": "failed",
+        "last_ok_utc": "2026-02-21T18:45:39.832Z",
+        "error_summary": "HTTP 404 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/TS/M700071)"
       },
       "unit_labour_cost_construction": {
         "status": "ok",
@@ -276,7 +279,7 @@
         "latest_period": "20253Q",
         "latest_value": 137.8,
         "units": "%",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "loan_bc_total": {
         "status": "ok",
@@ -284,7 +287,7 @@
         "latest_period": "2025Dec",
         "latest_value": 182422.9,
         "units": "S$ million",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "loan_bc_construction": {
         "status": "ok",
@@ -292,7 +295,7 @@
         "latest_period": "2025Dec",
         "latest_value": 9282.8,
         "units": "S$ million",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "loan_bc_real_property": {
         "status": "ok",
@@ -300,7 +303,7 @@
         "latest_period": "2025Dec",
         "latest_value": 173140.1,
         "units": "S$ million",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "dataset_d_29f7b431ad79f61f19a731a6a86b0247": {
         "status": "failed",
@@ -332,7 +335,7 @@
       },
       "sora_overnight": {
         "status": "failed",
-        "error_summary": "SORA page missing expected selector controls: frequency, series"
+        "error_summary": "HTTP 404 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/TS/M700071)"
       },
       "loan_limits_granted_building_construction": {
         "status": "ok",
@@ -612,7 +615,7 @@
             "value": 266325.2
           }
         ],
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "loan_limits_utilised_building_construction": {
         "status": "ok",
@@ -892,7 +895,7 @@
             "value": 81.6
           }
         ],
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "construction_material_steel_reinforcement_bars_16_32mm_high_tensile": {
         "freq": "M",
@@ -901,7 +904,7 @@
         "units": "index",
         "source_series_name": "Steel Reinforcement Bars (16-32mm High Tensile)",
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "construction_material_cement_in_bulk_ordinary_portland_cement": {
         "freq": "M",
@@ -910,7 +913,7 @@
         "units": "index",
         "source_series_name": "Cement In Bulk (Ordinary Portland Cement)",
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "construction_material_concreting_sand": {
         "freq": "M",
@@ -919,7 +922,7 @@
         "units": "index",
         "source_series_name": "Concreting Sand",
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "private_available_private_sector_office_space_available": {
         "freq": "Q",
@@ -928,7 +931,7 @@
         "units": "sqm",
         "source_series_name": "Private Sector Office Space Available",
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "private_available_private_sector_retail_space_available": {
         "freq": "Q",
@@ -937,7 +940,7 @@
         "units": "sqm",
         "source_series_name": "Private Sector Retail Space Available",
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "private_available_private_sector_business_park_space_available": {
         "freq": "Q",
@@ -946,7 +949,7 @@
         "units": "sqm",
         "source_series_name": "Private Sector Business Park Space Available",
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "private_available_private_sector_multiple_user_factory_space_available": {
         "freq": "Q",
@@ -955,7 +958,7 @@
         "units": "sqm",
         "source_series_name": "Private Sector Multiple-User Factory Space Available",
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "gdp_industry__construction": {
         "freq": "Q",
@@ -964,7 +967,7 @@
         "units": "S$ million",
         "source_series_name": "        Construction",
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "gdp_industry__real_estate_professional_services_and_administrative_support_services": {
         "freq": "Q",
@@ -973,7 +976,7 @@
         "units": "S$ million",
         "source_series_name": "        Real Estate, Professional Services And Administrative & Support Services",
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "gdp_industry__real_estate": {
         "freq": "Q",
@@ -982,7 +985,7 @@
         "units": "S$ million",
         "source_series_name": "            Real Estate",
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "demand_construction_materials_cement": {
         "freq": "M",
@@ -992,7 +995,7 @@
         "datasetId": "d_ba3c493ad160125ce347d5572712f14f",
         "matched_series_label": "Cement",
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "demand_construction_materials_steel_reinforcement_bars": {
         "freq": "M",
@@ -1002,7 +1005,7 @@
         "datasetId": "d_ba3c493ad160125ce347d5572712f14f",
         "matched_series_label": "Steel Reinforcement Bars",
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "demand_construction_materials_granite": {
         "freq": "M",
@@ -1012,7 +1015,7 @@
         "datasetId": "d_ba3c493ad160125ce347d5572712f14f",
         "matched_series_label": "Granite",
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "demand_construction_materials_ready_mixed_concrete": {
         "freq": "M",
@@ -1022,7 +1025,7 @@
         "datasetId": "d_ba3c493ad160125ce347d5572712f14f",
         "matched_series_label": "Ready-Mixed Concrete",
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "prp_pipeline_total_non_landed": {
         "freq": "Q",
@@ -1038,7 +1041,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "prp_pipeline_non_landed_under_construction": {
         "freq": "Q",
@@ -1054,7 +1057,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "prp_pipeline_non_landed_planned_written_permission": {
         "freq": "Q",
@@ -1070,7 +1073,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "prp_pipeline_non_landed_planned_provisional_permission": {
         "freq": "Q",
@@ -1086,7 +1089,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "prp_pipeline_non_landed_planned_others": {
         "freq": "Q",
@@ -1102,7 +1105,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "commind_office_total": {
         "freq": "Q",
@@ -1120,7 +1123,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "commind_office_under_construction": {
         "freq": "Q",
@@ -1138,7 +1141,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "commind_office_planned_written_permission": {
         "freq": "Q",
@@ -1156,7 +1159,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "commind_office_planned_provisional_permission": {
         "freq": "Q",
@@ -1174,7 +1177,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "commind_office_planned_others": {
         "freq": "Q",
@@ -1192,7 +1195,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "commind_business_park_total": {
         "freq": "Q",
@@ -1210,7 +1213,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "commind_business_park_under_construction": {
         "freq": "Q",
@@ -1228,7 +1231,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "commind_business_park_planned_written_permission": {
         "freq": "Q",
@@ -1246,7 +1249,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "commind_business_park_planned_provisional_permission": {
         "freq": "Q",
@@ -1264,7 +1267,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "commind_business_park_planned_others": {
         "freq": "Q",
@@ -1282,7 +1285,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "commind_retail_total": {
         "freq": "Q",
@@ -1300,7 +1303,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "commind_retail_under_construction": {
         "freq": "Q",
@@ -1318,7 +1321,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "commind_retail_planned_written_permission": {
         "freq": "Q",
@@ -1336,7 +1339,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "commind_retail_planned_provisional_permission": {
         "freq": "Q",
@@ -1354,7 +1357,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "commind_retail_planned_others": {
         "freq": "Q",
@@ -1372,7 +1375,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "industrial_pipeline_total": {
         "freq": "Q",
@@ -1388,7 +1391,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "industrial_pipeline_under_construction": {
         "freq": "Q",
@@ -1404,7 +1407,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "industrial_pipeline_written_permission": {
         "freq": "Q",
@@ -1420,7 +1423,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "industrial_pipeline_provisional_permission": {
         "freq": "Q",
@@ -1436,7 +1439,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       },
       "industrial_pipeline_others": {
         "freq": "Q",
@@ -1452,18 +1455,36 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-02-21T18:45:39.832Z"
+        "last_ok_utc": "2026-02-21T19:04:24.171Z"
       }
     },
     "update_run": {
-      "ok_count": 16,
-      "failed_count": 1,
+      "ok_count": 13,
+      "failed_count": 4,
       "failed_items": [
         {
+          "name": "sgs_10y",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/TS/M700071",
+          "error_summary": "HTTP 404 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/TS/M700071)"
+        },
+        {
+          "name": "sgs_2y",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/TS/M700071",
+          "error_summary": "HTTP 404 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/TS/M700071)"
+        },
+        {
+          "name": "term_spread_10y_2y",
+          "source": "derived",
+          "dataset_ref": "sgs_10y-sgs_2y",
+          "error_summary": "HTTP 404 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/TS/M700071)"
+        },
+        {
           "name": "sora_overnight",
-          "source": "MAS eServices",
-          "dataset_ref": "https://eservices.mas.gov.sg/statistics/dir/domesticinterestrates.aspx",
-          "error_summary": "SORA page missing expected selector controls: frequency, series"
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/TS/M700071",
+          "error_summary": "HTTP 404 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/TS/M700071)"
         }
       ]
     }
