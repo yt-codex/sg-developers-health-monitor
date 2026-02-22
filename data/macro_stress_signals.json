@@ -1,0 +1,51 @@
+{
+  "last_updated_sgt": "2026-02-22 08:00",
+  "signals": {
+    "sector_performance": {
+      "status": "Normal",
+      "series_id": "construction_gdp",
+      "as_of": "2025-Q4",
+      "details": {
+        "latest": {
+          "period": "2025-Q4",
+          "value": 0.6
+        },
+        "prev": {
+          "period": "2025-Q3",
+          "value": 2.3
+        }
+      },
+      "tooltip": "Stress if construction_gdp is negative for 2 consecutive quarters."
+    },
+    "labour_cost": {
+      "status": "Normal",
+      "series_id": "unit_labour_cost_construction",
+      "as_of": "2025-Q4",
+      "details": {
+        "yoy_latest": {
+          "period": "2025-Q4",
+          "value": 0.045969
+        },
+        "yoy_prev": {
+          "period": "2025-Q3",
+          "value": 0.028771
+        }
+      },
+      "tooltip": "Stress if Construction Unit Labour Cost (ULC) YoY growth ≥ 8% for 2 consecutive quarters."
+    },
+    "interest_rate": {
+      "status": "Normal",
+      "series_id": "sora_overnight",
+      "as_of": "2026-01",
+      "details": {
+        "current": {
+          "period": "2026-01",
+          "value": 1.1092
+        },
+        "p80_5y": 3.66438,
+        "chg_6m_pp": -0.6424
+      },
+      "tooltip": "Stress if SORA overnight is above its 5-year 80th percentile AND the 6-month change ≥ +0.75pp."
+    }
+  }
+}

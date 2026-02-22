@@ -443,6 +443,14 @@ small { font-size: 0.875rem; }
 .sev-watch { background: #fefce8; color: var(--watch); border-color: #fde68a; }
 .sev-info { background: #eff6ff; color: var(--info); border-color: #bfdbfe; }
 
+.macro-stress-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.7rem;
+}
+
+
 .status-green { background: #f0fdf4; color: var(--ok); border-color: #bbf7d0; }
 .status-amber { background: #fffbeb; color: var(--amber); border-color: #fde68a; }
 .status-red { background: #fef2f2; color: var(--bad); border-color: #fecaca; }
