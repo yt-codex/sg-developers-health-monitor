@@ -230,6 +230,30 @@ small { font-size: 0.875rem; }
   margin: var(--space-2) 0;
 }
 
+
+.sparkline-point {
+  cursor: pointer;
+  outline: none;
+}
+
+.sparkline-point-hit {
+  fill: transparent;
+  pointer-events: all;
+}
+
+.sparkline-point-dot {
+  fill: #38bdf8;
+  opacity: 0.35;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  transform-origin: center;
+}
+
+.sparkline-point:hover .sparkline-point-dot,
+.sparkline-point:focus .sparkline-point-dot {
+  opacity: 1;
+  transform: scale(1.4);
+}
+
 .indicator-title-row {
   display: flex;
   align-items: center;
