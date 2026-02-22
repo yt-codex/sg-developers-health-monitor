@@ -52,6 +52,15 @@ function parseMonthLabel(periodLabel) {
   return null;
 }
 
+function isoDateToQuarterPeriod(dateString) {
+  const match = String(dateString || '').trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+  const month = Number(match[2]);
+  if (month < 1 || month > 12) return null;
+  const quarter = Math.floor((month - 1) / 3) + 1;
+  return `${match[1]}Q${quarter}`;
+}
+
 function findSeriesRowLabel(row) {
   const preferred = ['Data Series', 'data series', 'Series', 'series', 'rowText', 'row_label', 'label'];
   for (const key of preferred) {
@@ -324,6 +333,7 @@ module.exports = {
   SERIES_MAP,
   normalizeLabel,
   parseMonthLabel,
+  isoDateToQuarterPeriod,
   parseTableBuilderPivotJson,
   matchRequiredSeries,
   fetchTableBuilderJson,
