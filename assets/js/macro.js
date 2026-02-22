@@ -72,10 +72,10 @@ const MACRO_INDICATOR_METADATA = [
 ].map(([seriesId, title, why, unit]) => ({ seriesId, title, why, unit }));
 
 function inferFrequency(point, fallbackFrequency = null) {
+  if (fallbackFrequency) return fallbackFrequency;
   const raw = String(point?.rawDate || '');
   if (/^\d{4}Q[1-4]$/.test(raw) || /^\d{4}[1-4]Q$/.test(raw)) return 'Q';
   if (/^\d{4}-(\d{2})$/.test(raw)) return 'M';
-  if (fallbackFrequency) return fallbackFrequency;
   return null;
 }
 
