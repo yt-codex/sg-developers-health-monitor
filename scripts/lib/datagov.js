@@ -173,6 +173,13 @@ function extractLatest(row, timeFields) {
   return null;
 }
 
+function extractSeriesValues(row, timeFields) {
+  return [...(timeFields || [])]
+    .sort((a, b) => a.sortKey - b.sortKey)
+    .map((field) => ({ period: field.id, value: toFiniteNumber(row?.[field.id]) }))
+    .filter((point) => point.value != null);
+}
+
 function normalizeSeriesFieldName(name) {
   return String(name || '').toLowerCase().replace(/[\s_]+/g, '');
 }
@@ -285,6 +292,7 @@ module.exports = {
   approxEqual,
   sumCheck,
   extractLatest,
+  extractSeriesValues,
   toFiniteNumber,
   isMissingValue
 };
