@@ -71,8 +71,45 @@ const MACRO_INDICATOR_METADATA = [
   ['construction_gdp', 'Construction Sector GDP Growth (SA)', 'Growth in construction sector output. Weakening growth can signal softer sector momentum, project delays, or a downturn in construction activity.', '%'],
 ].map(([seriesId, title, why, unit]) => ({ seriesId, title, why, unit }));
 
-function sparklineSvg(series) {
+function inferFrequency(point, fallbackFrequency = null) {
+  if (fallbackFrequency) return fallbackFrequency;
+  const raw = String(point?.rawDate || '');
+  if (/^\d{4}-(\d{2})$/.test(raw)) return 'M';
+  if (/^\d{4}Q[1-4]$/.test(raw) || /^\d{4}[1-4]Q$/.test(raw)) return 'Q';
+  return null;
+}
+
+function formatPointDate(point, fallbackFrequency = null) {
+  if (!point) return 'No data';
+  const frequency = inferFrequency(point, fallbackFrequency);
+
+  if (frequency === 'M' && point.date) {
+    const date = new Date(point.date);
+    if (!Number.isNaN(date.getTime())) {
+      const month = date.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
+      return `${date.getUTCFullYear()} ${month}`;
+    }
+  }
+
+  if (frequency === 'Q') {
+    const quarterMatch = String(point.rawDate).match(/^(\d{4})Q([1-4])$/) || String(point.rawDate).match(/^(\d{4})([1-4])Q$/);
+    if (quarterMatch) return `${quarterMatch[1]} Q${quarterMatch[2]}`;
+    if (point.date) {
+      const date = new Date(point.date);
+      if (!Number.isNaN(date.getTime())) {
+        const quarter = Math.floor(date.getUTCMonth() / 3) + 1;
+        return `${date.getUTCFullYear()} Q${quarter}`;
+      }
+    }
+  }
+
+  if (point.date) return App.formatDate(point.date);
+  return point.rawDate;
+}
+
+function sparklineSvg(series, options = {}) {
   if (!series || series.length < 2) return '<svg class="sparkline"></svg>';
+  const { frequency = null, unit = '' } = options;
   const values = series.map((s) => s.value);
   const min = Math.min(...values);
   const max = Math.max(...values);
@@ -80,10 +117,25 @@ function sparklineSvg(series) {
   const w = 240;
   const h = 72;
   const step = w / (values.length - 1);
-  const points = values
-    .map((v, i) => `${(i * step).toFixed(1)},${(h - ((v - min) / range) * h).toFixed(1)}`)
+  const coordinates = values
+    .map((v, i) => ({
+      x: (i * step).toFixed(1),
+      y: (h - ((v - min) / range) * h).toFixed(1),
+      value: v,
+      date: formatPointDate(series[i], frequency)
+    }));
+  const points = coordinates
+    .map((coord) => `${coord.x},${coord.y}`)
     .join(' ');
-  return `<svg class="sparkline" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polyline fill="none" stroke="#64748b" stroke-width="2" points="${points}" /></svg>`;
+
+  const circles = coordinates
+    .map((coord) => {
+      const hoverText = `${coord.date}: ${coord.value.toFixed(2)} ${unit}`.trim();
+      return `<circle cx="${coord.x}" cy="${coord.y}" r="5" fill="transparent"><title>${escapeHtml(hoverText)}</title></circle>`;
+    })
+    .join('');
+
+  return `<svg class="sparkline" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polyline fill="none" stroke="#64748b" stroke-width="2" points="${points}" />${circles}</svg>`;
 }
 
 function escapeHtml(value) {
@@ -137,29 +189,7 @@ function normalizeSeriesPoints(rawSeries = []) {
 }
 
 function formatLastPointDate(point) {
-  if (!point) return 'No data';
-  if (point.frequency === 'M' && point.date) {
-    const date = new Date(point.date);
-    if (!Number.isNaN(date.getTime())) {
-      const month = date.toLocaleString('en-US', { month: 'short' });
-      return `${date.getUTCFullYear()} ${month}`;
-    }
-  }
-
-  if (point.frequency === 'Q') {
-    const quarterMatch = String(point.rawDate).match(/^(\d{4})Q([1-4])$/) || String(point.rawDate).match(/^(\d{4})([1-4])Q$/);
-    if (quarterMatch) return `${quarterMatch[1]} Q${quarterMatch[2]}`;
-    if (point.date) {
-      const date = new Date(point.date);
-      if (!Number.isNaN(date.getTime())) {
-        const quarter = Math.floor(date.getUTCMonth() / 3) + 1;
-        return `${date.getUTCFullYear()} Q${quarter}`;
-      }
-    }
-  }
-
-  if (point.date) return App.formatDate(point.date);
-  return point.rawDate;
+  return formatPointDate(point, point?.frequency || null);
 }
 
 async function loadFrequencyMap() {
@@ -321,7 +351,7 @@ async function initMacroPage() {
             <div class="value">${latestText}</div>
             <div class="meta-row">Change vs prior: ${delta}</div>
             <div class="meta-row">Last point: ${formatLastPointDate(card.latest)}</div>
-            ${sparklineSvg(card.sparkline)}
+            ${sparklineSvg(card.sparkline, { frequency: card.frequency, unit: card.unit })}
           </article>`;
         })
         .join('');
