@@ -11,7 +11,8 @@ const {
   sortRecordsStable,
   getLatestCommonPeriod,
   sumCheck,
-  extractLatest
+  extractLatest,
+  extractSeriesValues
 } = require('./lib/datagov');
 const { MAS_I6_API_URL, fetchMasI6LoanLimits } = require('./lib/mas_api');
 const {
@@ -141,12 +142,14 @@ async function extractRatesFromSingStatTableBuilder() {
 
   let spread = null;
   let spreadDate = null;
+  const spreadValues = [];
   const monthly10y = new Map(series.SGS_10Y.rows.map((row) => [row.date, row.value]));
   for (const row of series.SGS_2Y.rows) {
     const ten = monthly10y.get(row.date);
     if (ten == null) continue;
     spread = Number((ten - row.value).toFixed(4));
     spreadDate = row.date;
+    spreadValues.push({ period: row.date.slice(0, 7), value: spread });
   }
 
   return {
@@ -165,6 +168,9 @@ async function extractRatesFromSingStatTableBuilder() {
     },
     sgs_10y: { freq: 'M', latest_period: latest10.date, latest_value: latest10.value, units: '%' },
     sgs_2y: { freq: 'M', latest_period: latest2.date, latest_value: latest2.value, units: '%' },
+    SGS_10Y_values: series.SGS_10Y.rows.map((row) => ({ period: row.date.slice(0, 7), value: row.value })),
+    SGS_2Y_values: series.SGS_2Y.rows.map((row) => ({ period: row.date.slice(0, 7), value: row.value })),
+    term_spread_values: spreadValues,
     term_spread_10y_2y: spread != null
       ? { freq: 'M', latest_period: spreadDate, latest_value: spread, units: 'pp' }
       : null
@@ -280,6 +286,19 @@ function mergeMonthlyHistory(existingValues, fetchedValues) {
   return { merged, updated, appended };
 }
 
+function mergePeriodHistory(existingValues, fetchedValues) {
+  const byPeriod = new Map();
+  for (const item of Array.isArray(existingValues) ? existingValues : []) {
+    if (!item?.period) continue;
+    byPeriod.set(item.period, { period: item.period, value: item.value });
+  }
+  for (const item of Array.isArray(fetchedValues) ? fetchedValues : []) {
+    if (!item?.period) continue;
+    byPeriod.set(item.period, { period: item.period, value: item.value });
+  }
+  return [...byPeriod.values()].sort((a, b) => a.period.localeCompare(b.period));
+}
+
 async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
   const series = {};
   const results = [];
@@ -310,7 +329,12 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
 
   await tryIndicator({ key: 'sgs_10y', source: 'SingStat TableBuilder', dataset_ref: SINGSTAT_RATES_DATASET_REF, series_name: 'Government Securities - 10-Year Bond Yield' }, async () => {
     const rates = await getSingStatBundle();
-    if (!verifyOnly) series.sgs_10y = rates.sgs_10y;
+    if (!verifyOnly) {
+      series.sgs_10y = {
+        ...rates.sgs_10y,
+        values: rates.SGS_10Y_values
+      };
+    }
     if (VERIFY_MODE) {
       console.log(`[verify-series] datasetRef=${rates.datasetRef} required=${rates.matchedLabels.SGS_10Y} latest=${rates.sgs_10y.latest_period}=${rates.sgs_10y.latest_value}`);
     }
@@ -319,7 +343,12 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
 
   await tryIndicator({ key: 'sgs_2y', source: 'SingStat TableBuilder', dataset_ref: SINGSTAT_RATES_DATASET_REF, series_name: 'Government Securities - 2-Year Bond Yield' }, async () => {
     const rates = await getSingStatBundle();
-    if (!verifyOnly) series.sgs_2y = rates.sgs_2y;
+    if (!verifyOnly) {
+      series.sgs_2y = {
+        ...rates.sgs_2y,
+        values: rates.SGS_2Y_values
+      };
+    }
     if (VERIFY_MODE) {
       console.log(`[verify-series] datasetRef=${rates.datasetRef} required=${rates.matchedLabels.SGS_2Y} latest=${rates.sgs_2y.latest_period}=${rates.sgs_2y.latest_value}`);
     }
@@ -329,7 +358,12 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
   await tryIndicator({ key: 'term_spread_10y_2y', source: 'derived', dataset_ref: 'sgs_10y-sgs_2y' }, async () => {
     const rates = await getSingStatBundle();
     if (!rates.term_spread_10y_2y) throw new Error('no overlapping monthly observations for SGS 10Y and 2Y');
-    if (!verifyOnly) series.term_spread_10y_2y = rates.term_spread_10y_2y;
+    if (!verifyOnly) {
+      series.term_spread_10y_2y = {
+        ...rates.term_spread_10y_2y,
+        values: rates.term_spread_values
+      };
+    }
     return { latest_period: rates.term_spread_10y_2y.latest_period, latest_value: rates.term_spread_10y_2y.latest_value };
   });
 
@@ -352,7 +386,8 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
           if (VERIFY_MODE) {
             console.log(`[verify-series] datasetId=${datasetId} required=${requirement.target} matched=${match.matchedSeriesName} (${match.matchType}) latest=${latest.latest_period}=${latest.latest_value}`);
           }
-          series[requirement.key] = { freq, latest_period: latest.latest_period, latest_value: latest.latest_value, units };
+          const values = extractSeriesValues(match.row, dataset.timeFields);
+          series[requirement.key] = { freq, latest_period: latest.latest_period, latest_value: latest.latest_value, units, values };
           return { latest_period: latest.latest_period, latest_value: latest.latest_value, series_name: requirement.target };
         }
       );
@@ -364,7 +399,7 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
       datasetId: 'd_29f7b431ad79f61f19a731a6a86b0247', source: 'data.gov.sg',
       build: (records, sf, tf) => pickByKeywords(records, sf, ['steel', 'cement', 'sand', 'ready mixed'], 3).map((row) => ({
         key: `construction_material_${String(row[sf]).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '')}`,
-        freq: inferFrequencyFromTimeFields(tf), units: 'index', latest: extractLatest(row, tf), metadata: { source_series_name: row[sf] }
+        freq: inferFrequencyFromTimeFields(tf), units: 'index', latest: extractLatest(row, tf), row, metadata: { source_series_name: row[sf] }
       }))
     },
     {
@@ -387,6 +422,7 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
             freq: inferFrequencyFromTimeFields(tf),
             units: 'index',
             latest: extractLatest(match.row, tf),
+            row: match.row,
             metadata: { datasetId, matched_series_label: match.matchedSeriesName }
           };
         });
@@ -416,6 +452,7 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
           freq: inferFrequencyFromTimeFields(tf),
           units: 'units',
           latest: extractLatest(row, tf),
+          row,
           metadata: { source_series_name: row[sf], check, status }
         }));
       }
@@ -457,6 +494,7 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
                 freq: inferFrequencyFromTimeFields(tf),
                 units: 'units',
                 latest: extractLatest(row, tf),
+                row,
                 metadata: { source_series_name: row[sf], parent_total: cat.total, category: cat.category, check, status }
               });
             });
@@ -487,6 +525,7 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
           freq: inferFrequencyFromTimeFields(tf),
           units: 'sqm',
           latest: extractLatest(row, tf),
+          row,
           metadata: { source_series_name: row[sf], check, status }
         }));
       }
@@ -497,7 +536,7 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
         .filter((row) => /private/i.test(String(row[sf])) && /available/i.test(String(row[sf])))
         .map((row) => ({
           key: `private_available_${String(row[sf]).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`,
-          freq: inferFrequencyFromTimeFields(tf), units: 'sqm', latest: extractLatest(row, tf), metadata: { source_series_name: row[sf] }
+          freq: inferFrequencyFromTimeFields(tf), units: 'sqm', latest: extractLatest(row, tf), row, metadata: { source_series_name: row[sf] }
         }))
     },
 
@@ -519,11 +558,13 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
         if (!entry.latest) continue;
         latestSeen = entry.latest;
         if (!verifyOnly) {
+          const mergedValues = mergePeriodHistory(existingSeries[entry.key]?.values, extractSeriesValues(entry.row, timeFields));
           series[entry.key] = {
             freq: entry.freq,
             latest_period: entry.latest.latest_period,
             latest_value: entry.latest.latest_value,
             units: entry.units,
+            values: mergedValues,
             ...(entry.metadata || {})
           };
         }
@@ -545,7 +586,8 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
         latest_period: latestQuarterPeriod,
         latest_value: construction.latest.value,
         units: 'S$ million',
-        source_series_name: construction.rows[0]?.series_name || 'Construction'
+        source_series_name: construction.rows[0]?.series_name || 'Construction',
+        values: construction.rows.map((row) => ({ period: isoDateToQuarterPeriod(row.date), value: row.value })).filter((row) => row.period)
       };
     }
     if (VERIFY_MODE) {
@@ -569,7 +611,8 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
         freq: 'M',
         latest_period: unit.latest.date,
         latest_value: unit.latest.value,
-        units: 'index'
+        units: 'index',
+        values: unit.rows.map((row) => ({ period: row.date.slice(0, 7), value: row.value }))
       };
     }
     return { latest_period: unit.latest.date, latest_value: unit.latest.value };
