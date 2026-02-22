@@ -319,6 +319,24 @@ function normalizeSeriesPoints(rawSeries = []) {
   return points;
 }
 
+function inferDisplayFrequency(points = [], declaredFrequency = null) {
+  const normalizedDeclared = String(declaredFrequency || '').toUpperCase();
+  if (normalizedDeclared !== 'M') return normalizedDeclared || null;
+
+  const monthValues = points
+    .map((point) => {
+      if (!point.date) return null;
+      const match = point.date.match(/^\d{4}-(\d{2})-\d{2}$/);
+      return match ? Number(match[1]) : null;
+    })
+    .filter((month) => Number.isFinite(month));
+
+  if (monthValues.length < 4) return 'M';
+  const quarterlyMonthStarts = new Set([1, 4, 7, 10]);
+  const isQuarterlyCadence = monthValues.every((month) => quarterlyMonthStarts.has(month));
+  return isQuarterlyCadence ? 'Q' : 'M';
+}
+
 function formatLastPointDate(point) {
   return formatPointDate(point, point?.frequency || null);
 }
@@ -455,7 +473,8 @@ function mapCardsFromSeries(data, frequencyMap = {}) {
     const prior = normalized[normalized.length - 2] || null;
     const majorCategory = normalizeCategory(seriesObj?.major_category);
 
-    const frequency = seriesObj?.freq || frequencyMap[meta.seriesId] || null;
+    const declaredFrequency = seriesObj?.freq || frequencyMap[meta.seriesId] || null;
+    const frequency = inferDisplayFrequency(normalized, declaredFrequency);
 
     return {
       ...meta,
