@@ -138,8 +138,77 @@ function normalizeSeriesPoints(rawSeries = []) {
 
 function formatLastPointDate(point) {
   if (!point) return 'No data';
+  if (point.frequency === 'M' && point.date) {
+    const date = new Date(point.date);
+    if (!Number.isNaN(date.getTime())) {
+      const month = date.toLocaleString('en-US', { month: 'short' });
+      return `${date.getUTCFullYear()} ${month}`;
+    }
+  }
+
+  if (point.frequency === 'Q') {
+    const quarterMatch = String(point.rawDate).match(/^(\d{4})Q([1-4])$/) || String(point.rawDate).match(/^(\d{4})([1-4])Q$/);
+    if (quarterMatch) return `${quarterMatch[1]} Q${quarterMatch[2]}`;
+    if (point.date) {
+      const date = new Date(point.date);
+      if (!Number.isNaN(date.getTime())) {
+        const quarter = Math.floor(date.getUTCMonth() / 3) + 1;
+        return `${date.getUTCFullYear()} Q${quarter}`;
+      }
+    }
+  }
+
   if (point.date) return App.formatDate(point.date);
   return point.rawDate;
+}
+
+async function loadFrequencyMap() {
+  const response = await fetch('./data/macro indicators meta.csv');
+  if (!response.ok) return {};
+
+  const csvText = await response.text();
+  const lines = csvText.split(/\r?\n/).filter(Boolean);
+  if (lines.length < 2) return {};
+
+  const parseRow = (line) => {
+    const out = [];
+    let token = '';
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i += 1) {
+      const char = line[i];
+      if (char === '"') {
+        if (inQuotes && line[i + 1] === '"') {
+          token += '"';
+          i += 1;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (char === ',' && !inQuotes) {
+        out.push(token.trim());
+        token = '';
+      } else {
+        token += char;
+      }
+    }
+    out.push(token.trim());
+    return out;
+  };
+
+  const headers = parseRow(lines[0]).map((header) => header.toLowerCase());
+  const seriesIdIndex = headers.findIndex((header) => header === 'series id');
+  const frequencyIndex = headers.findIndex((header) => header === 'frequency' || header === 'freq');
+  if (seriesIdIndex === -1 || frequencyIndex === -1) return {};
+
+  return lines.slice(1).reduce((acc, line) => {
+    const row = parseRow(line);
+    const seriesId = row[seriesIdIndex];
+    const frequency = row[frequencyIndex];
+    if (!seriesId || !frequency) return acc;
+
+    const normalized = frequency.toUpperCase().startsWith('Q') ? 'Q' : frequency.toUpperCase().startsWith('M') ? 'M' : null;
+    if (normalized) acc[seriesId] = normalized;
+    return acc;
+  }, {});
 }
 
 function computeMacroRisk(cards) {
@@ -181,7 +250,7 @@ function validateMacroCardsOrThrow(cards, macroSeries) {
   }
 }
 
-function mapCardsFromSeries(data) {
+function mapCardsFromSeries(data, frequencyMap = {}) {
   const macroSeries = data?.macro_indicators?.series || {};
 
   const cards = MACRO_INDICATOR_METADATA.map((meta) => {
@@ -191,14 +260,16 @@ function mapCardsFromSeries(data) {
     const prior = normalized[normalized.length - 2] || null;
     const majorCategory = normalizeCategory(seriesObj?.major_category);
 
+    const frequency = frequencyMap[meta.seriesId] || seriesObj?.freq || null;
+
     return {
       ...meta,
       majorCategory,
       categoryLabel: majorCategory ? CATEGORY_UI[majorCategory]?.short : null,
       unit: meta.unit || seriesObj?.units || '',
-      frequency: seriesObj?.freq || null,
+      frequency,
       sparkline: normalized.slice(-24),
-      latest,
+      latest: latest ? { ...latest, frequency } : null,
       prior,
       thresholds: null
     };
@@ -216,7 +287,8 @@ async function initMacroPage() {
 
   try {
     const data = await App.fetchJson('./data/macro_indicators.json');
-    const cards = mapCardsFromSeries(data);
+    const frequencyMap = await loadFrequencyMap();
+    const cards = mapCardsFromSeries(data, frequencyMap);
 
     const render = () => {
       const selectedCategory = categoryFilter.value;
@@ -234,11 +306,13 @@ async function initMacroPage() {
           const delta = card.latest && card.prior ? (card.latest.value - card.prior.value).toFixed(2) : 'No data';
           const latestText = card.latest ? `${card.latest.value.toFixed(2)} ${card.unit}`.trim() : 'No data';
           const tooltipId = `macro-tooltip-${index}`;
-          const categoryPill = card.categoryLabel ? `<span class="badge macro-category-pill">${escapeHtml(card.categoryLabel)}</span>` : '';
+          const categoryPill = card.categoryLabel ? `<span class="badge macro-category-pill macro-category-pill-${card.majorCategory?.[0]?.toLowerCase() || 'default'}">${escapeHtml(card.categoryLabel)}</span>` : '';
           return `<article class="panel indicator-tile">
+            <div class="indicator-top-row">
+              ${categoryPill}
+            </div>
             <div class="indicator-title-row">
               <h3>${escapeHtml(card.title)}</h3>
-              ${categoryPill}
               <span class="info-tooltip">
                 <button class="tooltip-trigger" type="button" aria-label="Why it matters for ${escapeHtml(card.title)}" aria-describedby="${tooltipId}">?</button>
                 <span class="tooltip-content" id="${tooltipId}" role="tooltip">${escapeHtml(card.why)}</span>
