@@ -24,6 +24,12 @@ const {
   fetchConstructionGdpSeries,
   isoDateToQuarterPeriod
 } = require('./lib/singstat_tablebuilder');
+const {
+  ALLOWED_MAJOR_CATEGORIES,
+  MAJOR_CATEGORY_LABELS,
+  EXPECTED_SERIES_IDS_49,
+  getMajorCategory
+} = require('./lib/major_categories');
 
 const VERIFY_MODE = process.argv.includes('--verify_sources');
 const IS_GITHUB_ACTIONS = process.env.GITHUB_ACTIONS === 'true';
@@ -297,6 +303,53 @@ function mergePeriodHistory(existingValues, fetchedValues) {
     byPeriod.set(item.period, { period: item.period, value: item.value });
   }
   return [...byPeriod.values()].sort((a, b) => a.period.localeCompare(b.period));
+}
+
+function applyMajorCategoriesAndValidate(seriesById) {
+  const missingSeries = [];
+  const unmappedSeries = [];
+  const invalidCategories = [];
+  const counts = Object.fromEntries(ALLOWED_MAJOR_CATEGORIES.map((category) => [category, 0]));
+
+  for (const seriesId of EXPECTED_SERIES_IDS_49) {
+    const series = seriesById[seriesId];
+    if (!series) {
+      missingSeries.push(seriesId);
+      continue;
+    }
+    const majorCategory = getMajorCategory(seriesId);
+    if (!majorCategory) {
+      unmappedSeries.push(seriesId);
+      continue;
+    }
+    if (!ALLOWED_MAJOR_CATEGORIES.includes(majorCategory)) {
+      invalidCategories.push({ seriesId, majorCategory });
+      continue;
+    }
+
+    series.major_category = majorCategory;
+    series.major_category_label = MAJOR_CATEGORY_LABELS[majorCategory];
+    counts[majorCategory] += 1;
+  }
+
+  const summary = ALLOWED_MAJOR_CATEGORIES
+    .map((category) => `${category}=${counts[category]}`)
+    .join(', ');
+  console.log(`[major-category] counts: ${summary}`);
+
+  if (missingSeries.length) {
+    console.error(`[major-category] missing series IDs (${missingSeries.length}): ${missingSeries.join(', ')}`);
+  }
+  if (unmappedSeries.length) {
+    console.error(`[major-category] unmapped series IDs (${unmappedSeries.length}): ${unmappedSeries.join(', ')}`);
+  }
+  if (invalidCategories.length) {
+    console.error(`[major-category] invalid category assignments: ${invalidCategories.map((x) => `${x.seriesId}:${x.majorCategory}`).join(', ')}`);
+  }
+
+  if (missingSeries.length || unmappedSeries.length || invalidCategories.length) {
+    throw new Error('Major category mapping validation failed');
+  }
 }
 
 async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
@@ -792,6 +845,8 @@ async function main() {
       error_summary: result.error_summary
     };
   }
+
+  applyMajorCategoriesAndValidate(mergedSeries);
 
   existing.macro_indicators = {
     ...(existing.macro_indicators || {}),
