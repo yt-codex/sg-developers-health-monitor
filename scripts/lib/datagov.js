@@ -103,6 +103,15 @@ async function fetchAllRecords(resourceId, apiKey, { verifyMode = false } = {}) 
 }
 
 const MONTHS = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
+const MONTH_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function formatPeriodLabel(field) {
+  if (!field) return null;
+  if (field.periodType === 'M' && Number.isFinite(field.year) && Number.isFinite(field.month) && field.month >= 1 && field.month <= 12) {
+    return `${field.year} ${MONTH_ABBR[field.month - 1]}`;
+  }
+  return field.id;
+}
 
 function parseMonthlyFieldId(fieldId) {
   const raw = String(fieldId || '').trim();
@@ -168,7 +177,7 @@ function toFiniteNumber(value) {
 function extractLatest(row, timeFields) {
   for (const field of timeFields) {
     const n = toFiniteNumber(row?.[field.id]);
-    if (n != null) return { latest_period: field.id, latest_value: n };
+    if (n != null) return { latest_period: formatPeriodLabel(field), latest_value: n };
   }
   return null;
 }
@@ -176,7 +185,7 @@ function extractLatest(row, timeFields) {
 function extractSeriesValues(row, timeFields) {
   return [...(timeFields || [])]
     .sort((a, b) => a.sortKey - b.sortKey)
-    .map((field) => ({ period: field.id, value: toFiniteNumber(row?.[field.id]) }))
+    .map((field) => ({ period: formatPeriodLabel(field), value: toFiniteNumber(row?.[field.id]) }))
     .filter((point) => point.value != null);
 }
 

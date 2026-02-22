@@ -273,10 +273,21 @@ function normalizeCategory(rawCategory) {
 }
 
 function parsePeriodToDate(period) {
-  const monthly = String(period).match(/^(\d{4})-(\d{2})$/);
+  const raw = String(period).trim();
+  const monthly = raw.match(/^(\d{4})-(\d{2})$/);
   if (monthly) return `${monthly[1]}-${monthly[2]}-01`;
 
-  const quarter = String(period).match(/^(\d{4})Q([1-4])$/) || String(period).match(/^(\d{4})([1-4])Q$/);
+  const monthlyText = raw.match(/^(\d{4})\s+([A-Za-z]{3})$/);
+  if (monthlyText) {
+    const monthByAbbr = {
+      jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06',
+      jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12'
+    };
+    const month = monthByAbbr[monthlyText[2].toLowerCase()];
+    if (month) return `${monthlyText[1]}-${month}-01`;
+  }
+
+  const quarter = raw.match(/^(\d{4})Q([1-4])$/) || raw.match(/^(\d{4})([1-4])Q$/);
   if (!quarter) return null;
 
   const year = Number(quarter[1]);
