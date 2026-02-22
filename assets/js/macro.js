@@ -197,6 +197,15 @@ function formatLastPointDate(point) {
   return formatPointDate(point, point?.frequency || null);
 }
 
+const LATEST_VALUE_ROUNDED_UNITS = new Set(['K Sqm Gross', 'Units', 'K Sqm Nett', 'K Tonnes', 'S$M']);
+
+function formatLatestValue(point, unit = '') {
+  if (!point) return 'No data';
+  const normalizedUnit = String(unit).trim();
+  const displayValue = LATEST_VALUE_ROUNDED_UNITS.has(normalizedUnit) ? Math.round(point.value) : point.value.toFixed(2);
+  return `${displayValue} ${normalizedUnit}`.trim();
+}
+
 async function loadFrequencyMap() {
   const response = await fetch('./data/macro indicators meta.csv');
   if (!response.ok) return {};
@@ -339,7 +348,7 @@ async function initMacroPage() {
       wrap.innerHTML = filtered
         .map((card, index) => {
           const delta = card.latest && card.prior ? (card.latest.value - card.prior.value).toFixed(2) : 'No data';
-          const latestText = card.latest ? `${card.latest.value.toFixed(2)} ${card.unit}`.trim() : 'No data';
+          const latestText = formatLatestValue(card.latest, card.unit);
           const tooltipId = `macro-tooltip-${index}`;
           const categoryPill = card.categoryLabel ? `<span class="badge macro-category-pill macro-category-pill-${card.majorCategory?.[0]?.toLowerCase() || 'default'}">${escapeHtml(card.categoryLabel)}</span>` : '';
           return `<article class="panel indicator-tile">
