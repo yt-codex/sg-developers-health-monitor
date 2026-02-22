@@ -19,44 +19,57 @@ const LEGACY_CATEGORY_TO_MAJOR = {
   D_macro_regime: MAJOR_CATEGORY.D
 };
 
-const MACRO_CARD_DEFS = [
-  {
-    seriesId: 'sora_overnight',
-    title: 'Singapore interest rate proxy',
-    fallbackUnit: '%',
-    why: 'Higher rates increase debt servicing burden and raise refinancing risk for leveraged developers.'
-  },
-  {
-    seriesId: 'term_spread_10y_2y',
-    title: 'Corporate credit spread proxy',
-    fallbackUnit: 'pp',
-    why: 'A flatter or inverted curve can coincide with tighter lending and more selective credit conditions.'
-  },
-  {
-    seriesId: 'unit_labour_cost_construction',
-    title: 'Construction cost inflation proxy',
-    fallbackUnit: 'index',
-    why: 'Persistent construction cost pressure can compress gross margins and increase completion risk.'
-  },
-  {
-    seriesId: 'private_vacant_private_sector_office_space_vacant',
-    title: 'Office vacancy proxy',
-    fallbackUnit: 'sqm',
-    why: 'Higher vacant office stock can weigh on leasing momentum, rental growth, and valuation assumptions.'
-  },
-  {
-    seriesId: 'construction_gdp',
-    title: 'Construction GDP growth proxy',
-    fallbackUnit: '% YoY',
-    why: 'Weaker construction activity can point to softer sector demand and lower operating momentum.'
-  },
-  {
-    seriesId: 'prp_pipeline_total_non_landed',
-    title: 'Private home supply pipeline',
-    fallbackUnit: 'units',
-    why: 'A large non-landed pipeline may increase inventory overhang risk if absorption slows.'
-  }
-];
+const MACRO_INDICATOR_METADATA = [
+  ['commind_business_park_planned_others', 'Business Park Space Pipeline (Planned: Other)', 'Planned business park space that is still early-stage. A larger pipeline can increase future supply pressure if take-up slows.'],
+  ['commind_business_park_planned_provisional_permission', 'Business Park Space Pipeline (Planned: Provisional Permission)', 'Planned business park space with provisional planning approval. Rising volumes can add future supply and weigh on rents if demand softens.'],
+  ['commind_business_park_planned_written_permission', 'Business Park Space Pipeline (Planned: Written Permission)', 'Planned business park space with written planning approval. Higher levels signal more committed future supply and potential leasing competition.'],
+  ['commind_business_park_total', 'Business Park Space Pipeline (Total)', 'Total business park pipeline across planning stages. Useful for gauging forthcoming supply and the risk of overhang.'],
+  ['commind_business_park_under_construction', 'Business Park Space Pipeline (Under Construction)', 'Business park space currently being built. A rising under-construction stock can increase near-term completion and leasing competition.'],
+  ['commind_office_planned_others', 'Office Space Pipeline (Planned: Other)', 'Planned office space that is still early-stage. A larger pipeline can raise future supply risk if absorption weakens.'],
+  ['commind_office_planned_provisional_permission', 'Office Space Pipeline (Planned: Provisional Permission)', 'Planned office space with provisional planning approval. Higher levels can translate into more deliverable supply over time.'],
+  ['commind_office_planned_written_permission', 'Office Space Pipeline (Planned: Written Permission)', 'Planned office space with written planning approval. Indicates a more advanced pipeline and potential future supply pressure.'],
+  ['commind_office_total', 'Office Space Pipeline (Total)', 'Total office pipeline across planning stages. Signals future supply and potential impact on vacancy and rents.'],
+  ['commind_office_under_construction', 'Office Space Pipeline (Under Construction)', 'Office space currently being built. Rising levels can increase near-term completions and raise vacancy risk if leasing demand slows.'],
+  ['commind_retail_planned_others', 'Retail Space Pipeline (Planned: Other)', 'Planned retail space that is still early-stage. A larger pipeline can increase overhang risk if retail leasing demand weakens.'],
+  ['commind_retail_planned_provisional_permission', 'Retail Space Pipeline (Planned: Provisional Permission)', 'Planned retail space with provisional planning approval. Higher levels can add to future supply and weigh on rents if take-up is slow.'],
+  ['commind_retail_planned_written_permission', 'Retail Space Pipeline (Planned: Written Permission)', 'Planned retail space with written planning approval. Indicates more committed future supply and potential leasing competition.'],
+  ['commind_retail_total', 'Retail Space Pipeline (Total)', 'Total retail pipeline across planning stages. Helps assess future supply pressure and potential vacancy/rent risk.'],
+  ['commind_retail_under_construction', 'Retail Space Pipeline (Under Construction)', 'Retail space currently being built. More completions can pressure occupancy and rents if demand does not keep pace.'],
+  ['industrial_pipeline_others', 'Industrial Space Pipeline (Planned: Other)', 'Planned industrial space at an early stage. Growth can signal more future supply and potential competitive pressure on rents.'],
+  ['industrial_pipeline_provisional_permission', 'Industrial Space Pipeline (Planned: Provisional Permission)', 'Planned industrial space with provisional planning approval. Higher levels can point to a larger future delivery pipeline.'],
+  ['industrial_pipeline_total', 'Industrial Space Pipeline (Total)', 'Total industrial pipeline across planning stages. Tracks future supply risk and potential overhang.'],
+  ['industrial_pipeline_under_construction', 'Industrial Space Pipeline (Under Construction)', 'Industrial space currently being built. Rising levels can increase near-term completions and vacancy risk if demand slows.'],
+  ['industrial_pipeline_written_permission', 'Industrial Space Pipeline (Planned: Written Permission)', 'Planned industrial space with written planning approval. Signals a more committed pipeline and higher likelihood of future supply.'],
+  ['prp_pipeline_non_landed_planned_others', 'Private Residential (Non-Landed) Pipeline (Planned: Other)', 'Early-stage non-landed private residential pipeline. Larger values can increase future housing supply and competitive pressure.'],
+  ['prp_pipeline_non_landed_planned_provisional_permission', 'Private Residential (Non-Landed) Pipeline (Planned: Provisional Permission)', 'Non-landed private residential pipeline with provisional planning approval. Rising levels can add to future supply and increase overhang risk.'],
+  ['prp_pipeline_non_landed_planned_written_permission', 'Private Residential (Non-Landed) Pipeline (Planned: Written Permission)', 'Non-landed private residential pipeline with written planning approval. Indicates a more advanced pipeline and greater likelihood of delivery.'],
+  ['prp_pipeline_non_landed_under_construction', 'Private Residential (Non-Landed) Pipeline (Under Construction)', 'Non-landed private residential units under construction. Higher levels increase near-term completions and sales absorption requirements.'],
+  ['prp_pipeline_total_non_landed', 'Private Residential (Non-Landed) Pipeline (Total)', 'Total non-landed private residential pipeline across stages. Tracks future supply and potential inventory overhang if take-up slows.'],
+  ['private_vacant_private_sector_business_park_space_vacant', 'Business Park Vacancy Rate (Private Sector)', 'Amount of private-sector business park space that is vacant. Higher vacancy typically signals weaker leasing demand and downside risk to rents and asset values.'],
+  ['private_vacant_private_sector_multiple_user_factory_space_vacant', 'Multiple-User Factory Vacancy Rate (Private Sector)', 'Amount of private-sector multiple-user factory space that is vacant. Rising vacancy can indicate softer industrial demand and pressure on rents.'],
+  ['private_vacant_private_sector_office_space_vacant', 'Office Vacancy Rate (Private Sector)', 'Amount of private-sector office space that is vacant. Higher vacancy can weigh on rents, incentives, and valuation assumptions for commercial assets.'],
+  ['private_vacant_private_sector_retail_space_vacant', 'Retail Vacancy Rate (Private Sector)', 'Amount of private-sector retail space that is vacant. Higher vacancy can signal weak tenant demand and greater downside risk to rents and income.'],
+  ['construction_material_cement_in_bulk_ordinary_portland_cement', 'Construction Material Price: Ordinary Portland Cement (Bulk)', 'Tracks cement prices. Sustained increases raise construction costs and can compress development margins, especially for projects without cost pass-through.'],
+  ['construction_material_concreting_sand', 'Construction Material Price: Concreting Sand', 'Tracks concreting sand prices. Rising costs can lift project costs and increase budget and tender risks.'],
+  ['construction_material_steel_reinforcement_bars_16_32mm_high_tensile', 'Construction Material Price: Steel Reinforcement Bars (16–32mm, High Tensile)', 'Tracks rebar prices. Higher steel costs can materially increase structural costs and pressure margins for ongoing and future builds.'],
+  ['construction_material_granite_20mm_aggregate', 'Construction Material Price: Granite Aggregate (20mm)', 'Tracks aggregate prices. Increases raise concreting costs and can contribute to construction cost inflation.'],
+  ['construction_material_ready_mixed_concrete', 'Construction Material Price: Ready-Mixed Concrete', 'Tracks ready-mixed concrete prices. Higher prices raise direct build costs and can reduce profitability if selling prices do not adjust.'],
+  ['unit_labour_cost_construction', 'Construction Unit Labour Cost', 'Measures labour cost per unit of construction output. Persistent increases raise overall construction costs and can squeeze margins and delay project timelines.'],
+  ['demand_construction_materials_cement', 'Construction Materials Demand: Cement', 'Measures demand for cement. Strong demand can indicate a heated construction cycle, potential capacity constraints, and upward pressure on input costs.'],
+  ['demand_construction_materials_granite', 'Construction Materials Demand: Granite', 'Measures demand for granite aggregate. Higher demand can signal stronger construction activity and potential cost pressure from supply tightness.'],
+  ['demand_construction_materials_ready_mixed_concrete', 'Construction Materials Demand: Ready-Mixed Concrete', 'Measures demand for ready-mixed concrete. Rising demand can coincide with tighter capacity and higher concreting costs.'],
+  ['demand_construction_materials_steel_reinforcement_bars', 'Construction Materials Demand: Steel Reinforcement Bars', 'Measures demand for reinforcing steel. Strong demand can signal a busy construction pipeline and possible upward pressure on steel-related costs.'],
+  ['sgs_10y', 'Singapore Government Securities (SGS) 10-Year Yield', 'Long-term risk-free yield benchmark. Higher yields raise discount rates and borrowing costs, which can pressure valuations and refinancing conditions.'],
+  ['sgs_2y', 'Singapore Government Securities (SGS) 2-Year Yield', 'Shorter-term risk-free yield benchmark. Higher yields typically translate into higher floating/short-tenor funding costs and tighter affordability for leveraged borrowers.'],
+  ['term_spread_10y_2y', 'Yield Curve Slope (10-Year minus 2-Year)', 'Measures the steepness of the yield curve. A flatter or inverted curve often coincides with tighter credit conditions and weaker growth expectations.'],
+  ['sora_overnight', 'Singapore Overnight Rate Average (SORA)', 'Key overnight interest rate benchmark. Higher rates increase debt servicing costs and can raise refinancing risk for leveraged developers.'],
+  ['loan_bc_construction', 'Bank Loans to Building & Construction (Construction)', 'Outstanding bank loans to the construction segment within building & construction. Slowing growth or contraction can signal tighter credit supply or weaker borrowing demand.'],
+  ['loan_bc_real_property', 'Bank Loans to Building & Construction (Real Property)', 'Outstanding bank loans to the real property segment within building & construction. Useful for tracking credit conditions facing property-related borrowers.'],
+  ['loan_bc_total', 'Bank Loans to Building & Construction (Total)', 'Total outstanding bank loans to building & construction. Indicates overall credit exposure and whether lending to the sector is expanding or tightening.'],
+  ['loan_limits_granted_building_construction', 'Loan Limits Granted to Building & Construction', 'Total credit limits granted by banks to the building & construction sector. A decline can indicate reduced bank risk appetite or tighter underwriting.'],
+  ['loan_limits_utilised_building_construction', 'Utilisation Rate of Loan Limits (Building & Construction)', 'Share of granted credit limits that is utilised. Rising utilisation can indicate tighter liquidity buffers and less headroom if conditions worsen.'],
+  ['construction_gdp', 'Construction Sector GDP Growth (SA)', 'Growth in construction sector output. Weakening growth can signal softer sector momentum, project delays, or a downturn in construction activity.']
+].map(([seriesId, title, why]) => ({ seriesId, title, why }));
 
 function sparklineSvg(series) {
   if (!series || series.length < 2) return '<svg class="sparkline"></svg>';
@@ -171,23 +184,23 @@ function validateMacroCardsOrThrow(cards, macroSeries) {
 function mapCardsFromSeries(data) {
   const macroSeries = data?.macro_indicators?.series || {};
 
-  const cards = MACRO_CARD_DEFS.map((def) => {
-    const seriesObj = macroSeries[def.seriesId];
+  const cards = MACRO_INDICATOR_METADATA.map((meta) => {
+    const seriesObj = macroSeries[meta.seriesId];
     const normalized = normalizeSeriesPoints(seriesObj?.values || []);
     const latest = normalized[normalized.length - 1] || null;
     const prior = normalized[normalized.length - 2] || null;
     const majorCategory = normalizeCategory(seriesObj?.major_category);
 
     return {
-      ...def,
+      ...meta,
       majorCategory,
       categoryLabel: majorCategory ? CATEGORY_UI[majorCategory]?.short : null,
-      unit: seriesObj?.units || def.fallbackUnit,
+      unit: seriesObj?.units || '',
       frequency: seriesObj?.freq || null,
       sparkline: normalized.slice(-24),
       latest,
       prior,
-      thresholds: def.thresholds || null
+      thresholds: null
     };
   });
 
@@ -219,7 +232,7 @@ async function initMacroPage() {
       wrap.innerHTML = filtered
         .map((card, index) => {
           const delta = card.latest && card.prior ? (card.latest.value - card.prior.value).toFixed(2) : 'No data';
-          const latestText = card.latest ? `${card.latest.value.toFixed(2)} ${card.unit}` : `No data ${card.unit}`;
+          const latestText = card.latest ? `${card.latest.value.toFixed(2)} ${card.unit}`.trim() : 'No data';
           const tooltipId = `macro-tooltip-${index}`;
           const categoryPill = card.categoryLabel ? `<span class="badge macro-category-pill">${escapeHtml(card.categoryLabel)}</span>` : '';
           return `<article class="panel indicator-tile">
