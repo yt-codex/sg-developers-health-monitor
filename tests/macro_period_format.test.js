@@ -12,9 +12,9 @@ const {
 test('monthly stays monthly when metadata indicates monthly', () => {
   const result = formatLastPointLabel(
     'monthly_series',
-    '2025 Oct',
+    '2025Oct',
     { freq: 'monthly' },
-    [{ period: '2025 Aug' }, { period: '2025 Sep' }, { period: '2025 Oct' }]
+    [{ period: '2025Aug' }, { period: '2025Sep' }, { period: '2025Oct' }]
   );
   assert.equal(result, '2025 Oct');
 });
@@ -52,6 +52,7 @@ test('inference distinguishes monthly vs quarterly from month gaps', () => {
 
 test('strict period parsing and quarter mapping helpers', () => {
   assert.deepEqual(parseYearMonth('2025 Oct'), { year: 2025, month: 10 });
+  assert.deepEqual(parseYearMonth('2025Oct'), { year: 2025, month: 10 });
   assert.equal(parseYearMonth('2025 October'), null);
   assert.equal(toQuarterLabel({ year: 2025, month: 10 }), '2025 Q4');
 });

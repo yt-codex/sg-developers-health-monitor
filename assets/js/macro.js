@@ -277,6 +277,16 @@ function parsePeriodToDate(period) {
   const monthly = raw.match(/^(\d{4})-(\d{2})$/);
   if (monthly) return `${monthly[1]}-${monthly[2]}-01`;
 
+  const monthlyCompact = raw.match(/^(\d{4})([A-Za-z]{3})$/);
+  if (monthlyCompact) {
+    const monthByAbbr = {
+      jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06',
+      jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12'
+    };
+    const month = monthByAbbr[monthlyCompact[2].toLowerCase()];
+    if (month) return `${monthlyCompact[1]}-${month}-01`;
+  }
+
   const monthlyText = raw.match(/^(\d{4})\s+([A-Za-z]{3})$/);
   if (monthlyText) {
     const monthByAbbr = {
@@ -315,7 +325,7 @@ const PERIOD_MONTH_MAP = {
 const QUARTERLY_SERIES_FALLBACK_IDS = new Set(['unit_labour_cost_construction']);
 
 function parseYearMonth(periodStr) {
-  const match = String(periodStr || '').trim().match(/^(\d{4})\s([A-Za-z]{3})$/);
+  const match = String(periodStr || '').trim().match(/^(\d{4})(?:\s)?([A-Za-z]{3})$/);
   if (!match) return null;
 
   const month = PERIOD_MONTH_MAP[match[2].toLowerCase()];
@@ -325,6 +335,13 @@ function parseYearMonth(periodStr) {
     year: Number(match[1]),
     month
   };
+}
+
+function formatYearMonthLabel(yearMonth) {
+  if (!yearMonth || !Number.isFinite(yearMonth.year) || !Number.isFinite(yearMonth.month)) return null;
+  const date = new Date(Date.UTC(yearMonth.year, yearMonth.month - 1, 1));
+  const monthAbbr = date.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
+  return `${yearMonth.year} ${monthAbbr}`;
 }
 
 function toQuarterLabel(yearMonth) {
@@ -388,7 +405,7 @@ function formatLastPointLabel(seriesId, periodStr, seriesMeta = null, seriesValu
   if (!parsed) return periodStr;
 
   const frequency = resolveSeriesFrequency(seriesId, seriesMeta, seriesValues);
-  if (frequency !== 'Q') return periodStr;
+  if (frequency !== 'Q') return formatYearMonthLabel(parsed) || periodStr;
 
   return toQuarterLabel(parsed) || periodStr;
 }
