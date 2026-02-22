@@ -6,7 +6,8 @@ const {
   parseTableBuilderPivotJson,
   matchRequiredSeries,
   normalizeLabel,
-  parseMonthLabel
+  parseMonthLabel,
+  isoDateToQuarterPeriod
 } = require('../scripts/lib/singstat_tablebuilder');
 
 
@@ -17,6 +18,13 @@ test('parseMonthLabel supports monthly, quarterly, and yearly period labels', ()
   assert.equal(parseMonthLabel('2025 3Q'), '2025-07-01');
   assert.equal(parseMonthLabel('2024'), '2024-01-01');
   assert.equal(parseMonthLabel('invalid'), null);
+});
+
+
+test('isoDateToQuarterPeriod converts monthly ISO dates to YYYYQn', () => {
+  assert.equal(isoDateToQuarterPeriod('2025-10-01'), '2025Q4');
+  assert.equal(isoDateToQuarterPeriod('2026-01-01'), '2026Q1');
+  assert.equal(isoDateToQuarterPeriod('invalid'), null);
 });
 
 test('parses TableBuilder pivot JSON fixture into tidy rows and matches required labels strictly', () => {

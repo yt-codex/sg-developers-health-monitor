@@ -20,7 +20,8 @@ const {
   CONSTRUCTION_GDP_TABLE_ID: SINGSTAT_CONSTRUCTION_GDP_TABLE_ID,
   fetchSingStatRequiredSeries,
   fetchUnitLabourCostConstructionSeries,
-  fetchConstructionGdpSeries
+  fetchConstructionGdpSeries,
+  isoDateToQuarterPeriod
 } = require('./lib/singstat_tablebuilder');
 
 const VERIFY_MODE = process.argv.includes('--verify_sources');
@@ -537,9 +538,11 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
     const construction = bundle.CONSTRUCTION_GDP_SA;
     if (!construction?.latest) throw new Error('SingStat parse 0 rows for construction GDP');
     if (!verifyOnly) {
+      const latestQuarterPeriod = isoDateToQuarterPeriod(construction.latest.date);
+      if (!latestQuarterPeriod) throw new Error(`Unable to convert construction GDP date ${construction.latest.date} to quarter period`);
       series.construction_gdp = {
         freq: 'Q',
-        latest_period: construction.latest.date,
+        latest_period: latestQuarterPeriod,
         latest_value: construction.latest.value,
         units: 'S$ million',
         source_series_name: construction.rows[0]?.series_name || 'Construction'
