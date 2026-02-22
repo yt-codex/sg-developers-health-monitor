@@ -70,12 +70,20 @@ Then open `http://localhost:8000/index.html`.
 npm run verify:macro-sources
 npm run update:macro
 npm test
+npm run smoke
 ```
 
 - `verify:macro-sources` checks upstream macro data sources and logs diagnostics.
 - `update:macro` refreshes `data/macro_indicators.json` and derives `data/macro_stress_signals.json`.
 - `test` runs parser + integration tests, including live source contract checks for SingStat TableBuilder `M700071` and `M183741` (network-dependent; auto-skipped if unreachable).
+- `smoke` runs a local dashboard smoke check to assert required runtime files and `macro.html` hooks (`#macro-grid`, `#macro-risk`, `#category-filter`) are present.
 
+## Repo hygiene checks
+Run this lightweight verification before and after cleanup changes:
+
+```bash
+npm run smoke
+```
 
 ## Macro source details (SingStat TableBuilder)
 - Indicators `sora_overnight`, `sgs_2y`, and `sgs_10y` are sourced from **SingStat TableBuilder `M700071`** via JSON endpoint `https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071`.

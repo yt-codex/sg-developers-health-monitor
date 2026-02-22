@@ -6,6 +6,7 @@
   "scripts": {
     "update:macro": "node scripts/update_macro_indicators.js",
     "verify:macro-sources": "node scripts/update_macro_indicators.js --verify_sources",
-    "test": "node --test"
+    "test": "node --test",
+    "smoke": "node scripts/smoke_check.js"
   }
 }
