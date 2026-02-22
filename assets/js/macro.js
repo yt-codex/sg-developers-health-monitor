@@ -297,6 +297,102 @@ function parsePeriodToDate(period) {
   return `${year}-${month}-01`;
 }
 
+const PERIOD_MONTH_MAP = {
+  jan: 1,
+  feb: 2,
+  mar: 3,
+  apr: 4,
+  may: 5,
+  jun: 6,
+  jul: 7,
+  aug: 8,
+  sep: 9,
+  oct: 10,
+  nov: 11,
+  dec: 12
+};
+
+const QUARTERLY_SERIES_FALLBACK_IDS = new Set(['unit_labour_cost_construction']);
+
+function parseYearMonth(periodStr) {
+  const match = String(periodStr || '').trim().match(/^(\d{4})\s([A-Za-z]{3})$/);
+  if (!match) return null;
+
+  const month = PERIOD_MONTH_MAP[match[2].toLowerCase()];
+  if (!month) return null;
+
+  return {
+    year: Number(match[1]),
+    month
+  };
+}
+
+function toQuarterLabel(yearMonth) {
+  if (!yearMonth || !Number.isFinite(yearMonth.year) || !Number.isFinite(yearMonth.month)) return null;
+  const quarter = Math.floor((yearMonth.month - 1) / 3) + 1;
+  return `${yearMonth.year} Q${quarter}`;
+}
+
+function normalizeFrequencyValue(raw) {
+  const normalized = String(raw || '').trim().toLowerCase();
+  if (!normalized) return null;
+  if (normalized === 'q' || normalized === 'quarterly') return 'Q';
+  if (normalized === 'm' || normalized === 'monthly') return 'M';
+  return null;
+}
+
+function inferFrequencyFromSeriesValues(seriesValues = []) {
+  const parsed = seriesValues
+    .map((point) => parseYearMonth(point?.period || point?.rawDate || point))
+    .filter(Boolean)
+    .slice(-8);
+
+  if (parsed.length < 3) return null;
+
+  const monthIndexes = parsed.map(({ year, month }) => year * 12 + month);
+  const gaps = [];
+  for (let i = 1; i < monthIndexes.length; i += 1) {
+    const gap = monthIndexes[i] - monthIndexes[i - 1];
+    if (gap > 0) gaps.push(gap);
+  }
+  if (!gaps.length) return null;
+
+  const sorted = gaps.slice().sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  const medianGap = sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+  return medianGap >= 3 ? 'Q' : 'M';
+}
+
+function resolveSeriesFrequency(seriesId, seriesMeta = null, seriesValues = []) {
+  const metadataCandidates = [
+    seriesMeta?.freq,
+    seriesMeta?.frequency,
+    seriesMeta?.periodicity,
+    seriesMeta?.interval
+  ];
+
+  for (const candidate of metadataCandidates) {
+    const normalized = normalizeFrequencyValue(candidate);
+    if (normalized) return normalized;
+  }
+
+  const inferred = inferFrequencyFromSeriesValues(seriesValues);
+  if (inferred) return inferred;
+
+  if (QUARTERLY_SERIES_FALLBACK_IDS.has(seriesId)) return 'Q';
+  return 'M';
+}
+
+function formatLastPointLabel(seriesId, periodStr, seriesMeta = null, seriesValues = []) {
+  const parsed = parseYearMonth(periodStr);
+  if (!parsed) return periodStr;
+
+  const frequency = resolveSeriesFrequency(seriesId, seriesMeta, seriesValues);
+  if (frequency !== 'Q') return periodStr;
+
+  return toQuarterLabel(parsed) || periodStr;
+}
+
 function normalizeSeriesPoints(rawSeries = []) {
   const points = rawSeries
     .map((point) => {
@@ -338,7 +434,10 @@ function inferDisplayFrequency(points = [], declaredFrequency = null) {
 }
 
 function formatLastPointDate(point) {
-  return formatPointDate(point, point?.frequency || null);
+  if (!point) return 'No data';
+
+  const monthlyLabel = formatPointDate(point, 'M');
+  return formatLastPointLabel(point.seriesId, monthlyLabel, point.seriesMeta, point.seriesValues);
 }
 
 const LATEST_VALUE_ROUNDED_UNITS = new Set(['K Sqm Gross', 'Units', 'K Sqm Nett', 'K Tonnes', 'S$M']);
@@ -473,7 +572,7 @@ function mapCardsFromSeries(data, frequencyMap = {}) {
     const prior = normalized[normalized.length - 2] || null;
     const majorCategory = normalizeCategory(seriesObj?.major_category);
 
-    const declaredFrequency = seriesObj?.freq || frequencyMap[meta.seriesId] || null;
+    const declaredFrequency = frequencyMap[meta.seriesId] || seriesObj?.freq || null;
     const frequency = inferDisplayFrequency(normalized, declaredFrequency);
 
     return {
@@ -483,7 +582,15 @@ function mapCardsFromSeries(data, frequencyMap = {}) {
       unit: meta.unit || seriesObj?.units || '',
       frequency,
       sparkline: normalized.slice(-24),
-      latest: latest ? { ...latest, frequency } : null,
+      latest: latest
+        ? {
+            ...latest,
+            frequency,
+            seriesId: meta.seriesId,
+            seriesMeta: { ...seriesObj, frequency: frequencyMap[meta.seriesId] || seriesObj?.frequency || null },
+            seriesValues: seriesObj?.values || []
+          }
+        : null,
       prior,
       thresholds: null
     };
@@ -555,4 +662,16 @@ async function initMacroPage() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', initMacroPage);
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', initMacroPage);
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    parseYearMonth,
+    toQuarterLabel,
+    formatLastPointLabel,
+    inferFrequencyFromSeriesValues,
+    resolveSeriesFrequency
+  };
+}
