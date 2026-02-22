@@ -307,6 +307,14 @@ function mergePeriodHistory(existingValues, fetchedValues) {
   return [...byPeriod.values()].sort((a, b) => a.period.localeCompare(b.period));
 }
 
+function isoDateToSpacedQuarterPeriod(dateString) {
+  const compactQuarter = isoDateToQuarterPeriod(dateString);
+  if (!compactQuarter) return null;
+  const match = compactQuarter.match(/^(\d{4})Q([1-4])$/);
+  if (!match) return null;
+  return `${match[1]} Q${match[2]}`;
+}
+
 function applyMajorCategoriesAndValidate(seriesById) {
   const missingSeries = [];
   const unmappedSeries = [];
@@ -714,12 +722,16 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
     const unit = bundle.UNIT_LABOUR_COST_CONSTRUCTION;
     if (!unit?.latest) throw new Error('SingStat parse 0 rows for unit labour cost of construction');
     if (!verifyOnly) {
+      const latestQuarterPeriod = isoDateToSpacedQuarterPeriod(unit.latest.date);
+      if (!latestQuarterPeriod) throw new Error(`Unable to convert unit labour cost date ${unit.latest.date} to quarter period`);
       series.unit_labour_cost_construction = {
-        freq: 'M',
-        latest_period: unit.latest.date,
+        freq: 'Q',
+        latest_period: latestQuarterPeriod,
         latest_value: unit.latest.value,
         units: 'index',
-        values: unit.rows.map((row) => ({ period: row.date.slice(0, 7), value: row.value }))
+        values: unit.rows
+          .map((row) => ({ period: isoDateToSpacedQuarterPeriod(row.date), value: row.value }))
+          .filter((row) => row.period)
       };
     }
     return { latest_period: unit.latest.date, latest_value: unit.latest.value };
