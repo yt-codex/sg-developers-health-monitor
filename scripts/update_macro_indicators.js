@@ -397,10 +397,45 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
   const optionalDatasetSpecs = [
     {
       datasetId: 'd_29f7b431ad79f61f19a731a6a86b0247', source: 'data.gov.sg',
-      build: (records, sf, tf) => pickByKeywords(records, sf, ['steel', 'cement', 'sand', 'ready mixed'], 3).map((row) => ({
-        key: `construction_material_${String(row[sf]).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '')}`,
-        freq: inferFrequencyFromTimeFields(tf), units: 'index', latest: extractLatest(row, tf), row, metadata: { source_series_name: row[sf] }
-      }))
+      build: (records, sf, tf, datasetId) => {
+        const targets = [
+          {
+            key: 'construction_material_steel_reinforcement_bars_16_32mm_high_tensile',
+            label: 'Steel Reinforcement Bars (16-32mm High Tensile)'
+          },
+          {
+            key: 'construction_material_cement_in_bulk_ordinary_portland_cement',
+            label: 'Cement In Bulk (Ordinary Portland Cement)'
+          },
+          {
+            key: 'construction_material_concreting_sand',
+            label: 'Concreting Sand'
+          },
+          {
+            key: 'construction_material_granite_20mm_aggregate',
+            label: 'Granite (20mm Aggregate)'
+          },
+          {
+            key: 'construction_material_ready_mixed_concrete',
+            label: 'Ready Mixed Concrete'
+          }
+        ];
+        return targets.map((target) => {
+          const match = findSeriesRow(records, sf, target.label);
+          if (!match.row) throw new Error(`${target.label}: ${match.error || 'series not found'}`);
+          if (VERIFY_MODE) {
+            console.log(`[verify-series] datasetId=${datasetId} required=${target.label} matched=${match.matchedSeriesName} (${match.matchType})`);
+          }
+          return {
+            key: target.key,
+            freq: inferFrequencyFromTimeFields(tf),
+            units: 'index',
+            latest: extractLatest(match.row, tf),
+            row: match.row,
+            metadata: { source_series_name: match.matchedSeriesName }
+          };
+        });
+      }
     },
     {
       datasetId: 'd_ba3c493ad160125ce347d5572712f14f', source: 'data.gov.sg',
@@ -532,12 +567,29 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
     },
     {
       datasetId: 'd_e9cc9d297b1cf8024cf99db4b12505cc', source: 'data.gov.sg',
-      build: (records, sf, tf) => pickByKeywords(records, sf, ['private', 'available', 'office', 'retail', 'industrial'], 4)
-        .filter((row) => /private/i.test(String(row[sf])) && /available/i.test(String(row[sf])))
-        .map((row) => ({
-          key: `private_available_${String(row[sf]).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`,
-          freq: inferFrequencyFromTimeFields(tf), units: 'sqm', latest: extractLatest(row, tf), row, metadata: { source_series_name: row[sf] }
-        }))
+      build: (records, sf, tf, datasetId) => {
+        const targets = [
+          { key: 'private_vacant_private_sector_office_space_vacant', label: 'Private Sector Office Space Vacant' },
+          { key: 'private_vacant_private_sector_business_park_space_vacant', label: 'Private Sector Business Park Space Vacant' },
+          { key: 'private_vacant_private_sector_multiple_user_factory_space_vacant', label: 'Private Sector Multiple-User Factory Space Vacant' },
+          { key: 'private_vacant_private_sector_retail_space_vacant', label: 'Private Sector Retail Space Vacant' }
+        ];
+        return targets.map((target) => {
+          const match = findSeriesRow(records, sf, target.label);
+          if (!match.row) throw new Error(`${target.label}: ${match.error || 'series not found'}`);
+          if (VERIFY_MODE) {
+            console.log(`[verify-series] datasetId=${datasetId} required=${target.label} matched=${match.matchedSeriesName} (${match.matchType})`);
+          }
+          return {
+            key: target.key,
+            freq: inferFrequencyFromTimeFields(tf),
+            units: 'sqm',
+            latest: extractLatest(match.row, tf),
+            row: match.row,
+            metadata: { source_series_name: match.matchedSeriesName }
+          };
+        });
+      }
     },
 
   ];
