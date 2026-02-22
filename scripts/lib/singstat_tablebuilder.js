@@ -2,6 +2,7 @@ const { toFiniteNumber } = require('./datagov');
 
 const RATES_TABLE_ID = 'M700071';
 const UNIT_LABOUR_TABLE_ID = 'M183741';
+const CONSTRUCTION_GDP_TABLE_ID = 'M015792';
 const DEFAULT_API_BASE = process.env.SINGSTAT_TABLEBUILDER_API_BASE || 'https://tablebuilder.singstat.gov.sg/api/table/tabledata';
 const DEFAULT_TIMEOUT_MS = Number(process.env.SINGSTAT_TABLEBUILDER_TIMEOUT_MS || 30000);
 const DEFAULT_RETRIES = Number(process.env.SINGSTAT_TABLEBUILDER_RETRIES || 3);
@@ -10,7 +11,8 @@ const SERIES_MAP = {
   SORA: 'Singapore Overnight Rate Average',
   SGS_2Y: 'Government Securities - 2-Year Bond Yield',
   SGS_10Y: 'Government Securities - 10-Year Bond Yield',
-  UNIT_LABOUR_COST_CONSTRUCTION: 'Unit labour cost of construction'
+  UNIT_LABOUR_COST_CONSTRUCTION: 'Unit labour cost of construction',
+  CONSTRUCTION_GDP_SA: 'Construction'
 };
 
 function sleep(ms) {
@@ -302,9 +304,22 @@ async function fetchUnitLabourCostConstructionSeries(options = {}) {
   });
 }
 
+async function fetchConstructionGdpSeries(options = {}) {
+  return extractSeries({
+    tableId: options.tableId || CONSTRUCTION_GDP_TABLE_ID,
+    wantedSeries: [{
+      key: 'CONSTRUCTION_GDP_SA',
+      label: SERIES_MAP.CONSTRUCTION_GDP_SA,
+      pattern: /^construction$/
+    }],
+    ...options
+  });
+}
+
 module.exports = {
   RATES_TABLE_ID,
   UNIT_LABOUR_TABLE_ID,
+  CONSTRUCTION_GDP_TABLE_ID,
   DEFAULT_API_BASE,
   SERIES_MAP,
   normalizeLabel,
@@ -314,5 +329,6 @@ module.exports = {
   fetchTableBuilderJson,
   extractSeries,
   fetchSingStatRequiredSeries,
-  fetchUnitLabourCostConstructionSeries
+  fetchUnitLabourCostConstructionSeries,
+  fetchConstructionGdpSeries
 };

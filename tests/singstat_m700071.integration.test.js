@@ -2,7 +2,8 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
   fetchSingStatRequiredSeries,
-  fetchUnitLabourCostConstructionSeries
+  fetchUnitLabourCostConstructionSeries,
+  fetchConstructionGdpSeries
 } = require('../scripts/lib/singstat_tablebuilder');
 
 function isMonotonicAscending(items) {
@@ -63,6 +64,29 @@ test('SingStat M183741 includes Unit labour cost of construction with numeric as
   const rows = bundle.UNIT_LABOUR_COST_CONSTRUCTION?.rows;
   assert.ok(Array.isArray(rows) && rows.length > 0, 'unit labour cost rows are missing/empty');
   assert.ok(isMonotonicAscending(rows), 'unit labour cost dates are not monotonic ascending');
+
+  for (const row of rows) {
+    assert.match(row.date, /^\d{4}-\d{2}-\d{2}$/);
+    assert.equal(typeof row.value, 'number');
+    assert.ok(Number.isFinite(row.value));
+  }
+
+  assertRecentDate(rows[rows.length - 1].date, 200);
+});
+
+
+test('SingStat M015792 includes Construction GDP (seasonally adjusted) with numeric ascending quarterly data', async (t) => {
+  let bundle;
+  try {
+    bundle = await fetchConstructionGdpSeries({ tableId: 'M015792' });
+  } catch (err) {
+    if (shouldSkipLive(err)) t.skip(`live SingStat unavailable: ${err.message}`);
+    throw err;
+  }
+
+  const rows = bundle.CONSTRUCTION_GDP_SA?.rows;
+  assert.ok(Array.isArray(rows) && rows.length > 0, 'construction GDP rows are missing/empty');
+  assert.ok(isMonotonicAscending(rows), 'construction GDP dates are not monotonic ascending');
 
   for (const row of rows) {
     assert.match(row.date, /^\d{4}-\d{2}-\d{2}$/);
