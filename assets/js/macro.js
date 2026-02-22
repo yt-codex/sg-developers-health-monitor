@@ -548,14 +548,16 @@ function renderStatusPill(label, status, tooltip) {
 
 function renderStressTags(riskNode, stressPayload) {
   const defs = [
-    ['sector_performance', 'Sector performance'],
-    ['labour_cost', 'Labour cost'],
-    ['interest_rate', 'Interest rate'],
-    ['materials_price', 'Materials price']
+    { keys: ['sector_performance'], label: 'Sector performance' },
+    { keys: ['labour_cost'], label: 'Labour cost' },
+    { keys: ['interest_rate'], label: 'Interest rate' },
+    { keys: ['materials_price', 'material_price'], label: 'Material price' }
   ];
 
-  const tags = defs.map(([key, label]) => {
-    const signal = stressPayload?.signals?.[key] || null;
+  const tags = defs.map(({ keys, label }) => {
+    const signal = keys
+      .map((key) => stressPayload?.signals?.[key] || null)
+      .find((value) => Boolean(value));
     return renderStatusPill(label, signal?.status || '—', signal?.tooltip || 'Unable to load status');
   });
 
