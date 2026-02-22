@@ -17,8 +17,10 @@ const { MAS_I6_API_URL, fetchMasI6LoanLimits } = require('./lib/mas_api');
 const {
   RATES_TABLE_ID: SINGSTAT_RATES_TABLE_ID,
   UNIT_LABOUR_TABLE_ID: SINGSTAT_UNIT_LABOUR_TABLE_ID,
+  CONSTRUCTION_GDP_TABLE_ID: SINGSTAT_CONSTRUCTION_GDP_TABLE_ID,
   fetchSingStatRequiredSeries,
-  fetchUnitLabourCostConstructionSeries
+  fetchUnitLabourCostConstructionSeries,
+  fetchConstructionGdpSeries
 } = require('./lib/singstat_tablebuilder');
 
 const VERIFY_MODE = process.argv.includes('--verify_sources');
@@ -26,6 +28,7 @@ const IS_GITHUB_ACTIONS = process.env.GITHUB_ACTIONS === 'true';
 const DATA_FILE = path.join(process.cwd(), 'data', 'macro_indicators.json');
 const SINGSTAT_RATES_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_RATES_TABLE_ID}`;
 const SINGSTAT_UNIT_LABOUR_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_UNIT_LABOUR_TABLE_ID}`;
+const SINGSTAT_CONSTRUCTION_GDP_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_CONSTRUCTION_GDP_TABLE_ID}`;
 
 const DATASET_IDS = [
   'd_29f7b431ad79f61f19a731a6a86b0247',
@@ -34,7 +37,6 @@ const DATASET_IDS = [
   'd_e47c0f0674b46981c4994d5257de5be4',
   'd_4dca06508cd9d0a8076153443c17ea5f',
   'd_e9cc9d297b1cf8024cf99db4b12505cc',
-  'd_df200b7f89f94e52964ff45cd7878a30',
   'd_af0415517a3a3a94b3b74039934ef976'
 ];
 
@@ -497,13 +499,7 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
           freq: inferFrequencyFromTimeFields(tf), units: 'sqm', latest: extractLatest(row, tf), metadata: { source_series_name: row[sf] }
         }))
     },
-    {
-      datasetId: 'd_df200b7f89f94e52964ff45cd7878a30', source: 'data.gov.sg',
-      build: (records, sf, tf) => pickByKeywords(records, sf, ['construction', 'real estate'], 3).map((row) => ({
-        key: `gdp_industry_${String(row[sf]).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`,
-        freq: inferFrequencyFromTimeFields(tf), units: 'S$ million', latest: extractLatest(row, tf), metadata: { source_series_name: row[sf] }
-      }))
-    }
+
   ];
 
   for (const spec of optionalDatasetSpecs) {
@@ -535,6 +531,25 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
       return { latest_period: latestSeen.latest_period, latest_value: latestSeen.latest_value };
     });
   }
+
+  await tryIndicator({ key: 'construction_gdp', source: 'SingStat TableBuilder', dataset_ref: SINGSTAT_CONSTRUCTION_GDP_DATASET_REF, series_name: 'Construction' }, async () => {
+    const bundle = await fetchConstructionGdpSeries();
+    const construction = bundle.CONSTRUCTION_GDP_SA;
+    if (!construction?.latest) throw new Error('SingStat parse 0 rows for construction GDP');
+    if (!verifyOnly) {
+      series.construction_gdp = {
+        freq: 'Q',
+        latest_period: construction.latest.date,
+        latest_value: construction.latest.value,
+        units: 'S$ million',
+        source_series_name: construction.rows[0]?.series_name || 'Construction'
+      };
+    }
+    if (VERIFY_MODE) {
+      console.log(`[verify-series] datasetRef=${SINGSTAT_CONSTRUCTION_GDP_DATASET_REF} required=${construction.rows[0]?.series_name || 'Construction'} latest=${construction.latest.date}=${construction.latest.value}`);
+    }
+    return { latest_period: construction.latest.date, latest_value: construction.latest.value };
+  });
 
   let singStatUnitLabourPromise;
   const getSingStatUnitLabourBundle = async () => {
@@ -698,10 +713,11 @@ async function main() {
       {
         name: 'SingStat TableBuilder',
         method: 'json_api_parse',
-        table_ids: [SINGSTAT_RATES_TABLE_ID, SINGSTAT_UNIT_LABOUR_TABLE_ID],
+        table_ids: [SINGSTAT_RATES_TABLE_ID, SINGSTAT_UNIT_LABOUR_TABLE_ID, SINGSTAT_CONSTRUCTION_GDP_TABLE_ID],
         table_urls: [
           `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_RATES_TABLE_ID}`,
-          `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_UNIT_LABOUR_TABLE_ID}`
+          `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_UNIT_LABOUR_TABLE_ID}`,
+          `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_CONSTRUCTION_GDP_TABLE_ID}`
         ]
       },
       { name: 'MAS I.6 JSON API', method: 'json_api_parse', url: MAS_I6_API_URL }
