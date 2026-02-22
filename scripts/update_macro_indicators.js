@@ -819,9 +819,6 @@ async function main() {
   }
 
   const existing = JSON.parse(await fs.readFile(DATA_FILE, 'utf8'));
-  if (Array.isArray(existing.indicators)) {
-    existing.indicators = existing.indicators.map((indicator) => ({ ...indicator, is_mock: true }));
-  }
 
   const nowIso = new Date().toISOString();
   const existingSeries = existing?.macro_indicators?.series || {};
@@ -847,6 +844,8 @@ async function main() {
   }
 
   applyMajorCategoriesAndValidate(mergedSeries);
+
+  delete existing.indicators;
 
   existing.macro_indicators = {
     ...(existing.macro_indicators || {}),
