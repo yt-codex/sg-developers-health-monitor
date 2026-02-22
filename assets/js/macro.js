@@ -332,7 +332,7 @@ function inferDisplayFrequency(points = [], declaredFrequency = null) {
     .filter((month) => Number.isFinite(month));
 
   if (monthValues.length < 4) return 'M';
-  const quarterlyMonthStarts = new Set([1, 4, 7, 10]);
+  const quarterlyMonthStarts = new Set([3, 6, 9, 12]);
   const isQuarterlyCadence = monthValues.every((month) => quarterlyMonthStarts.has(month));
   return isQuarterlyCadence ? 'Q' : 'M';
 }
