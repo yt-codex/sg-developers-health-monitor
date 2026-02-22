@@ -217,7 +217,10 @@ small { font-size: 0.875rem; }
   gap: var(--space-3);
 }
 
-.indicator-tile { min-height: 265px; }
+.indicator-tile {
+  min-height: 265px;
+  position: relative;
+}
 
 .indicator-tile .value {
   font-size: 1.75rem;
@@ -228,30 +231,71 @@ small { font-size: 0.875rem; }
   width: 100%;
   height: 76px;
   margin: var(--space-2) 0;
+  overflow: visible;
 }
 
-
-.sparkline-point {
-  cursor: pointer;
-  outline: none;
-}
-
-.sparkline-point-hit {
-  fill: transparent;
-  pointer-events: all;
+.sparkline-line {
+  fill: none;
+  stroke: #64748b;
+  stroke-width: 2;
 }
 
 .sparkline-point-dot {
   fill: #38bdf8;
   opacity: 0.35;
-  transition: transform 0.15s ease, opacity 0.15s ease;
-  transform-origin: center;
 }
 
-.sparkline-point:hover .sparkline-point-dot,
-.sparkline-point:focus .sparkline-point-dot {
+.sparkline-focus {
+  fill: #38bdf8;
+  stroke: rgba(15, 23, 42, 0.75);
+  stroke-width: 1.4;
+  opacity: 0;
+  transform-origin: center;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.sparkline-focus.visible {
   opacity: 1;
-  transform: scale(1.4);
+  transform: scale(1.18);
+}
+
+.sparkline-hover-layer {
+  cursor: crosshair;
+}
+
+.chart-tooltip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 8;
+  pointer-events: none;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.35;
+  padding: 9px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(10, 12, 18, 0.95);
+  box-shadow: 0 10px 26px rgba(2, 6, 23, 0.42);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+  max-width: min(205px, calc(100% - 10px));
+}
+
+.chart-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.chart-tooltip-period {
+  color: rgba(255, 255, 255, 0.74);
+  margin-bottom: 2px;
+}
+
+.chart-tooltip-value {
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .indicator-title-row {
