@@ -131,7 +131,12 @@ function sparklineSvg(series, options = {}) {
   const circles = coordinates
     .map((coord) => {
       const hoverText = `${coord.date}: ${coord.value.toFixed(2)} ${unit}`.trim();
-      return `<circle cx="${coord.x}" cy="${coord.y}" r="5" fill="transparent"><title>${escapeHtml(hoverText)}</title></circle>`;
+      const escapedHoverText = escapeHtml(hoverText);
+      return `<g class="sparkline-point" tabindex="0" role="img" aria-label="${escapedHoverText}">
+        <circle class="sparkline-point-hit" cx="${coord.x}" cy="${coord.y}" r="7"></circle>
+        <circle class="sparkline-point-dot" cx="${coord.x}" cy="${coord.y}" r="2.8"></circle>
+        <title>${escapedHoverText}</title>
+      </g>`;
     })
     .join('');
 
