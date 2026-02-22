@@ -116,31 +116,126 @@ function sparklineSvg(series, options = {}) {
   const range = max - min || 1;
   const w = 240;
   const h = 72;
+  const pointRadius = 3;
+  const clipPad = pointRadius + 2;
   const step = w / (values.length - 1);
   const coordinates = values
     .map((v, i) => ({
       x: (i * step).toFixed(1),
-      y: (h - ((v - min) / range) * h).toFixed(1),
+      y: (h - clipPad - ((v - min) / range) * (h - clipPad * 2)).toFixed(1),
       value: v,
-      date: formatPointDate(series[i], frequency)
+      periodLabel: formatPointDate(series[i], frequency)
     }));
   const points = coordinates
     .map((coord) => `${coord.x},${coord.y}`)
     .join(' ');
 
   const circles = coordinates
-    .map((coord) => {
-      const hoverText = `${coord.date}: ${coord.value.toFixed(2)} ${unit}`.trim();
-      const escapedHoverText = escapeHtml(hoverText);
-      return `<g class="sparkline-point" tabindex="0" role="img" aria-label="${escapedHoverText}">
-        <circle class="sparkline-point-hit" cx="${coord.x}" cy="${coord.y}" r="7"></circle>
-        <circle class="sparkline-point-dot" cx="${coord.x}" cy="${coord.y}" r="2.8"></circle>
-        <title>${escapedHoverText}</title>
-      </g>`;
-    })
+    .map((coord) => `<circle class="sparkline-point-dot" cx="${coord.x}" cy="${coord.y}" r="${pointRadius - 0.2}"></circle>`)
     .join('');
+  const encodedPoints = encodeURIComponent(JSON.stringify(coordinates));
+  const clipId = `sparkline-clip-${Math.random().toString(36).slice(2, 9)}`;
 
-  return `<svg class="sparkline" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polyline fill="none" stroke="#64748b" stroke-width="2" points="${points}" />${circles}</svg>`;
+  return `<svg class="sparkline" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" data-points="${encodedPoints}" data-unit="${escapeHtml(unit)}" data-width="${w}" data-height="${h}" data-point-radius="${pointRadius}">
+    <defs>
+      <clipPath id="${clipId}">
+        <rect x="${-clipPad}" y="${-clipPad}" width="${w + clipPad * 2}" height="${h + clipPad * 2}"></rect>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#${clipId})">
+      <polyline class="sparkline-line" points="${points}" />
+      ${circles}
+      <circle class="sparkline-focus" cx="0" cy="0" r="${pointRadius}"></circle>
+    </g>
+    <rect class="sparkline-hover-layer" x="0" y="0" width="${w}" height="${h}" fill="transparent"></rect>
+  </svg>`;
+}
+
+function createTooltip(container) {
+  let tooltip = container.querySelector('.chart-tooltip');
+  if (tooltip) return tooltip;
+  tooltip = document.createElement('div');
+  tooltip.className = 'chart-tooltip';
+  container.appendChild(tooltip);
+  return tooltip;
+}
+
+function showTooltip(tooltip, periodLabel, valueFormatted, unitLabel) {
+  tooltip.innerHTML = `<div class="chart-tooltip-period">${escapeHtml(periodLabel)}</div><div class="chart-tooltip-value">${escapeHtml(`${valueFormatted} ${unitLabel}`.trim())}</div>`;
+  tooltip.classList.add('visible');
+}
+
+function moveTooltip(tooltip, container, x, y, offset = 10) {
+  const containerRect = container.getBoundingClientRect();
+  const tooltipRect = tooltip.getBoundingClientRect();
+  const maxLeft = Math.max(0, containerRect.width - tooltipRect.width);
+  const maxTop = Math.max(0, containerRect.height - tooltipRect.height);
+  const left = Math.min(Math.max(x + offset, 0), maxLeft);
+  const top = Math.min(Math.max(y + offset, 0), maxTop);
+  tooltip.style.left = `${left}px`;
+  tooltip.style.top = `${top}px`;
+}
+
+function hideTooltip(tooltip) {
+  tooltip.classList.remove('visible');
+}
+
+function formatTooltipValue(value) {
+  return new Intl.NumberFormat('en-SG', { maximumFractionDigits: 2 }).format(value);
+}
+
+function initSparklineInteractions() {
+  const bisect = (points, targetX) => {
+    let low = 0;
+    let high = points.length - 1;
+    while (low < high) {
+      const mid = Math.floor((low + high) / 2);
+      if (Number(points[mid].x) < targetX) low = mid + 1;
+      else high = mid;
+    }
+
+    if (low === 0) return 0;
+    const current = Number(points[low].x);
+    const prev = Number(points[low - 1].x);
+    return Math.abs(current - targetX) < Math.abs(targetX - prev) ? low : low - 1;
+  };
+
+  document.querySelectorAll('.indicator-tile').forEach((tile) => {
+    const svg = tile.querySelector('.sparkline[data-points]');
+    if (!svg) return;
+    const hoverLayer = svg.querySelector('.sparkline-hover-layer');
+    const focus = svg.querySelector('.sparkline-focus');
+    if (!hoverLayer || !focus) return;
+
+    const points = JSON.parse(decodeURIComponent(svg.dataset.points || '[]'));
+    if (!points.length) return;
+
+    const unit = svg.dataset.unit || '';
+    const width = Number(svg.dataset.width) || 240;
+    const tooltip = createTooltip(tile);
+
+    const updateHoverState = (event) => {
+      const rect = hoverLayer.getBoundingClientRect();
+      const chartX = ((event.clientX - rect.left) / rect.width) * width;
+      const nearestIndex = bisect(points, chartX);
+      const point = points[nearestIndex];
+      focus.setAttribute('cx', point.x);
+      focus.setAttribute('cy', point.y);
+      focus.classList.add('visible');
+
+      showTooltip(tooltip, point.periodLabel, formatTooltipValue(point.value), unit);
+
+      const tileRect = tile.getBoundingClientRect();
+      moveTooltip(tooltip, tile, event.clientX - tileRect.left, event.clientY - tileRect.top);
+    };
+
+    hoverLayer.addEventListener('mouseenter', updateHoverState);
+    hoverLayer.addEventListener('mousemove', updateHoverState);
+    hoverLayer.addEventListener('mouseleave', () => {
+      focus.classList.remove('visible');
+      hideTooltip(tooltip);
+    });
+  });
 }
 
 function escapeHtml(value) {
@@ -369,9 +464,14 @@ async function initMacroPage() {
           </article>`;
         })
         .join('');
+
+      initSparklineInteractions();
     };
 
     categoryFilter.addEventListener('change', render);
+    window.addEventListener('resize', () => {
+      document.querySelectorAll('.chart-tooltip.visible').forEach((tooltip) => hideTooltip(tooltip));
+    });
     render();
   } catch (e) {
     wrap.innerHTML = `<p class="empty">Unable to load macro data: ${e.message}</p>`;
