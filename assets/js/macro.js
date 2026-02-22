@@ -214,25 +214,45 @@ function initSparklineInteractions() {
     const width = Number(svg.dataset.width) || 240;
     const tooltip = createTooltip(tile);
 
+    const getClientX = (event) => {
+      if (typeof event.clientX === 'number') return event.clientX;
+      const touch = event.touches?.[0] || event.changedTouches?.[0];
+      return touch?.clientX;
+    };
+
     const updateHoverState = (event) => {
+      const clientX = getClientX(event);
+      if (typeof clientX !== 'number') return;
       const rect = hoverLayer.getBoundingClientRect();
-      const chartX = ((event.clientX - rect.left) / rect.width) * width;
+      const chartX = ((clientX - rect.left) / rect.width) * width;
       const nearestIndex = bisect(points, chartX);
       const point = points[nearestIndex];
       focus.setAttribute('cx', point.x);
       focus.setAttribute('cy', point.y);
       focus.classList.add('visible');
+      svg.classList.add('is-hovering');
 
       showTooltip(tooltip, point.periodLabel, formatTooltipValue(point.value), unit);
 
       const tileRect = tile.getBoundingClientRect();
-      moveTooltip(tooltip, tile, event.clientX - tileRect.left, event.clientY - tileRect.top);
+      const pointXWithinTile = rect.left - tileRect.left + (Number(point.x) / width) * rect.width;
+      const pointYWithinTile = rect.top - tileRect.top + (Number(point.y) / (Number(svg.dataset.height) || 76)) * rect.height;
+      moveTooltip(tooltip, tile, pointXWithinTile, pointYWithinTile, 14);
     };
 
     hoverLayer.addEventListener('mouseenter', updateHoverState);
     hoverLayer.addEventListener('mousemove', updateHoverState);
+    hoverLayer.addEventListener('touchstart', updateHoverState, { passive: true });
+    hoverLayer.addEventListener('touchmove', updateHoverState, { passive: true });
     hoverLayer.addEventListener('mouseleave', () => {
       focus.classList.remove('visible');
+      svg.classList.remove('is-hovering');
+      hideTooltip(tooltip);
+    });
+
+    hoverLayer.addEventListener('touchend', () => {
+      focus.classList.remove('visible');
+      svg.classList.remove('is-hovering');
       hideTooltip(tooltip);
     });
   });
