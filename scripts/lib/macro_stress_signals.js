@@ -1,7 +1,13 @@
+const {
+  MATERIALS_PRICE_YOY_THRESHOLD_PCT,
+  MATERIALS_PRICE_SERIES_IDS
+} = require('./macro_stress_constants');
+
 const STRESS_TOOLTIPS = {
   sector_performance: 'Stress if construction_gdp is negative for 2 consecutive quarters.',
   labour_cost: 'Stress if Construction Unit Labour Cost (ULC) YoY growth ≥ 8% for 2 consecutive quarters.',
-  interest_rate: 'Stress if SORA overnight is above its 5-year 80th percentile AND the 6-month change ≥ +0.75pp.'
+  interest_rate: 'Stress if SORA overnight is above its 5-year 80th percentile AND the 6-month change ≥ +0.75pp.',
+  materials_price: `Watch if any listed construction material price index rises by ≥ ${MATERIALS_PRICE_YOY_THRESHOLD_PCT * 100}% YoY for 2 consecutive months.`
 };
 
 function formatSgtTimestamp(date = new Date()) {
@@ -202,13 +208,77 @@ function computeInterestRateSignal(values = []) {
   };
 }
 
+function computeMaterialsPriceSignal(seriesById = {}) {
+  const thresholdPct = MATERIALS_PRICE_YOY_THRESHOLD_PCT;
+  const evaluations = MATERIALS_PRICE_SERIES_IDS.map((seriesId) => {
+    const normalizedEntries = normalizeMonthlyValues(seriesById[seriesId]?.values || []);
+    const byMonth = new Map(normalizedEntries);
+    const latestMonthIdx = normalizedEntries[normalizedEntries.length - 1]?.[0] ?? null;
+
+    if (latestMonthIdx == null) {
+      return { seriesId, asOf: null, triggered: false, missingReason: `No monthly observations for ${seriesId}.` };
+    }
+
+    const required = [latestMonthIdx, latestMonthIdx - 1, latestMonthIdx - 12, latestMonthIdx - 13];
+    const missing = required.filter((idx) => !byMonth.has(idx));
+
+    if (missing.length) {
+      return {
+        seriesId,
+        asOf: monthPeriodFromIndex(latestMonthIdx),
+        triggered: false,
+        missingReason: `Missing required month(s): ${missing.map(monthPeriodFromIndex).join(', ')}.`
+      };
+    }
+
+    const yoyLatest = byMonth.get(latestMonthIdx).value / byMonth.get(latestMonthIdx - 12).value - 1;
+    const yoyPrev = byMonth.get(latestMonthIdx - 1).value / byMonth.get(latestMonthIdx - 13).value - 1;
+    return {
+      seriesId,
+      asOf: monthPeriodFromIndex(latestMonthIdx),
+      triggered: yoyLatest >= thresholdPct && yoyPrev >= thresholdPct,
+      yoyLatest: { period: monthPeriodFromIndex(latestMonthIdx), value: Number(yoyLatest.toFixed(6)) },
+      yoyPrev: { period: monthPeriodFromIndex(latestMonthIdx - 1), value: Number(yoyPrev.toFixed(6)) }
+    };
+  });
+
+  const triggeredSeries = evaluations.filter((entry) => entry.triggered);
+  const selected = triggeredSeries.sort((a, b) => b.yoyLatest.value - a.yoyLatest.value)[0] || null;
+  const latestAsOf = evaluations
+    .map((entry) => entry.asOf)
+    .filter(Boolean)
+    .sort()
+    .at(-1) || null;
+
+  const allMissing = evaluations.every((entry) => entry.missingReason || entry.asOf == null);
+
+  return {
+    status: selected ? 'Watch' : 'Normal',
+    series_ids: MATERIALS_PRICE_SERIES_IDS,
+    as_of: selected?.asOf || latestAsOf,
+    details: {
+      triggered_by: selected?.seriesId || null,
+      yoy_latest: selected?.yoyLatest || null,
+      yoy_prev: selected?.yoyPrev || null,
+      threshold_pct: thresholdPct
+    },
+    tooltip: STRESS_TOOLTIPS.materials_price,
+    ...(allMissing
+      ? {
+          note: 'All materials series missing required t-12/t-13 lags; defaulted to Normal.'
+        }
+      : {})
+  };
+}
+
 function generateMacroStressSignals(seriesById = {}, now = new Date()) {
   return {
     last_updated_sgt: formatSgtTimestamp(now),
     signals: {
       sector_performance: computeSectorPerformanceSignal(seriesById.construction_gdp?.values || []),
       labour_cost: computeLabourCostSignal(seriesById.unit_labour_cost_construction?.values || []),
-      interest_rate: computeInterestRateSignal(seriesById.sora_overnight?.values || [])
+      interest_rate: computeInterestRateSignal(seriesById.sora_overnight?.values || []),
+      materials_price: computeMaterialsPriceSignal(seriesById)
     }
   };
 }
@@ -219,5 +289,6 @@ module.exports = {
   computeSectorPerformanceSignal,
   computeLabourCostSignal,
   computeInterestRateSignal,
+  computeMaterialsPriceSignal,
   generateMacroStressSignals
 };

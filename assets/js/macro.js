@@ -533,25 +533,30 @@ function computeMacroRisk(cards) {
 }
 
 
-function getStressVisualClass(status) {
-  if (status === 'Stress') return 'sev-warning';
-  if (status === 'Normal') return 'sev-info';
-  return 'sev-watch';
+function getStatusPillClass(status) {
+  if (status === 'Stress') return 'pill--stress';
+  if (status === 'Watch') return 'pill--watch';
+  return 'pill--normal';
+}
+
+function renderStatusPill(label, status, tooltip) {
+  const visualStatus = status || '—';
+  const effectiveTooltip = tooltip || 'Unable to load status';
+  const klass = getStatusPillClass(status);
+  return `<span class="status-pill ${klass}" title="${escapeHtml(effectiveTooltip)}">${escapeHtml(label)}: ${escapeHtml(visualStatus)}</span>`;
 }
 
 function renderStressTags(riskNode, stressPayload) {
   const defs = [
     ['sector_performance', 'Sector performance'],
     ['labour_cost', 'Labour cost'],
-    ['interest_rate', 'Interest rate']
+    ['interest_rate', 'Interest rate'],
+    ['materials_price', 'Materials price']
   ];
 
   const tags = defs.map(([key, label]) => {
     const signal = stressPayload?.signals?.[key] || null;
-    const status = signal?.status || '—';
-    const tooltip = signal?.tooltip || 'Unable to load stress signals';
-    const klass = getStressVisualClass(signal?.status);
-    return `<span class="badge ${klass}" title="${escapeHtml(tooltip)}">${escapeHtml(label)}: ${escapeHtml(status)}</span>`;
+    return renderStatusPill(label, signal?.status || '—', signal?.tooltip || 'Unable to load status');
   });
 
   riskNode.innerHTML = tags.join(' ');
