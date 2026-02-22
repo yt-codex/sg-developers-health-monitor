@@ -428,6 +428,7 @@ small { font-size: 0.875rem; }
   font-size: 0.82rem;
   font-weight: 600;
   border: 1px solid transparent;
+  color: #1f2937;
 }
 
 .status-pill::before {
@@ -439,9 +440,9 @@ small { font-size: 0.875rem; }
 }
 
 .sev-critical { background: #fef3f2; color: var(--crit); border-color: #fecdca; }
-.pill--normal { background: #ffffff; color: #2563eb; border-color: var(--border); }
-.pill--watch { background: #fffbeb; color: #92400e; border-color: #fcd34d; }
-.pill--stress { background: #fef2f2; color: #b42318; border-color: #fca5a5; }
+.macro-stress-tags .status-pill.pill--normal { background: #ffffff; color: #1d4ed8; border-color: var(--border); }
+.macro-stress-tags .status-pill.pill--watch { background: #fffbeb; color: #92400e; border-color: #fcd34d; }
+.macro-stress-tags .status-pill.pill--stress { background: #fef2f2; color: #b42318; border-color: #fca5a5; }
 
 .macro-stress-tags {
   display: flex;
