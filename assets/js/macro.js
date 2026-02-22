@@ -387,6 +387,31 @@ function computeMacroRisk(cards) {
   return 'Watch';
 }
 
+
+function getStressVisualClass(status) {
+  if (status === 'Stress') return 'sev-warning';
+  if (status === 'Normal') return 'sev-info';
+  return 'sev-watch';
+}
+
+function renderStressTags(riskNode, stressPayload) {
+  const defs = [
+    ['sector_performance', 'Sector performance'],
+    ['labour_cost', 'Labour cost'],
+    ['interest_rate', 'Interest rate']
+  ];
+
+  const tags = defs.map(([key, label]) => {
+    const signal = stressPayload?.signals?.[key] || null;
+    const status = signal?.status || '—';
+    const tooltip = signal?.tooltip || 'Unable to load stress signals';
+    const klass = getStressVisualClass(signal?.status);
+    return `<span class="badge ${klass}" title="${escapeHtml(tooltip)}">${escapeHtml(label)}: ${escapeHtml(status)}</span>`;
+  });
+
+  riskNode.innerHTML = tags.join(' ');
+}
+
 function validateMacroCardsOrThrow(cards, macroSeries) {
   const missingSeries = cards.filter((card) => !macroSeries[card.seriesId]).map((card) => card.seriesId);
   const missingCategory = cards.filter((card) => !card.majorCategory).map((card) => card.seriesId);
@@ -445,16 +470,18 @@ async function initMacroPage() {
   if (!wrap) return;
 
   try {
-    const data = await App.fetchJson('./data/macro_indicators.json');
+    const [data, stressResult] = await Promise.all([
+      App.fetchJson('./data/macro_indicators.json'),
+      App.fetchJson('./data/macro_stress_signals.json').catch(() => null)
+    ]);
     const frequencyMap = await loadFrequencyMap();
     const cards = mapCardsFromSeries(data, frequencyMap);
 
     const render = () => {
       const selectedCategory = categoryFilter.value;
       const filtered = cards.filter((card) => (selectedCategory === 'all' ? true : card.majorCategory === selectedCategory));
-      const risk = computeMacroRisk(filtered);
 
-      riskNode.innerHTML = `<span class="badge sev-${risk.toLowerCase()}">Macro headwinds: ${risk}</span>`;
+      renderStressTags(riskNode, stressResult);
       if (!filtered.length) {
         wrap.innerHTML = '<p class="empty">No indicators for selected monitoring category.</p>';
         return;

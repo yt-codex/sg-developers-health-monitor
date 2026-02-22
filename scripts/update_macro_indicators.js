@@ -15,6 +15,7 @@ const {
   extractSeriesValues
 } = require('./lib/datagov');
 const { MAS_I6_API_URL, fetchMasI6LoanLimits } = require('./lib/mas_api');
+const { generateMacroStressSignals } = require('./lib/macro_stress_signals');
 const {
   RATES_TABLE_ID: SINGSTAT_RATES_TABLE_ID,
   UNIT_LABOUR_TABLE_ID: SINGSTAT_UNIT_LABOUR_TABLE_ID,
@@ -34,6 +35,7 @@ const {
 const VERIFY_MODE = process.argv.includes('--verify_sources');
 const IS_GITHUB_ACTIONS = process.env.GITHUB_ACTIONS === 'true';
 const DATA_FILE = path.join(process.cwd(), 'data', 'macro_indicators.json');
+const MACRO_STRESS_FILE = path.join(process.cwd(), 'data', 'macro_stress_signals.json');
 const SINGSTAT_RATES_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_RATES_TABLE_ID}`;
 const SINGSTAT_UNIT_LABOUR_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_UNIT_LABOUR_TABLE_ID}`;
 const SINGSTAT_CONSTRUCTION_GDP_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_CONSTRUCTION_GDP_TABLE_ID}`;
@@ -877,8 +879,12 @@ async function main() {
     series: mergedSeries
   };
 
+  const macroStressSignals = generateMacroStressSignals(mergedSeries, new Date());
+
   await fs.writeFile(DATA_FILE, `${JSON.stringify(existing, null, 2)}\n`, 'utf8');
+  await fs.writeFile(MACRO_STRESS_FILE, `${JSON.stringify(macroStressSignals, null, 2)}\n`, 'utf8');
   console.log(`Updated ${path.relative(process.cwd(), DATA_FILE)} with ${Object.keys(fetchedSeries).length} successful series updates.`);
+  console.log(`Updated ${path.relative(process.cwd(), MACRO_STRESS_FILE)}.`);
 
   if (updateRun.ok_count === 0) {
     process.exitCode = 1;

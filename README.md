@@ -16,6 +16,7 @@ Static multi-page dashboard for GitHub Pages that monitors vulnerability signals
 ├── data/
 │   ├── site_meta.json
 │   ├── macro_indicators.json
+│   ├── macro_stress_signals.json
 │   ├── developer_news.json
 │   ├── risk_rules.json
 │   └── listed_developers.json
@@ -72,7 +73,7 @@ npm test
 ```
 
 - `verify:macro-sources` checks upstream macro data sources and logs diagnostics.
-- `update:macro` refreshes `data/macro_indicators.json`.
+- `update:macro` refreshes `data/macro_indicators.json` and derives `data/macro_stress_signals.json`.
 - `test` runs parser + integration tests, including live source contract checks for SingStat TableBuilder `M700071` and `M183741` (network-dependent; auto-skipped if unreachable).
 
 
@@ -112,6 +113,7 @@ Set repository secret:
 ## Data files
 - `data/site_meta.json` – global timestamp shown on pages
 - `data/macro_indicators.json` – indicator config, series, thresholds, explanations
+- `data/macro_stress_signals.json` – derived stress statuses for sector performance, labour cost, and interest rates
 - `data/developer_news.json` – pre-fetched news items
 - `data/risk_rules.json` – regex tagging rules and severity hierarchy
 - `data/listed_developers.json` – developer metrics and scoring model
