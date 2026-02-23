@@ -16,6 +16,7 @@ const NEWS_90D_PATH = path.join(DATA_DIR, 'news_latest_90d.json');
 const META_PATH = path.join(DATA_DIR, 'meta.json');
 const REJECTED_LOG_PATH = path.join(DATA_DIR, 'rejected_items.log');
 const RELEVANCE_RULES_PATH = path.join(CONFIG_DIR, 'relevance_rules.json');
+const GOOGLE_QUERIES_PATH = path.join(CONFIG_DIR, 'google_news_queries.json');
 
 const FEEDS = [
   { source: 'CNA', url: 'https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=6936' },
@@ -28,6 +29,7 @@ const FEEDS = [
 
 const TRACKING_PREFIXES = ['utm_', 'fbclid', 'gclid', 'mc_cid', 'mc_eid', 'cmpid', 'igshid', 's_cid'];
 const SEVERITY_SCORE = { critical: 4, warning: 3, watch: 2, info: 1 };
+const GOOGLE_RSS_BASE = 'https://news.google.com/rss/search';
 
 const parser = XMLParser
   ? new XMLParser({
@@ -37,6 +39,22 @@ const parser = XMLParser
       parseTagValue: true
     })
   : null;
+
+function parseArgs(argv) {
+  const parsed = {};
+  for (const token of argv) {
+    if (!token.startsWith('--')) continue;
+    const [key, value] = token.slice(2).split('=');
+    parsed[key] = value === undefined ? true : value;
+  }
+  return {
+    cleanup: Boolean(parsed.cleanup),
+    source: String(parsed.source || 'default').toLowerCase(),
+    mode: String(parsed.mode || 'delta').toLowerCase(),
+    days: Number.parseInt(parsed.days || '7', 10),
+    maxQueries: parsed.max_queries ? Number.parseInt(parsed.max_queries, 10) : null
+  };
+}
 
 function ensureDir(dirPath) {
   fs.mkdirSync(dirPath, { recursive: true });
@@ -92,12 +110,29 @@ function canonicalizeLink(link) {
     if (url.pathname.length > 1) url.pathname = url.pathname.replace(/\/+$/, '');
     return url.toString();
   } catch {
-    return link;
+    return (link || '').trim();
   }
 }
 
-function buildId(source, canonicalLink) {
-  return crypto.createHash('sha256').update(`${source}|${canonicalLink}`).digest('hex').slice(0, 16);
+function normalizeTitle(text) {
+  return (text || '').toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+function buildId(source, key) {
+  return crypto.createHash('sha256').update(`${source}|${key}`).digest('hex').slice(0, 16);
+}
+
+function buildFallbackDedupKey(title, publisher, pubDate) {
+  const datePart = pubDate ? new Date(pubDate).toISOString().slice(0, 10) : 'unknown';
+  const raw = `${normalizeTitle(title)}|${normalizeTitle(publisher || '')}|${datePart}`;
+  return `fallback:${crypto.createHash('sha256').update(raw).digest('hex').slice(0, 24)}`;
+}
+
+function deriveDedupKey(item) {
+  if (item.resolved_link) return canonicalizeLink(item.resolved_link);
+  if (item.source_url) return canonicalizeLink(item.source_url);
+  if (item.link) return canonicalizeLink(item.link);
+  return buildFallbackDedupKey(item.title, item.publisher, item.pubDate);
 }
 
 function compileRules(tagRules) {
@@ -135,9 +170,7 @@ function classifySeverity(text, compiledRules, severityOrder) {
 }
 
 function extractDeveloper(text, developerConfig) {
-  const hits = developerConfig.developers.filter((dev) =>
-    dev.aliases.some((alias) => text.includes(alias.toLowerCase()))
-  );
+  const hits = developerConfig.developers.filter((dev) => dev.aliases.some((alias) => text.includes(alias.toLowerCase())));
   if (hits.length === 0) return 'Unknown';
   if (hits.length > 1) return 'Multiple';
   return hits[0].name;
@@ -285,10 +318,11 @@ function parseItemsWithRegex(xml, source) {
     const link = stripHtml((block.match(/<link>([\s\S]*?)<\/link>/i) || [])[1] || '');
     const description = stripHtml((block.match(/<description>([\s\S]*?)<\/description>/i) || [])[1] || '');
     const pubDate = stripHtml((block.match(/<pubDate>([\s\S]*?)<\/pubDate>/i) || [])[1] || '');
+    const sourceUrl = stripHtml((block.match(/<source[^>]*url=["']([^"']+)["'][^>]*>/i) || [])[1] || '');
     if (!title || !link || !pubDate) continue;
     const parsed = Date.parse(pubDate);
     if (!Number.isFinite(parsed)) continue;
-    items.push({ source, title, link, pubDate: new Date(parsed).toISOString(), snippet: description });
+    items.push({ source, title, link, pubDate: new Date(parsed).toISOString(), snippet: description, source_url: sourceUrl || null });
   }
   return items;
 }
@@ -307,6 +341,8 @@ function parseItemsFromXml(xml, source) {
       const link = (linkRaw || '').trim();
       const description = stripHtml(node.description || node.summary || node.content || '');
       const pubDate = node.pubDate || node.published || node.updated || node['dc:date'];
+      const sourceNode = node.source;
+      const sourceUrl = typeof sourceNode === 'object' ? sourceNode['@_url'] || sourceNode.url : null;
       if (!title || !link || !pubDate) return null;
       const parsedDate = Date.parse(pubDate);
       if (!Number.isFinite(parsedDate)) return null;
@@ -316,7 +352,8 @@ function parseItemsFromXml(xml, source) {
         title,
         link,
         pubDate: iso,
-        snippet: description
+        snippet: description,
+        source_url: sourceUrl || null
       };
     })
     .filter(Boolean);
@@ -327,6 +364,110 @@ async function fetchFeed(feed) {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const body = await res.text();
   return parseItemsFromXml(body, feed.source);
+}
+
+function buildGoogleUrl(query) {
+  const url = new URL(GOOGLE_RSS_BASE);
+  url.searchParams.set('q', query);
+  url.searchParams.set('hl', 'en-SG');
+  url.searchParams.set('gl', 'SG');
+  url.searchParams.set('ceid', 'SG:en');
+  return url.toString();
+}
+
+function parsePublisherFromTitle(title) {
+  const parts = String(title || '').split(' - ');
+  if (parts.length < 2) return null;
+  return parts[parts.length - 1].trim() || null;
+}
+
+function trimPublisherFromTitle(title, publisher) {
+  if (!publisher) return title;
+  const suffix = ` - ${publisher}`;
+  if (title.endsWith(suffix)) return title.slice(0, -suffix.length).trim();
+  return title;
+}
+
+function decodeGoogleLinkCandidate(link) {
+  try {
+    const url = new URL(link);
+    if (!url.hostname.includes('news.google.com')) return null;
+    const direct = url.searchParams.get('url') || url.searchParams.get('u');
+    if (direct) return direct;
+    const pathMatch = url.pathname.match(/\/rss\/articles\/(.+)$/);
+    if (!pathMatch) return null;
+    const maybeEncoded = decodeURIComponent(pathMatch[1]);
+    const embedded = maybeEncoded.match(/https?:\/\/[^\s&]+/i);
+    return embedded ? embedded[0] : null;
+  } catch {
+    return null;
+  }
+}
+
+async function resolveGoogleLink(item) {
+  const original = item.link;
+  if (item.source_url) {
+    return { original_link: original, resolved_link: canonicalizeLink(item.source_url), resolution: 'source_url' };
+  }
+
+  const decoded = decodeGoogleLinkCandidate(original);
+  if (decoded) {
+    return { original_link: original, resolved_link: canonicalizeLink(decoded), resolution: 'decoded' };
+  }
+
+  try {
+    const res = await fetch(original, {
+      method: 'GET',
+      redirect: 'follow',
+      headers: { 'user-agent': 'sg-dev-health-monitor/1.0' }
+    });
+    return { original_link: original, resolved_link: canonicalizeLink(res.url), resolution: 'redirect' };
+  } catch {
+    return { original_link: original, resolved_link: canonicalizeLink(original), resolution: 'fallback' };
+  }
+}
+
+function windowsForDays(days, mode) {
+  if (mode === 'backfill') {
+    const template = [7, 30, 90, 180, Math.max(days, 1)];
+    const out = [...new Set(template.filter((d) => d <= days))];
+    if (!out.includes(days)) out.push(days);
+    return out.sort((a, b) => a - b);
+  }
+  return [Math.max(Math.min(days || 7, 30), 1)];
+}
+
+async function fetchGoogleNewsItems(queries, mode, days, maxQueries = null) {
+  const selectedQueries = maxQueries ? queries.slice(0, maxQueries) : queries;
+  const windows = windowsForDays(days, mode);
+  const all = [];
+  const feedResults = [];
+
+  for (const query of selectedQueries) {
+    for (const whenDays of windows) {
+      const q = `${query} when:${whenDays}d`;
+      const feed = { source: 'google_news', url: buildGoogleUrl(q) };
+      try {
+        const parsedItems = await fetchFeed(feed);
+        feedResults.push({ source: 'google_news', query, window_days: whenDays, status: 'ok', items_fetched: parsedItems.length });
+        for (const item of parsedItems) {
+          all.push({ ...item, query });
+        }
+      } catch (error) {
+        feedResults.push({
+          source: 'google_news',
+          query,
+          window_days: whenDays,
+          status: 'error',
+          error: error.message,
+          items_fetched: 0
+        });
+        console.error(`[update_news] google feed failed: query="${query}" when:${whenDays}d -> ${error.message}`);
+      }
+    }
+  }
+
+  return { items: all, feedResults };
 }
 
 function daysAgoCutoff(days) {
@@ -410,6 +551,7 @@ function backupNewsAll() {
 
 async function run() {
   ensureDir(DATA_DIR);
+  const args = parseArgs(process.argv.slice(2));
 
   const tagRules = readJson(path.join(CONFIG_DIR, 'tag_rules.json'), null);
   const developerConfig = readJson(path.join(CONFIG_DIR, 'developers.json'), null);
@@ -418,8 +560,7 @@ async function run() {
     throw new Error('Missing config/tag_rules.json, config/developers.json, or config/relevance_rules.json');
   }
 
-  const doCleanup = process.argv.includes('--cleanup');
-  if (doCleanup) {
+  if (args.cleanup) {
     const allStore = readJson(NEWS_ALL_PATH, { items: [] });
     const existingItems = Array.isArray(allStore.items) ? allStore.items : [];
     const backupPath = backupNewsAll();
@@ -452,58 +593,119 @@ async function run() {
   const compiledRules = compileRules(tagRules);
   const allStore = readJson(NEWS_ALL_PATH, { items: [] });
   const existingItems = Array.isArray(allStore.items) ? allStore.items : [];
-  const existingIds = new Set(existingItems.map((item) => item.id));
+  const existingDedup = new Set(existingItems.map((item) => deriveDedupKey(item)));
   const fetchedAtSgt = nowSgtIso();
 
   const feedResults = [];
   const newItems = [];
   const rejectedLogs = [];
 
-  for (const feed of FEEDS) {
-    try {
-      const parsedItems = await fetchFeed(feed);
-      feedResults.push({ source: feed.source, url: feed.url, status: 'ok', items_fetched: parsedItems.length });
+  if (args.source === 'google') {
+    const config = readJson(GOOGLE_QUERIES_PATH, null);
+    const queries = Array.isArray(config?.queries) ? config.queries : [];
+    if (queries.length === 0) {
+      throw new Error('Missing or empty config/google_news_queries.json (queries array required)');
+    }
 
-      for (const rawItem of parsedItems) {
-        const canonicalLink = canonicalizeLink(rawItem.link);
-        const id = buildId(rawItem.source, canonicalLink);
-        if (existingIds.has(id)) continue;
+    const { items: parsedItems, feedResults: googleResults } = await fetchGoogleNewsItems(
+      queries,
+      args.mode,
+      Number.isFinite(args.days) ? args.days : 7,
+      args.maxQueries
+    );
+    feedResults.push(...googleResults);
 
-        const combined = `${rawItem.title} ${rawItem.snippet}`.toLowerCase();
-        const relevance = evaluateRelevance(combined, developerConfig, relevanceRules);
-        if (!relevance.pass) {
-          rejectedLogs.push({
-            title: rawItem.title,
-            source: rawItem.source,
-            reason: relevance.reject_reason,
-            timestamp: fetchedAtSgt
-          });
-          continue;
-        }
+    for (const rawItem of parsedItems) {
+      const publisherFromTitle = parsePublisherFromTitle(rawItem.title);
+      const resolved = await resolveGoogleLink(rawItem);
+      const resolvedLink = resolved.resolved_link || canonicalizeLink(rawItem.link);
+      const cleanedTitle = trimPublisherFromTitle(rawItem.title, publisherFromTitle);
+      const dedupKey = resolvedLink || canonicalizeLink(rawItem.source_url || rawItem.link);
+      if (existingDedup.has(dedupKey)) continue;
 
-        const { severity, tags, matched_terms } = classifySeverity(combined, compiledRules, tagRules.severity_order);
-        const item = {
-          id,
-          title: rawItem.title,
-          link: canonicalLink,
-          source: rawItem.source,
-          pubDate: rawItem.pubDate,
-          pubDate_sgt: toSgtIso(rawItem.pubDate),
-          developer: extractDeveloper(combined, developerConfig),
-          severity,
-          tags,
-          snippet: rawItem.snippet,
-          matched_terms,
-          fetched_at_sgt: fetchedAtSgt,
-          relevance_reason: relevance.relevance_reason,
-          relevance_terms: relevance.relevance_terms
-        };
-        existingIds.add(id);
-        newItems.push(item);
+      const combined = `${cleanedTitle} ${rawItem.snippet || ''}`.toLowerCase();
+      const relevance = evaluateRelevance(combined, developerConfig, relevanceRules);
+      if (!relevance.pass) {
+        rejectedLogs.push({
+          title: cleanedTitle,
+          source: 'google_news',
+          reason: relevance.reject_reason,
+          timestamp: fetchedAtSgt
+        });
+        continue;
       }
-    } catch (error) {
-      feedResults.push({ source: feed.source, url: feed.url, status: 'error', error: error.message, items_fetched: 0 });
-      console.error(`[update_news] feed failed: ${feed.url} -> ${error.message}`);
+
+      const { severity, tags, matched_terms } = classifySeverity(combined, compiledRules, tagRules.severity_order);
+      const id = buildId('google_news', dedupKey || buildFallbackDedupKey(cleanedTitle, publisherFromTitle, rawItem.pubDate));
+      newItems.push({
+        id,
+        title: cleanedTitle,
+        original_link: rawItem.link,
+        resolved_link: resolvedLink,
+        link: resolvedLink || rawItem.link,
+        source: 'google_news',
+        aggregator: 'google_news',
+        publisher: publisherFromTitle || null,
+        query: rawItem.query,
+        pubDate: rawItem.pubDate,
+        pubDate_sgt: toSgtIso(rawItem.pubDate),
+        developer: extractDeveloper(combined, developerConfig),
+        severity,
+        tags,
+        snippet: rawItem.snippet,
+        matched_terms,
+        fetched_at_sgt: fetchedAtSgt,
+        relevance_reason: relevance.relevance_reason,
+        relevance_terms: relevance.relevance_terms
+      });
+      existingDedup.add(dedupKey || buildFallbackDedupKey(cleanedTitle, publisherFromTitle, rawItem.pubDate));
+    }
+  } else {
+    for (const feed of FEEDS) {
+      try {
+        const parsedItems = await fetchFeed(feed);
+        feedResults.push({ source: feed.source, url: feed.url, status: 'ok', items_fetched: parsedItems.length });
+
+        for (const rawItem of parsedItems) {
+          const canonicalLink = canonicalizeLink(rawItem.link);
+          if (existingDedup.has(canonicalLink)) continue;
+
+          const combined = `${rawItem.title} ${rawItem.snippet}`.toLowerCase();
+          const relevance = evaluateRelevance(combined, developerConfig, relevanceRules);
+          if (!relevance.pass) {
+            rejectedLogs.push({
+              title: rawItem.title,
+              source: rawItem.source,
+              reason: relevance.reject_reason,
+              timestamp: fetchedAtSgt
+            });
+            continue;
+          }
+
+          const { severity, tags, matched_terms } = classifySeverity(combined, compiledRules, tagRules.severity_order);
+          const item = {
+            id: buildId(rawItem.source, canonicalLink),
+            title: rawItem.title,
+            link: canonicalLink,
+            source: rawItem.source,
+            pubDate: rawItem.pubDate,
+            pubDate_sgt: toSgtIso(rawItem.pubDate),
+            developer: extractDeveloper(combined, developerConfig),
+            severity,
+            tags,
+            snippet: rawItem.snippet,
+            matched_terms,
+            fetched_at_sgt: fetchedAtSgt,
+            relevance_reason: relevance.relevance_reason,
+            relevance_terms: relevance.relevance_terms
+          };
+          existingDedup.add(canonicalLink);
+          newItems.push(item);
+        }
+      } catch (error) {
+        feedResults.push({ source: feed.source, url: feed.url, status: 'error', error: error.message, items_fetched: 0 });
+        console.error(`[update_news] feed failed: ${feed.url} -> ${error.message}`);
+      }
     }
   }
 
@@ -525,7 +727,7 @@ async function run() {
   );
 
   console.log(
-    `[update_news] done. new_items=${newItems.length} rejected=${rejectedLogs.length} total_all=${mergedAllItems.length} latest_90d=${latest90.length}`
+    `[update_news] done. source=${args.source} mode=${args.mode} days=${args.days} new_items=${newItems.length} rejected=${rejectedLogs.length} total_all=${mergedAllItems.length} latest_90d=${latest90.length}`
   );
 }
 
