@@ -17,10 +17,10 @@ const SEVERITY_META = {
   }
 };
 
-function normalizeSeverity(severity, hasLegacyCritical = false) {
+function normalizeSeverity(severity) {
   const key = String(severity || 'info').toLowerCase();
   if (key === 'critical') return 'warning';
-  if (key === 'warning') return hasLegacyCritical ? 'watch' : 'warning';
+  if (key === 'warning') return 'watch';
   if (key === 'watch') return 'watch';
   return 'info';
 }
@@ -142,9 +142,8 @@ function initNewsPage() {
   Promise.all([loadNewsData(), App.fetchJson('./data/meta.json')])
     .then(([items, meta]) => {
       const ninetyDayCutoff = Date.now() - 90 * 24 * 60 * 60 * 1000;
-      const hasLegacyCritical = items.some((item) => String(item.severity || '').toLowerCase() === 'critical');
       const processed = items
-        .map((item) => ({ ...item, severity: normalizeSeverity(item.severity, hasLegacyCritical) }))
+        .map((item) => ({ ...item, severity: normalizeSeverity(item.severity) }))
         .filter((item) => new Date(item.pubDate).getTime() >= ninetyDayCutoff)
         .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
 
