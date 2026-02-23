@@ -17,15 +17,7 @@ const META_PATH = path.join(DATA_DIR, 'meta.json');
 const REJECTED_LOG_PATH = path.join(DATA_DIR, 'rejected_items.log');
 const RELEVANCE_RULES_PATH = path.join(CONFIG_DIR, 'relevance_rules.json');
 const GOOGLE_QUERIES_PATH = path.join(CONFIG_DIR, 'google_news_queries.json');
-
-const FEEDS = [
-  { source: 'CNA', url: 'https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=6936' },
-  { source: 'CNA', url: 'https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=10416' },
-  { source: 'BT', url: 'https://www.businesstimes.com.sg/rss/property' },
-  { source: 'BT', url: 'https://www.businesstimes.com.sg/rss/reits-property' },
-  { source: 'ST', url: 'https://www.straitstimes.com/news/singapore/rss.xml' },
-  { source: 'ST', url: 'https://www.straitstimes.com/news/business/rss.xml' }
-];
+const NEWS_PIPELINE_CONFIG_PATH = path.join(CONFIG_DIR, 'news_pipeline.json');
 
 const TRACKING_PREFIXES = ['utm_', 'fbclid', 'gclid', 'mc_cid', 'mc_eid', 'cmpid', 'igshid', 's_cid'];
 const SEVERITY_SCORE = { warning: 3, watch: 2, info: 1 };
@@ -53,6 +45,33 @@ const parser = XMLParser
       parseTagValue: true
     })
   : null;
+
+
+function logInfo(message) {
+  console.log(`[update_news] ${message}`);
+}
+
+function logError(message) {
+  console.error(`[update_news] ${message}`);
+}
+
+function loadRequiredConfig(filePath, label) {
+  const config = readJson(filePath, null);
+  if (!config) throw new Error(`Missing ${label}`);
+  return config;
+}
+
+function loadPipelineConfig() {
+  const tagRules = loadRequiredConfig(path.join(CONFIG_DIR, 'tag_rules.json'), 'config/tag_rules.json');
+  const developerConfig = loadRequiredConfig(path.join(CONFIG_DIR, 'developers.json'), 'config/developers.json');
+  const relevanceRules = loadRequiredConfig(RELEVANCE_RULES_PATH, 'config/relevance_rules.json');
+  const newsPipeline = loadRequiredConfig(NEWS_PIPELINE_CONFIG_PATH, 'config/news_pipeline.json');
+  const feeds = Array.isArray(newsPipeline?.rss_feeds) ? newsPipeline.rss_feeds : [];
+  if (feeds.length === 0) {
+    throw new Error('Missing rss_feeds in config/news_pipeline.json');
+  }
+  return { tagRules, developerConfig, relevanceRules, feeds };
+}
 
 function parseArgs(argv) {
   const parsed = {};
@@ -478,7 +497,7 @@ async function fetchGoogleNewsItems(queries, mode, days, maxQueries = null) {
           error: error.message,
           items_fetched: 0
         });
-        console.error(`[update_news] google feed failed: query="${query}" when:${whenDays}d -> ${error.message}`);
+        logError(`google feed failed: query="${query}" when:${whenDays}d -> ${error.message}`);
       }
     }
   }
@@ -585,12 +604,7 @@ async function run() {
   ensureDir(DATA_DIR);
   const args = parseArgs(process.argv.slice(2));
 
-  const tagRules = readJson(path.join(CONFIG_DIR, 'tag_rules.json'), null);
-  const developerConfig = readJson(path.join(CONFIG_DIR, 'developers.json'), null);
-  const relevanceRules = readJson(RELEVANCE_RULES_PATH, null);
-  if (!tagRules || !developerConfig || !relevanceRules) {
-    throw new Error('Missing config/tag_rules.json, config/developers.json, or config/relevance_rules.json');
-  }
+  const { tagRules, developerConfig, relevanceRules, feeds } = loadPipelineConfig();
 
   if (args.cleanup) {
     const allStore = readJson(NEWS_ALL_PATH, { items: [] });
@@ -618,9 +632,7 @@ async function run() {
       },
       feeds: []
     });
-    console.log(
-      `[update_news] cleanup complete. backup=${backupPath || 'none'} original=${existingItems.length} cleaned=${cleaned.length} rejected=${rejectedLogs.length}`
-    );
+    logInfo(`cleanup complete. backup=${backupPath || 'none'} original=${existingItems.length} cleaned=${cleaned.length} rejected=${rejectedLogs.length}`);
     return;
   }
 
@@ -632,7 +644,7 @@ async function run() {
     backupNewsAll();
     existingItems = migrated.items;
     writeJson(NEWS_ALL_PATH, { items: existingItems });
-    console.log('[update_news] migrated legacy severities in data/news_all.json');
+    logInfo('migrated legacy severities in data/news_all.json');
   }
   const existingDedup = new Set(existingItems.map((item) => deriveDedupKey(item)));
   const fetchedAtSgt = nowSgtIso();
@@ -702,7 +714,7 @@ async function run() {
       existingDedup.add(dedupKey || buildFallbackDedupKey(cleanedTitle, publisherFromTitle, rawItem.pubDate));
     }
   } else {
-    for (const feed of FEEDS) {
+    for (const feed of feeds) {
       try {
         const parsedItems = await fetchFeed(feed);
         feedResults.push({ source: feed.source, url: feed.url, status: 'ok', items_fetched: parsedItems.length });
@@ -745,7 +757,7 @@ async function run() {
         }
       } catch (error) {
         feedResults.push({ source: feed.source, url: feed.url, status: 'error', error: error.message, items_fetched: 0 });
-        console.error(`[update_news] feed failed: ${feed.url} -> ${error.message}`);
+        logError(`feed failed: ${feed.url} -> ${error.message}`);
       }
     }
   }
@@ -767,12 +779,10 @@ async function run() {
     rejectedLogs.length
   );
 
-  console.log(
-    `[update_news] done. source=${args.source} mode=${args.mode} days=${args.days} new_items=${newItems.length} rejected=${rejectedLogs.length} total_all=${mergedAllItems.length} latest_90d=${latest90.length}`
-  );
+  logInfo(`done. source=${args.source} mode=${args.mode} days=${args.days} new_items=${newItems.length} rejected=${rejectedLogs.length} total_all=${mergedAllItems.length} latest_90d=${latest90.length}`);
 }
 
 run().catch((error) => {
-  console.error(`[update_news] fatal: ${error.message}`);
+  logError(`fatal: ${error.message}`);
   process.exitCode = 1;
 });

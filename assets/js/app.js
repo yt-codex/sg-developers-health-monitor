@@ -1,5 +1,23 @@
 const App = (() => {
   const severityOrder = { Critical: 4, Warning: 3, Watch: 2, Info: 1 };
+  const NEWS_PAGE_SIZE = 15;
+  const NEWS_DATE_RANGE_OPTIONS = [7, 30, 90];
+  const NEWS_SEVERITY_META = {
+    warning: {
+      title: 'Warning',
+      description:
+        'Elevated risk signals (e.g., distress/default/covenant breach/restructuring or serious refinancing stress and major liquidity actions). Includes previous critical tier.'
+    },
+    watch: {
+      title: 'Watch',
+      description:
+        'Early-to-moderate risk signals (e.g., weaker presales/take-up, rising unsold stock, margin pressure, cost escalation, softer guidance). Includes previous warning tier.'
+    },
+    info: {
+      title: 'Info',
+      description: 'Neutral monitoring items without clear risk signals (e.g., routine launches, corporate updates, sector commentary).'
+    }
+  };
 
   function setActiveNav() {
     const page = document.body.dataset.page;
@@ -33,6 +51,14 @@ const App = (() => {
     return tags.sort((a, b) => severityOrder[b] - severityOrder[a])[0];
   }
 
+  function normalizeNewsSeverity(severity) {
+    const key = String(severity || 'info').toLowerCase();
+    if (key === 'critical') return 'warning';
+    if (key === 'warning') return 'watch';
+    if (key === 'watch') return 'watch';
+    return 'info';
+  }
+
   async function setGlobalLastUpdated() {
     const node = document.getElementById('global-last-updated');
     if (!node) return;
@@ -46,7 +72,21 @@ const App = (() => {
     }
   }
 
-  return { setActiveNav, fetchJson, formatDate, formatDateTime, highestSeverity, severityOrder, setGlobalLastUpdated };
+  return {
+    setActiveNav,
+    fetchJson,
+    formatDate,
+    formatDateTime,
+    highestSeverity,
+    severityOrder,
+    setGlobalLastUpdated,
+    normalizeNewsSeverity,
+    newsConfig: {
+      pageSize: NEWS_PAGE_SIZE,
+      dateRangeOptions: NEWS_DATE_RANGE_OPTIONS,
+      severityMeta: NEWS_SEVERITY_META
+    }
+  };
 })();
 
 document.addEventListener('DOMContentLoaded', () => {

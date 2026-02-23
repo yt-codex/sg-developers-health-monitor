@@ -1,0 +1,28 @@
+{
+  "rss_feeds": [
+    { "source": "CNA", "url": "https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=6936" },
+    { "source": "CNA", "url": "https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=10416" },
+    { "source": "BT", "url": "https://www.businesstimes.com.sg/rss/property" },
+    { "source": "BT", "url": "https://www.businesstimes.com.sg/rss/reits-property" },
+    { "source": "ST", "url": "https://www.straitstimes.com/news/singapore/rss.xml" },
+    { "source": "ST", "url": "https://www.straitstimes.com/news/business/rss.xml" }
+  ],
+  "frontend": {
+    "pagination_page_size": 15,
+    "date_range_days": [7, 30, 90],
+    "severity_meta": {
+      "warning": {
+        "title": "Warning",
+        "description": "Elevated risk signals (e.g., distress/default/covenant breach/restructuring or serious refinancing stress and major liquidity actions). Includes previous critical tier."
+      },
+      "watch": {
+        "title": "Watch",
+        "description": "Early-to-moderate risk signals (e.g., weaker presales/take-up, rising unsold stock, margin pressure, cost escalation, softer guidance). Includes previous warning tier."
+      },
+      "info": {
+        "title": "Info",
+        "description": "Neutral monitoring items without clear risk signals (e.g., routine launches, corporate updates, sector commentary)."
+      }
+    }
+  }
+}
