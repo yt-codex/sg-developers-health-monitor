@@ -179,19 +179,40 @@ function compileRules(tagRules) {
   );
 }
 
-function classifySeverity(text, compiledRules, severityOrder) {
+function classifySeverity(text, compiledRules, severityOrder, context = {}) {
   const tags = new Set();
   const matchedTerms = new Set();
+  const pendingFinancialMatches = [];
   let bestSeverity = 'info';
+
+  function applyRuleMatch(rule, matchText) {
+    tags.add(rule.tag);
+    matchedTerms.add(matchText);
+    const normalizedRuleSeverity = normalizeSeverityForScoring(rule.severity);
+    if (SEVERITY_SCORE[normalizedRuleSeverity] > SEVERITY_SCORE[bestSeverity]) {
+      bestSeverity = normalizedRuleSeverity;
+    }
+  }
 
   for (const rule of compiledRules) {
     const match = text.match(rule.regex);
     if (!match) continue;
-    tags.add(rule.tag);
-    matchedTerms.add(match[0]);
-    const normalizedRuleSeverity = normalizeSeverityForScoring(rule.severity);
-    if (SEVERITY_SCORE[normalizedRuleSeverity] > SEVERITY_SCORE[bestSeverity]) {
-      bestSeverity = normalizedRuleSeverity;
+    if (rule.tag === 'financial_deterioration') {
+      pendingFinancialMatches.push({ rule, matchText: match[0] });
+      continue;
+    }
+    applyRuleMatch(rule, match[0]);
+  }
+
+  const hasDeveloperAliasMatch = Array.isArray(context.developerMatches) && context.developerMatches.length > 0;
+  const uniqueFinancialTerms = [...new Set(pendingFinancialMatches.map((m) => m.matchText))];
+  const allowFinancialWatch =
+    hasDeveloperAliasMatch ||
+    (Boolean(context.relevancePassed) && uniqueFinancialTerms.length >= 2);
+
+  if (allowFinancialWatch) {
+    for (const pendingMatch of pendingFinancialMatches) {
+      applyRuleMatch(pendingMatch.rule, pendingMatch.matchText);
     }
   }
 
@@ -549,7 +570,7 @@ function refreshLatest90AndMeta(allItems, fetchedAtSgt, feedResults, existingCou
   return latest90;
 }
 
-function cleanupExistingNews(items, developerConfig, relevanceRules) {
+function cleanupExistingNews(items, developerConfig, relevanceRules, compiledRules, severityOrder) {
   const cleaned = [];
   const rejectedLogs = [];
 
@@ -566,9 +587,16 @@ function cleanupExistingNews(items, developerConfig, relevanceRules) {
       continue;
     }
 
+    const { severity, tags, matched_terms } = classifySeverity(combined, compiledRules, severityOrder, {
+      developerMatches: relevance.relevance_reason === 'developer_match' ? relevance.relevance_terms : [],
+      relevancePassed: relevance.pass
+    });
+
     cleaned.push({
       ...item,
-      severity: mapSeverityToCurrent(item.severity),
+      severity,
+      tags,
+      matched_terms,
       relevance_reason: relevance.relevance_reason,
       relevance_terms: relevance.relevance_terms
     });
@@ -612,7 +640,8 @@ async function run() {
     const migrated = migrateLegacySeverities(existingItemsRaw);
     const backupPath = backupNewsAll();
     const existingItems = migrated.items;
-    const { cleaned, rejectedLogs } = cleanupExistingNews(existingItems, developerConfig, relevanceRules);
+    const compiledRules = compileRules(tagRules);
+    const { cleaned, rejectedLogs } = cleanupExistingNews(existingItems, developerConfig, relevanceRules, compiledRules, tagRules.severity_order);
 
     writeJson(NEWS_ALL_PATH, { items: cleaned });
     const cleanup90 = cleaned
@@ -688,7 +717,10 @@ async function run() {
         continue;
       }
 
-      const { severity, tags, matched_terms } = classifySeverity(combined, compiledRules, tagRules.severity_order);
+      const { severity, tags, matched_terms } = classifySeverity(combined, compiledRules, tagRules.severity_order, {
+        developerMatches: relevance.relevance_reason === 'developer_match' ? relevance.relevance_terms : [],
+        relevancePassed: relevance.pass
+      });
       const id = buildId('google_news', dedupKey || buildFallbackDedupKey(cleanedTitle, publisherFromTitle, rawItem.pubDate));
       newItems.push({
         id,
@@ -735,7 +767,10 @@ async function run() {
             continue;
           }
 
-          const { severity, tags, matched_terms } = classifySeverity(combined, compiledRules, tagRules.severity_order);
+          const { severity, tags, matched_terms } = classifySeverity(combined, compiledRules, tagRules.severity_order, {
+            developerMatches: relevance.relevance_reason === 'developer_match' ? relevance.relevance_terms : [],
+            relevancePassed: relevance.pass
+          });
           const item = {
             id: buildId(rawItem.source, canonicalLink),
             title: rawItem.title,
