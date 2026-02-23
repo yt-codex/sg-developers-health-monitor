@@ -1,29 +1,6 @@
-const ITEMS_PER_PAGE = 15;
-
-const SEVERITY_META = {
-  warning: {
-    title: 'Warning',
-    description:
-      'Elevated risk signals (e.g., distress/default/covenant breach/restructuring or serious refinancing stress and major liquidity actions). Includes previous critical tier.'
-  },
-  watch: {
-    title: 'Watch',
-    description:
-      'Early-to-moderate risk signals (e.g., weaker presales/take-up, rising unsold stock, margin pressure, cost escalation, softer guidance). Includes previous warning tier.'
-  },
-  info: {
-    title: 'Info',
-    description: 'Neutral monitoring items without clear risk signals (e.g., routine launches, corporate updates, sector commentary).'
-  }
-};
-
-function normalizeSeverity(severity) {
-  const key = String(severity || 'info').toLowerCase();
-  if (key === 'critical') return 'warning';
-  if (key === 'warning') return 'watch';
-  if (key === 'watch') return 'watch';
-  return 'info';
-}
+const ITEMS_PER_PAGE = App.newsConfig.pageSize;
+const SEVERITY_META = App.newsConfig.severityMeta;
+const DATE_RANGE_OPTIONS = App.newsConfig.dateRangeOptions;
 
 function escapeHtml(value = '') {
   return value
@@ -82,6 +59,7 @@ function buildPaginationButtons(totalPages, currentPage) {
 function renderNewsItems(items, currentPage) {
   const list = document.getElementById('news-list');
   const pagination = document.getElementById('news-pagination');
+  if (!list || !pagination) return;
 
   if (!items.length) {
     list.innerHTML = '<p class="empty">No news items match your filters.</p>';
@@ -135,15 +113,24 @@ async function loadNewsData() {
   }
 }
 
+function initializeDateRangeOptions(dateRangeEl) {
+  if (!dateRangeEl) return;
+  dateRangeEl.innerHTML = DATE_RANGE_OPTIONS.map((days) => {
+    const selected = days === 30 ? ' selected' : '';
+    return `<option value="${days}"${selected}>Last ${days} days</option>`;
+  }).join('');
+}
+
 function initNewsPage() {
   const newsList = document.getElementById('news-list');
-  if (!newsList) return;
+  if (!newsList || newsList.dataset.initialized === 'true') return;
+  newsList.dataset.initialized = 'true';
 
   Promise.all([loadNewsData(), App.fetchJson('./data/meta.json')])
     .then(([items, meta]) => {
       const ninetyDayCutoff = Date.now() - 90 * 24 * 60 * 60 * 1000;
       const processed = items
-        .map((item) => ({ ...item, severity: normalizeSeverity(item.severity) }))
+        .map((item) => ({ ...item, severity: App.normalizeNewsSeverity(item.severity) }))
         .filter((item) => new Date(item.pubDate).getTime() >= ninetyDayCutoff)
         .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
 
@@ -157,37 +144,42 @@ function initNewsPage() {
       const searchInput = document.getElementById('search-text');
       const pagination = document.getElementById('news-pagination');
 
+      if (!sevSelect || !devSelect || !sourceSelect || !dateRange || !searchInput || !pagination) {
+        throw new Error('Missing required filter controls on news page');
+      }
+
+      initializeDateRangeOptions(dateRange);
       sevSelect.innerHTML = '<option value="all" selected>All severities</option>';
       devSelect.innerHTML = '<option value="all" selected>All developers</option>';
       sourceSelect.innerHTML = '<option value="all" selected>All sources</option>';
 
-      ['warning', 'watch', 'info'].forEach((s) => {
-        const label = SEVERITY_META[s].title;
-        sevSelect.insertAdjacentHTML('beforeend', `<option value="${s}">${label}</option>`);
+      ['warning', 'watch', 'info'].forEach((severityKey) => {
+        const label = SEVERITY_META[severityKey].title;
+        sevSelect.insertAdjacentHTML('beforeend', `<option value="${severityKey}">${label}</option>`);
       });
-      developers.forEach((d) => devSelect.insertAdjacentHTML('beforeend', `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`));
-      sources.forEach((s) => sourceSelect.insertAdjacentHTML('beforeend', `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`));
+      developers.forEach((developer) => devSelect.insertAdjacentHTML('beforeend', `<option value="${escapeHtml(developer)}">${escapeHtml(developer)}</option>`));
+      sources.forEach((source) => sourceSelect.insertAdjacentHTML('beforeend', `<option value="${escapeHtml(source)}">${escapeHtml(source)}</option>`));
 
       let currentPage = 1;
       let filteredItems = [];
 
       const applyFilters = () => {
-        const sevSel = sevSelect.value;
-        const devSel = devSelect.value;
-        const srcSel = sourceSelect.value;
+        const selectedSeverity = sevSelect.value;
+        const selectedDeveloper = devSelect.value;
+        const selectedSource = sourceSelect.value;
         const selectedDays = Number(dateRange.value || 30);
         const rangeDays = Number.isFinite(selectedDays) ? Math.min(selectedDays, 90) : 90;
-        const search = searchInput.value.trim().toLowerCase();
+        const searchText = searchInput.value.trim().toLowerCase();
         const cutoff = Date.now() - rangeDays * 24 * 60 * 60 * 1000;
 
         filteredItems = processed.filter((item) => {
           if (new Date(item.pubDate).getTime() < cutoff) return false;
-          if (sevSel !== 'all' && item.severity !== sevSel) return false;
-          if (devSel !== 'all' && (item.developer || 'Unknown') !== devSel) return false;
-          if (srcSel !== 'all' && item.source !== srcSel) return false;
-          if (search) {
+          if (selectedSeverity !== 'all' && item.severity !== selectedSeverity) return false;
+          if (selectedDeveloper !== 'all' && (item.developer || 'Unknown') !== selectedDeveloper) return false;
+          if (selectedSource !== 'all' && item.source !== selectedSource) return false;
+          if (searchText) {
             const blob = `${item.title || ''} ${item.snippet || ''}`.toLowerCase();
-            if (!blob.includes(search)) return false;
+            if (!blob.includes(searchText)) return false;
           }
           return true;
         });
@@ -201,9 +193,9 @@ function initNewsPage() {
       };
 
       document.querySelectorAll('#news-filters select').forEach((el) => {
-        el.addEventListener('change', onFilterChanged);
+        el.addEventListener('change', onFilterChanged, { passive: true });
       });
-      searchInput.addEventListener('input', onFilterChanged);
+      searchInput.addEventListener('input', onFilterChanged, { passive: true });
 
       pagination.addEventListener('click', (event) => {
         const button = event.target.closest('button[data-page]');
