@@ -18,6 +18,7 @@ const REJECTED_LOG_PATH = path.join(DATA_DIR, 'rejected_items.log');
 const RELEVANCE_RULES_PATH = path.join(CONFIG_DIR, 'relevance_rules.json');
 const GOOGLE_QUERIES_PATH = path.join(CONFIG_DIR, 'google_news_queries.json');
 const NEWS_PIPELINE_CONFIG_PATH = path.join(CONFIG_DIR, 'news_pipeline.json');
+const GOOGLE_PUBLISHERS_ALLOWLIST_PATH = path.join(CONFIG_DIR, 'google_news_publishers_allowlist.json');
 
 const TRACKING_PREFIXES = ['utm_', 'fbclid', 'gclid', 'mc_cid', 'mc_eid', 'cmpid', 'igshid', 's_cid'];
 const SEVERITY_SCORE = { warning: 3, watch: 2, info: 1 };
@@ -36,6 +37,7 @@ function normalizeSeverityForScoring(severity) {
   return ['warning', 'watch', 'info'].includes(key) ? key : 'info';
 }
 const GOOGLE_RSS_BASE = 'https://news.google.com/rss/search';
+const HOMEPAGE_CATEGORY_PATHS = new Set(['home', 'news', 'business', 'singapore', 'asia', 'world', 'property']);
 
 const parser = XMLParser
   ? new XMLParser({
@@ -162,8 +164,17 @@ function buildFallbackDedupKey(title, publisher, pubDate) {
 }
 
 function deriveDedupKey(item) {
-  if (item.resolved_link) return canonicalizeLink(item.resolved_link);
-  if (item.source_url) return canonicalizeLink(item.source_url);
+  if (item.source === 'google_news') {
+    const keys = buildGoogleDedupKeys({
+      title: item.title,
+      publisher: item.publisher,
+      pubDate: item.pubDate,
+      resolved_link: item.resolved_link || item.link,
+      source_url: item.source_url,
+      original_link: item.original_link || item.link
+    });
+    return keys[0] || buildFallbackDedupKey(item.title, item.publisher, item.pubDate);
+  }
   if (item.link) return canonicalizeLink(item.link);
   return buildFallbackDedupKey(item.title, item.publisher, item.pubDate);
 }
@@ -374,11 +385,24 @@ function parseItemsWithRegex(xml, source) {
     const link = stripHtml((block.match(/<link>([\s\S]*?)<\/link>/i) || [])[1] || '');
     const description = stripHtml((block.match(/<description>([\s\S]*?)<\/description>/i) || [])[1] || '');
     const pubDate = stripHtml((block.match(/<pubDate>([\s\S]*?)<\/pubDate>/i) || [])[1] || '');
-    const sourceUrl = stripHtml((block.match(/<source[^>]*url=["']([^"']+)["'][^>]*>/i) || [])[1] || '');
+    const guid = stripHtml((block.match(/<guid[^>]*>([\s\S]*?)<\/guid>/i) || [])[1] || '');
+    const sourceTag = block.match(/<source([^>]*)>([\s\S]*?)<\/source>/i);
+    const sourceAttrs = sourceTag ? sourceTag[1] || '' : '';
+    const sourceName = stripHtml(sourceTag ? sourceTag[2] || '' : '');
+    const sourceUrl = stripHtml((sourceAttrs.match(/url=["']([^"']+)["']/i) || [])[1] || '');
     if (!title || !link || !pubDate) continue;
     const parsed = Date.parse(pubDate);
     if (!Number.isFinite(parsed)) continue;
-    items.push({ source, title, link, pubDate: new Date(parsed).toISOString(), snippet: description, source_url: sourceUrl || null });
+    items.push({
+      source,
+      title,
+      link,
+      pubDate: new Date(parsed).toISOString(),
+      snippet: description,
+      source_url: sourceUrl || null,
+      source_name: sourceName || null,
+      guid: guid || null
+    });
   }
   return items;
 }
@@ -399,6 +423,9 @@ function parseItemsFromXml(xml, source) {
       const pubDate = node.pubDate || node.published || node.updated || node['dc:date'];
       const sourceNode = node.source;
       const sourceUrl = typeof sourceNode === 'object' ? sourceNode['@_url'] || sourceNode.url : null;
+      const sourceName = typeof sourceNode === 'object' ? stripHtml(sourceNode['#text'] || sourceNode['#cdata'] || '') : stripHtml(sourceNode || '');
+      const guidNode = node.guid;
+      const guid = typeof guidNode === 'object' ? guidNode['#text'] || guidNode['#cdata'] : guidNode;
       if (!title || !link || !pubDate) return null;
       const parsedDate = Date.parse(pubDate);
       if (!Number.isFinite(parsedDate)) return null;
@@ -409,7 +436,9 @@ function parseItemsFromXml(xml, source) {
         link,
         pubDate: iso,
         snippet: description,
-        source_url: sourceUrl || null
+        source_url: sourceUrl || null,
+        source_name: sourceName || null,
+        guid: guid ? String(guid).trim() : null
       };
     })
     .filter(Boolean);
@@ -431,10 +460,30 @@ function buildGoogleUrl(query) {
   return url.toString();
 }
 
+function normalizePublisherName(name) {
+  return String(name || '').toLowerCase().trim().replace(/\s+/g, ' ');
+}
+
 function parsePublisherFromTitle(title) {
   const parts = String(title || '').split(' - ');
   if (parts.length < 2) return null;
   return parts[parts.length - 1].trim() || null;
+}
+
+function normalizeGooglePublisher(publisher, allowlistConfig) {
+  const normalized = normalizePublisherName(publisher);
+  if (!normalized) return null;
+  const aliases = allowlistConfig?.aliases || {};
+  const canonical = aliases[normalized] || publisher;
+  return (canonical || '').trim() || null;
+}
+
+function isAllowlistedGooglePublisher(publisher, allowlistConfig) {
+  const canonical = normalizeGooglePublisher(publisher, allowlistConfig);
+  if (!canonical) return null;
+  const allowed = new Set((allowlistConfig?.allowed_publishers || []).map((v) => normalizePublisherName(v)));
+  if (!allowed.has(normalizePublisherName(canonical))) return null;
+  return canonical;
 }
 
 function trimPublisherFromTitle(title, publisher) {
@@ -442,6 +491,17 @@ function trimPublisherFromTitle(title, publisher) {
   const suffix = ` - ${publisher}`;
   if (title.endsWith(suffix)) return title.slice(0, -suffix.length).trim();
   return title;
+}
+
+function extractGoogleNewsPublisher(item, allowlistConfig) {
+  const sourcePublisher = item.source_name || null;
+  const titlePublisher = parsePublisherFromTitle(item.title);
+  const extractedPublisher = sourcePublisher || titlePublisher;
+  const canonicalPublisher = isAllowlistedGooglePublisher(extractedPublisher, allowlistConfig);
+  return {
+    extracted_publisher: extractedPublisher,
+    publisher: canonicalPublisher
+  };
 }
 
 function decodeGoogleLinkCandidate(link) {
@@ -463,22 +523,65 @@ function decodeGoogleLinkCandidate(link) {
 function isLikelyArticleUrl(link) {
   try {
     const url = new URL(link);
-    const pathname = (url.pathname || '').replace(/\/+$/, '');
-    if (!pathname || pathname === '') return false;
-    if (pathname === '/') return false;
-    if (pathname.split('/').filter(Boolean).length >= 2) return true;
+    const pathSegments = (url.pathname || '')
+      .toLowerCase()
+      .replace(/\/+$/, '')
+      .split('/')
+      .filter(Boolean);
+    if (pathSegments.length === 0) return false;
+    if (pathSegments.length === 1 && HOMEPAGE_CATEGORY_PATHS.has(pathSegments[0])) return false;
+    if (pathSegments.length >= 2) {
+      const joined = pathSegments.join('/');
+      const hasSlug = /[-_]/.test(joined) || /\d{3,}/.test(joined);
+      return hasSlug || pathSegments.length >= 3;
+    }
     return url.searchParams.size > 0;
   } catch {
     return false;
   }
 }
 
+function isHomepageLikeUrl(link) {
+  try {
+    const url = new URL(link);
+    if (url.hostname.includes('news.google.com')) return true;
+    const pathname = (url.pathname || '').replace(/\/+$/, '');
+    if (!pathname || pathname === '') return true;
+    const segments = pathname.toLowerCase().split('/').filter(Boolean);
+    if (segments.length === 0) return true;
+    if (segments.length === 1 && HOMEPAGE_CATEGORY_PATHS.has(segments[0])) return true;
+    return !isLikelyArticleUrl(link);
+  } catch {
+    return true;
+  }
+}
+
+function selectGoogleResolution(candidates) {
+  for (const candidate of candidates) {
+    if (!candidate || !candidate.link) continue;
+    const canonical = canonicalizeLink(candidate.link);
+    if (!canonical || isHomepageLikeUrl(canonical)) continue;
+    return { resolved_link: canonical, resolved_link_status: 'resolved', resolution: candidate.resolution };
+  }
+  return null;
+}
+
 async function resolveGoogleLink(item) {
-  const original = item.link;
+  const original = canonicalizeLink(item.link);
+  const candidates = [];
+
+  if (item.source_url) {
+    candidates.push({ link: item.source_url, resolution: 'source_url' });
+  }
+
+  const guidLink = item.guid && /^https?:\/\//i.test(item.guid) ? item.guid : null;
+  if (guidLink) {
+    candidates.push({ link: guidLink, resolution: 'guid' });
+  }
 
   const decoded = decodeGoogleLinkCandidate(original);
   if (decoded) {
-    return { original_link: original, resolved_link: canonicalizeLink(decoded), resolution: 'decoded' };
+    candidates.push({ link: decoded, resolution: 'decoded' });
   }
 
   try {
@@ -487,13 +590,40 @@ async function resolveGoogleLink(item) {
       redirect: 'follow',
       headers: { 'user-agent': 'sg-dev-health-monitor/1.0' }
     });
-    return { original_link: original, resolved_link: canonicalizeLink(res.url), resolution: 'redirect' };
+    candidates.push({ link: res.url, resolution: 'redirect' });
   } catch {
-    if (item.source_url && isLikelyArticleUrl(item.source_url)) {
-      return { original_link: original, resolved_link: canonicalizeLink(item.source_url), resolution: 'source_url' };
-    }
-    return { original_link: original, resolved_link: canonicalizeLink(original), resolution: 'fallback' };
+    // no-op
   }
+
+  const best = selectGoogleResolution(candidates);
+  if (best) {
+    return { original_link: original, ...best };
+  }
+
+  if (!isHomepageLikeUrl(original)) {
+    return {
+      original_link: original,
+      resolved_link: original,
+      resolved_link_status: 'fallback_google',
+      resolution: 'fallback'
+    };
+  }
+
+  return {
+    original_link: original,
+    resolved_link: null,
+    resolved_link_status: 'homepage_rejected',
+    resolution: 'homepage_rejected'
+  };
+}
+
+function buildGoogleDedupKeys(item) {
+  const keys = [];
+  if (item.resolved_link) keys.push(canonicalizeLink(item.resolved_link));
+  if (item.source_url) keys.push(canonicalizeLink(item.source_url));
+  keys.push(buildFallbackDedupKey(item.title, item.publisher, item.pubDate));
+  if (item.original_link) keys.push(canonicalizeLink(item.original_link));
+  return [...new Set(keys.filter(Boolean))];
 }
 
 function windowsForDays(days, mode) {
@@ -583,17 +713,48 @@ function refreshLatest90AndMeta(allItems, fetchedAtSgt, feedResults, existingCou
   return latest90;
 }
 
-function cleanupExistingNews(items, developerConfig, relevanceRules, compiledRules, severityOrder) {
+async function cleanupExistingNews(items, developerConfig, relevanceRules, compiledRules, severityOrder, allowlistConfig) {
   const cleaned = [];
   const rejectedLogs = [];
 
   for (const item of items) {
+    if (item.source !== 'google_news') {
+      cleaned.push(item);
+      continue;
+    }
+
+    const publisherCheck = extractGoogleNewsPublisher(item, allowlistConfig);
+    if (!publisherCheck.publisher) {
+      rejectedLogs.push({
+        title: item.title || 'Untitled',
+        source: 'google_news',
+        reason: 'cleanup_google_publisher_not_allowlisted',
+        timestamp: nowSgtIso()
+      });
+      continue;
+    }
+
+    const resolved = await resolveGoogleLink({
+      link: item.original_link || item.link,
+      source_url: item.source_url || null,
+      guid: item.guid || null
+    });
+    if (resolved.resolved_link_status === 'homepage_rejected') {
+      rejectedLogs.push({
+        title: item.title || 'Untitled',
+        source: 'google_news',
+        reason: 'google_homepage_resolution',
+        timestamp: nowSgtIso()
+      });
+      continue;
+    }
+
     const combined = `${item.title || ''} ${item.snippet || ''}`.toLowerCase();
     const relevance = evaluateRelevance(combined, developerConfig, relevanceRules);
     if (!relevance.pass) {
       rejectedLogs.push({
         title: item.title || 'Untitled',
-        source: item.source || 'unknown',
+        source: 'google_news',
         reason: `cleanup_${relevance.reject_reason}`,
         timestamp: nowSgtIso()
       });
@@ -607,6 +768,11 @@ function cleanupExistingNews(items, developerConfig, relevanceRules, compiledRul
 
     cleaned.push({
       ...item,
+      publisher: publisherCheck.publisher,
+      original_link: resolved.original_link,
+      resolved_link: resolved.resolved_link,
+      resolved_link_status: resolved.resolved_link_status,
+      link: resolved.resolved_link || resolved.original_link,
       severity,
       tags,
       matched_terms,
@@ -617,7 +783,6 @@ function cleanupExistingNews(items, developerConfig, relevanceRules, compiledRul
 
   return { cleaned, rejectedLogs };
 }
-
 
 function migrateLegacySeverities(items) {
   let changed = false;
@@ -646,6 +811,7 @@ async function run() {
   const args = parseArgs(process.argv.slice(2));
 
   const { tagRules, developerConfig, relevanceRules, feeds } = loadPipelineConfig();
+  const googleAllowlistConfig = loadRequiredConfig(GOOGLE_PUBLISHERS_ALLOWLIST_PATH, 'config/google_news_publishers_allowlist.json');
 
   if (args.cleanup) {
     const allStore = readJson(NEWS_ALL_PATH, { items: [] });
@@ -654,7 +820,7 @@ async function run() {
     const backupPath = backupNewsAll();
     const existingItems = migrated.items;
     const compiledRules = compileRules(tagRules);
-    const { cleaned, rejectedLogs } = cleanupExistingNews(existingItems, developerConfig, relevanceRules, compiledRules, tagRules.severity_order);
+    const { cleaned, rejectedLogs } = await cleanupExistingNews(existingItems, developerConfig, relevanceRules, compiledRules, tagRules.severity_order, googleAllowlistConfig);
 
     writeJson(NEWS_ALL_PATH, { items: cleaned });
     const cleanup90 = cleaned
@@ -711,12 +877,38 @@ async function run() {
     feedResults.push(...googleResults);
 
     for (const rawItem of parsedItems) {
-      const publisherFromTitle = parsePublisherFromTitle(rawItem.title);
+      const publisherInfo = extractGoogleNewsPublisher(rawItem, googleAllowlistConfig);
+      if (!publisherInfo.publisher) {
+        rejectedLogs.push({
+          title: rawItem.title,
+          source: 'google_news',
+          reason: 'google_publisher_not_allowlisted',
+          timestamp: fetchedAtSgt
+        });
+        continue;
+      }
+
+      const cleanedTitle = trimPublisherFromTitle(rawItem.title, publisherInfo.extracted_publisher);
       const resolved = await resolveGoogleLink(rawItem);
-      const resolvedLink = resolved.resolved_link || canonicalizeLink(rawItem.link);
-      const cleanedTitle = trimPublisherFromTitle(rawItem.title, publisherFromTitle);
-      const dedupKey = resolvedLink || canonicalizeLink(rawItem.source_url || rawItem.link);
-      if (existingDedup.has(dedupKey)) continue;
+      if (resolved.resolved_link_status === 'homepage_rejected') {
+        rejectedLogs.push({
+          title: cleanedTitle,
+          source: 'google_news',
+          reason: 'google_homepage_resolution',
+          timestamp: fetchedAtSgt
+        });
+        continue;
+      }
+
+      const dedupKeys = buildGoogleDedupKeys({
+        title: cleanedTitle,
+        publisher: publisherInfo.publisher,
+        pubDate: rawItem.pubDate,
+        resolved_link: resolved.resolved_link,
+        source_url: rawItem.source_url,
+        original_link: resolved.original_link
+      });
+      if (dedupKeys.some((key) => existingDedup.has(key))) continue;
 
       const combined = `${cleanedTitle} ${rawItem.snippet || ''}`.toLowerCase();
       const relevance = evaluateRelevance(combined, developerConfig, relevanceRules);
@@ -734,16 +926,20 @@ async function run() {
         developerMatches: relevance.relevance_reason === 'developer_match' ? relevance.relevance_terms : [],
         relevancePassed: relevance.pass
       });
-      const id = buildId('google_news', dedupKey || buildFallbackDedupKey(cleanedTitle, publisherFromTitle, rawItem.pubDate));
+      const primaryDedupKey = dedupKeys[0] || buildFallbackDedupKey(cleanedTitle, publisherInfo.publisher, rawItem.pubDate);
+      const id = buildId('google_news', primaryDedupKey);
       newItems.push({
         id,
         title: cleanedTitle,
-        original_link: rawItem.link,
-        resolved_link: resolvedLink,
-        link: resolvedLink || rawItem.link,
+        original_link: resolved.original_link,
+        resolved_link: resolved.resolved_link,
+        resolved_link_status: resolved.resolved_link_status,
+        source_url: rawItem.source_url || null,
+        guid: rawItem.guid || null,
+        link: resolved.resolved_link || resolved.original_link,
         source: 'google_news',
         aggregator: 'google_news',
-        publisher: publisherFromTitle || null,
+        publisher: publisherInfo.publisher,
         query: rawItem.query,
         pubDate: rawItem.pubDate,
         pubDate_sgt: toSgtIso(rawItem.pubDate),
@@ -756,7 +952,7 @@ async function run() {
         relevance_reason: relevance.relevance_reason,
         relevance_terms: relevance.relevance_terms
       });
-      existingDedup.add(dedupKey || buildFallbackDedupKey(cleanedTitle, publisherFromTitle, rawItem.pubDate));
+      dedupKeys.forEach((key) => existingDedup.add(key));
     }
   } else {
     for (const feed of feeds) {
