@@ -1,17 +1,13 @@
 {
-  "severity_order": ["critical", "warning", "watch", "info"],
+  "severity_order": ["warning", "watch", "info"],
   "severity_definitions": {
-    "critical": {
-      "title": "Critical",
-      "description": "Credible distress or default-risk signals such as missed payments, insolvency proceedings, liquidation risk, covenant breaches, or formal restructuring."
-    },
     "warning": {
       "title": "Warning",
-      "description": "Material balance-sheet pressure indicators, including refinancing stress, liquidity-raising actions, rating pressure, or rights issues to shore up funding."
+      "description": "Elevated risk signals including distress/default-risk indicators such as missed payments, insolvency proceedings, liquidation risk, covenant breaches, or formal restructuring."
     },
     "watch": {
       "title": "Watch",
-      "description": "Early warning signs like weaker take-up, slower presales, margin/cost pressure, rising unsold inventory, or project execution delays."
+      "description": "Early-to-moderate risk indicators such as refinancing stress, liquidity-raising actions, weaker take-up, slower presales, margin/cost pressure, rising unsold inventory, or project delays."
     },
     "info": {
       "title": "Info",
@@ -20,12 +16,12 @@
   },
   "rules": [
     {
-      "severity": "critical",
+      "severity": "warning",
       "tag": "default_risk",
       "patterns": ["\\bdefault(?:ed|s|ing)?\\b", "\\bmiss(?:ed|ing)?\\s+payment\\b", "\\binsolvenc(?:y|ies)\\b", "\\bwinding\\s*up\\b", "\\bliquidation\\b", "\\breceivership\\b", "\\bcovenant\\s+breach\\b", "\\bdebt\\s+restructur(?:e|ing)\\b", "\\bjudicial\\s+management\\b"]
     },
     {
-      "severity": "warning",
+      "severity": "watch",
       "tag": "liquidity_action",
       "patterns": ["\\brefinanc(?:e|ing|ed)\\b", "\\bmaturit(?:y|ies)\\b", "\\basset\\s+disposal\\b", "\\bdivest(?:ment|ing)?\\b", "\\bprofit\\s+warning\\b", "\\bliquidity\\s+stress\\b", "\\bdowngrade\\b", "\\bnegative\\s+outlook\\b", "\\brights\\s+issue\\b", "\\bshore\\s+up\\s+(?:its|their)?\\s*balance\\s+sheet\\b"]
     },

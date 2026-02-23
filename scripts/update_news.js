@@ -28,7 +28,7 @@ const FEEDS = [
 ];
 
 const TRACKING_PREFIXES = ['utm_', 'fbclid', 'gclid', 'mc_cid', 'mc_eid', 'cmpid', 'igshid', 's_cid'];
-const SEVERITY_SCORE = { critical: 4, warning: 3, watch: 2, info: 1 };
+const SEVERITY_SCORE = { warning: 3, watch: 2, info: 1 };
 
 function mapSeverityToCurrent(severity) {
   const key = String(severity || 'info').toLowerCase();
@@ -36,6 +36,12 @@ function mapSeverityToCurrent(severity) {
   if (key === 'warning') return 'watch';
   if (key === 'watch') return 'watch';
   return 'info';
+}
+
+function normalizeSeverityForScoring(severity) {
+  const key = String(severity || 'info').toLowerCase();
+  if (key === 'critical') return 'warning';
+  return ['warning', 'watch', 'info'].includes(key) ? key : 'info';
 }
 const GOOGLE_RSS_BASE = 'https://news.google.com/rss/search';
 
@@ -164,15 +170,16 @@ function classifySeverity(text, compiledRules, severityOrder) {
     if (!match) continue;
     tags.add(rule.tag);
     matchedTerms.add(match[0]);
-    if (SEVERITY_SCORE[rule.severity] > SEVERITY_SCORE[bestSeverity]) {
-      bestSeverity = rule.severity;
+    const normalizedRuleSeverity = normalizeSeverityForScoring(rule.severity);
+    if (SEVERITY_SCORE[normalizedRuleSeverity] > SEVERITY_SCORE[bestSeverity]) {
+      bestSeverity = normalizedRuleSeverity;
     }
   }
 
-  const fallback = severityOrder[severityOrder.length - 1] || 'info';
-  const legacySeverity = bestSeverity || fallback;
+  const fallback = normalizeSeverityForScoring(severityOrder[severityOrder.length - 1] || 'info');
+  const severity = normalizeSeverityForScoring(bestSeverity || fallback);
   return {
-    severity: mapSeverityToCurrent(legacySeverity),
+    severity,
     tags: [...tags],
     matched_terms: [...matchedTerms]
   };
@@ -564,8 +571,12 @@ function migrateLegacySeverities(items) {
 
 function backupNewsAll() {
   if (!fs.existsSync(NEWS_ALL_PATH)) return null;
-  const date = new Date().toISOString().slice(0, 10);
-  const backupPath = path.join(DATA_DIR, `news_all_backup_${date}.json`);
+  const now = new Date();
+  const date = now.toISOString().slice(0, 10);
+  const stamp = now.toISOString().replace(/[:.]/g, '-');
+  const datedPath = path.join(DATA_DIR, `news_all_backup_${date}.json`);
+  const stampedPath = path.join(DATA_DIR, `news_all_backup_${stamp}.json`);
+  const backupPath = fs.existsSync(datedPath) ? stampedPath : datedPath;
   fs.copyFileSync(NEWS_ALL_PATH, backupPath);
   return backupPath;
 }
