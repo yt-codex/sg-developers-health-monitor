@@ -18,6 +18,9 @@ Static multi-page dashboard for GitHub Pages that monitors vulnerability signals
 │   ├── macro_indicators.json
 │   ├── macro_stress_signals.json
 │   ├── developer_news.json
+│   ├── news_all.json
+│   ├── news_latest_90d.json
+│   ├── meta.json
 │   ├── risk_rules.json
 │   └── listed_developers.json
 ├── scripts/
@@ -69,6 +72,7 @@ Then open `http://localhost:8000/index.html`.
 ```bash
 npm run verify:macro-sources
 npm run update:macro
+npm run update:news
 npm test
 npm run smoke
 ```
@@ -113,6 +117,7 @@ DATA_GOV_SG_API_KEY=your_key_here
 ## GitHub Actions automation
 - `.github/workflows/update_data.yml`: refreshes metadata timestamps daily/manual.
 - `.github/workflows/update-macro.yml`: verifies and updates macro indicators daily/manual.
+- `.github/workflows/update_news.yml`: ingests CNA/BT/ST RSS feeds daily at 02:00 SGT (18:00 UTC) and commits changed news data files.
 
 Set repository secret:
 - Name: `DATA_GOV_SG_API_KEY`
@@ -122,6 +127,23 @@ Set repository secret:
 - `data/site_meta.json` – global timestamp shown on pages
 - `data/macro_indicators.json` – indicator config, series, thresholds, explanations
 - `data/macro_stress_signals.json` – derived stress statuses for sector performance, labour cost, and interest rates
-- `data/developer_news.json` – pre-fetched news items
+- `data/developer_news.json` – deprecated placeholder (news now sourced from RSS pipeline outputs)
+- `data/news_all.json` – append-only historical RSS store (all items retained)
+- `data/news_latest_90d.json` – derived subset limited to the last 90 days for frontend loading
+- `data/meta.json` – latest news pipeline run metadata and per-feed status
 - `data/risk_rules.json` – regex tagging rules and severity hierarchy
 - `data/listed_developers.json` – developer metrics and scoring model
+
+
+## News updater (RSS ingestion)
+Run the developer news pipeline locally:
+
+```bash
+npm run update:news
+```
+
+This script reads feeds from CNA, BT, and ST, deduplicates by canonicalized link hash, appends only new records to `data/news_all.json`, derives `data/news_latest_90d.json`, and updates `data/meta.json`.
+
+### Editing severity/tag rules
+- Edit `config/tag_rules.json` to update severity regex patterns and tooltip definitions without code changes.
+- Edit `config/developers.json` to add or revise known developer aliases used for entity extraction.
