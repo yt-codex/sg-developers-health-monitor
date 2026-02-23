@@ -2,6 +2,25 @@ name: Update developer news
 
 on:
   workflow_dispatch:
+    inputs:
+      enable_google:
+        description: 'Enable Google News ingestion in this run'
+        required: false
+        default: false
+        type: boolean
+      google_mode:
+        description: 'Google mode: delta or backfill'
+        required: false
+        default: 'backfill'
+        type: choice
+        options:
+          - delta
+          - backfill
+      backfill_days:
+        description: 'Lookback days for Google mode'
+        required: false
+        default: '180'
+        type: string
   schedule:
     - cron: '0 18 * * *'
 
@@ -26,10 +45,14 @@ jobs:
       - name: Update CNA/BT/ST news data
         run: node scripts/update_news.js
 
+      - name: Optional Google News ingestion
+        if: github.event_name == 'workflow_dispatch' && inputs.enable_google
+        run: node scripts/update_news.js --source=google --mode=${{ inputs.google_mode }} --days=${{ inputs.backfill_days }}
+
       - name: Commit updated news data
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add data/news_all.json data/news_latest_90d.json data/meta.json
+          git add data/news_all.json data/news_latest_90d.json data/meta.json data/rejected_items.log
           git diff --staged --quiet || git commit -m "chore(data): update developer news [skip ci]"
           git push

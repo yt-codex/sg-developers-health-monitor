@@ -117,7 +117,7 @@ DATA_GOV_SG_API_KEY=your_key_here
 ## GitHub Actions automation
 - `.github/workflows/update_data.yml`: refreshes metadata timestamps daily/manual.
 - `.github/workflows/update-macro.yml`: verifies and updates macro indicators daily/manual.
-- `.github/workflows/update_news.yml`: ingests CNA/BT/ST RSS feeds daily at 02:00 SGT (18:00 UTC) and commits changed news data files.
+- `.github/workflows/update_news.yml`: ingests CNA/BT/ST RSS feeds daily at 02:00 SGT (18:00 UTC), and supports optional Google News ingestion via manual workflow dispatch inputs (`enable_google`, `google_mode`, `backfill_days`).
 
 Set repository secret:
 - Name: `DATA_GOV_SG_API_KEY`
@@ -143,6 +143,49 @@ npm run update:news
 ```
 
 This script reads feeds from CNA, BT, and ST, deduplicates by canonicalized link hash, appends only new records to `data/news_all.json`, derives `data/news_latest_90d.json`, and updates `data/meta.json`.
+
+
+### Google News backfill and delta modes
+The news updater supports Google News RSS Search as an additional source for older backfill and optional delta catch-up, while reusing the same relevance filters used for CNA/BT/ST.
+
+- Query config: `config/google_news_queries.json` (`queries` array).
+- Endpoint format: `https://news.google.com/rss/search?q=<query>&hl=en-SG&gl=SG&ceid=SG:en`
+- Relevance gate: unchanged; all Google items must pass existing rules (`developer_match` OR SG+property/developer-topic) and still respect hard negatives.
+- Rejections: rejected Google items are appended to `data/rejected_items.log` with rejection reason.
+
+Run Google backfill manually (example 365-day backfill):
+
+```bash
+node scripts/update_news.js --source=google --mode=backfill --days=365
+```
+
+Run Google delta mode (example 7-day catch-up, optional query limit):
+
+```bash
+node scripts/update_news.js --source=google --mode=delta --days=7 --max_queries=10
+```
+
+Backfill mode attempts iterative windows using Google query `when:Xd` chunks (7/30/90/180/N days). Google support for `when:` can vary, so partial backfill is possible.
+
+For Google items, the pipeline stores additional fields:
+- `aggregator: "google_news"`
+- `original_link` (Google RSS link)
+- `resolved_link` (best-effort destination URL)
+- `link` (resolved if available; otherwise original)
+- `publisher` (best-effort title suffix extraction)
+- `query` (triggering Google query string)
+
+Google URL resolution priority:
+1. `<source url="...">` from RSS item, if present
+2. Decoding from Google URL, if possible
+3. One HTTP GET with redirects; use final URL
+4. Fallback to the original Google URL
+
+Deduplication priority:
+1. `resolved_link`
+2. `<source url>`
+3. canonicalized `link`
+4. hash of `(normalized title + publisher + date)` as fallback
 
 ### Editing severity/tag rules
 - Edit `config/tag_rules.json` to update severity regex patterns and tooltip definitions without code changes.
