@@ -29,6 +29,14 @@ const FEEDS = [
 
 const TRACKING_PREFIXES = ['utm_', 'fbclid', 'gclid', 'mc_cid', 'mc_eid', 'cmpid', 'igshid', 's_cid'];
 const SEVERITY_SCORE = { critical: 4, warning: 3, watch: 2, info: 1 };
+
+function mapSeverityToCurrent(severity) {
+  const key = String(severity || 'info').toLowerCase();
+  if (key === 'critical') return 'warning';
+  if (key === 'warning') return 'watch';
+  if (key === 'watch') return 'watch';
+  return 'info';
+}
 const GOOGLE_RSS_BASE = 'https://news.google.com/rss/search';
 
 const parser = XMLParser
@@ -162,8 +170,9 @@ function classifySeverity(text, compiledRules, severityOrder) {
   }
 
   const fallback = severityOrder[severityOrder.length - 1] || 'info';
+  const legacySeverity = bestSeverity || fallback;
   return {
-    severity: bestSeverity || fallback,
+    severity: mapSeverityToCurrent(legacySeverity),
     tags: [...tags],
     matched_terms: [...matchedTerms]
   };
@@ -533,12 +542,24 @@ function cleanupExistingNews(items, developerConfig, relevanceRules) {
 
     cleaned.push({
       ...item,
+      severity: mapSeverityToCurrent(item.severity),
       relevance_reason: relevance.relevance_reason,
       relevance_terms: relevance.relevance_terms
     });
   }
 
   return { cleaned, rejectedLogs };
+}
+
+
+function migrateLegacySeverities(items) {
+  let changed = false;
+  const migrated = items.map((item) => {
+    const mappedSeverity = mapSeverityToCurrent(item.severity);
+    if ((item.severity || 'info') !== mappedSeverity) changed = true;
+    return { ...item, severity: mappedSeverity };
+  });
+  return { items: migrated, changed };
 }
 
 function backupNewsAll() {
@@ -562,8 +583,10 @@ async function run() {
 
   if (args.cleanup) {
     const allStore = readJson(NEWS_ALL_PATH, { items: [] });
-    const existingItems = Array.isArray(allStore.items) ? allStore.items : [];
+    const existingItemsRaw = Array.isArray(allStore.items) ? allStore.items : [];
+    const migrated = migrateLegacySeverities(existingItemsRaw);
     const backupPath = backupNewsAll();
+    const existingItems = migrated.items;
     const { cleaned, rejectedLogs } = cleanupExistingNews(existingItems, developerConfig, relevanceRules);
 
     writeJson(NEWS_ALL_PATH, { items: cleaned });
@@ -592,7 +615,14 @@ async function run() {
 
   const compiledRules = compileRules(tagRules);
   const allStore = readJson(NEWS_ALL_PATH, { items: [] });
-  const existingItems = Array.isArray(allStore.items) ? allStore.items : [];
+  let existingItems = Array.isArray(allStore.items) ? allStore.items : [];
+  const migrated = migrateLegacySeverities(existingItems);
+  if (migrated.changed) {
+    backupNewsAll();
+    existingItems = migrated.items;
+    writeJson(NEWS_ALL_PATH, { items: existingItems });
+    console.log('[update_news] migrated legacy severities in data/news_all.json');
+  }
   const existingDedup = new Set(existingItems.map((item) => deriveDedupKey(item)));
   const fetchedAtSgt = nowSgtIso();
 

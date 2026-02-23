@@ -7,8 +7,7 @@
   --border: #dbe1e8;
   --accent: #2563eb;
 
-  --crit: #b42318;
-  --warn: #c2410c;
+  --warn: #b45309;
   --watch: #a16207;
   --info: #1d4ed8;
 
@@ -442,16 +441,9 @@ small { font-size: 0.875rem; }
   background: currentColor;
 }
 
-.sev-critical { background: #fef3f2; color: var(--crit); border-color: #fecdca; }
-.sev-warning { background: #fff7ed; color: var(--warn); border-color: #fed7aa; }
-.sev-watch { background: #fffbeb; color: var(--watch); border-color: #fde68a; }
-.sev-info { background: #eff6ff; color: var(--info); border-color: #bfdbfe; }
-
-.severity-wrap {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-}
+.sev-warning { background: #fff7ed; color: var(--warn); border-color: #fdba74; }
+.sev-watch { background: #fffbeb; color: var(--watch); border-color: #fcd34d; }
+.sev-info { background: #eff6ff; color: var(--info); border-color: #93c5fd; }
 
 .severity-tooltip {
   position: relative;
@@ -459,17 +451,6 @@ small { font-size: 0.875rem; }
   align-items: center;
   justify-content: center;
   cursor: help;
-}
-
-.severity-tooltip-trigger {
-  width: 1rem;
-  height: 1rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  color: #94a3b8;
 }
 
 .severity-tooltip-content {
@@ -591,6 +572,47 @@ button:hover {
   border: 1px solid var(--border);
   border-radius: 999px;
   padding: 0.2rem 0.5rem;
+}
+
+.news-pagination {
+  margin-top: var(--space-3);
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-3);
+}
+
+.pagination-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.pagination-pages {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.pagination-nav,
+.pagination-page {
+  min-width: 2.2rem;
+}
+
+.pagination-page.is-active {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #93c5fd;
+}
+
+.pagination-ellipsis {
+  color: var(--muted);
+  padding: 0 0.1rem;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .table-wrap {
