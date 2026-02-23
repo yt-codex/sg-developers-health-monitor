@@ -1,13 +1,13 @@
 {
   "queries": [
-    "(\"Singapore\" AND (developer OR \"property developer\") AND (GLS OR \"land bid\" OR tender OR \"new launch\" OR presales OR \"take-up\" OR \"unsold stock\"))",
-    "(\"Government Land Sales\" OR GLS) Singapore developer tender",
-    "URA Singapore private housing supply developer",
-    "\"en bloc\" Singapore developer",
-    "\"City Developments\" OR CDL Singapore",
-    "UOL Singapore developer",
-    "GuocoLand Singapore",
-    "CapitaLand Development Singapore",
-    "Frasers Property Singapore developer"
+    "(\"Singapore\" AND (developer OR \"property developer\") AND (GLS OR \"land bid\" OR tender OR \"new launch\" OR presales OR \"take-up\" OR \"unsold stock\")) (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com OR site:todayonline.com OR site:theedgesingapore.com)",
+    "(\"Government Land Sales\" OR GLS) Singapore developer tender (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
+    "URA Singapore private housing supply developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
+    "\"en bloc\" Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:theedgesingapore.com)",
+    "(\"City Developments\" OR CDL) Singapore property developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
+    "UOL Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
+    "GuocoLand Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:theedgesingapore.com)",
+    "CapitaLand Development Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
+    "Frasers Property Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)"
   ]
 }

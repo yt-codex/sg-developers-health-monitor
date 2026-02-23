@@ -14,34 +14,43 @@ test('decodeGoogleLinkCandidate extracts direct URL from url query parameter', (
   assert.equal(decoded, 'https://example.com/news/story-123');
 });
 
-test('isLikelyArticleUrl rejects domain roots and accepts deep article paths', () => {
+test('isLikelyArticleUrl rejects homepage-like paths and accepts article paths', () => {
   assert.equal(isLikelyArticleUrl('https://www.theedgesingapore.com/'), false);
-  assert.equal(isLikelyArticleUrl('https://www.era.com.sg/'), false);
-  assert.equal(isLikelyArticleUrl('https://www.straitstimes.com/business/property/cdl-wins-bid'), true);
+  assert.equal(isLikelyArticleUrl('https://www.channelnewsasia.com/news'), false);
+  assert.equal(isLikelyArticleUrl('https://www.straitstimes.com/business/property/cdl-wins-bid-12345'), true);
 });
 
-test('resolveGoogleLink falls back to source_url only when it looks like a specific article URL', async () => {
+test('resolveGoogleLink marks homepage redirects as rejected', async () => {
+  const originalFetch = global.fetch;
+  global.fetch = async () => ({ url: 'https://www.theedgesingapore.com/' });
+
+  try {
+    const result = await resolveGoogleLink({
+      link: 'https://news.google.com/rss/articles/CBMiXw?oc=5',
+      source_url: 'https://www.theedgesingapore.com/'
+    });
+    assert.equal(result.resolved_link_status, 'homepage_rejected');
+    assert.equal(result.resolved_link, null);
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test('resolveGoogleLink falls back to source_url when it is article-like', async () => {
   const originalFetch = global.fetch;
   global.fetch = async () => {
     throw new Error('network unavailable in unit test');
   };
 
   try {
-    const genericSourceResult = await resolveGoogleLink({
-      link: 'https://news.google.com/rss/articles/CBMiXw?oc=5',
-      source_url: 'https://www.theedgesingapore.com/'
-    });
-    assert.equal(genericSourceResult.resolution, 'fallback');
-    assert.equal(genericSourceResult.resolved_link, 'https://news.google.com/rss/articles/CBMiXw?oc=5');
-
     const articleSourceResult = await resolveGoogleLink({
       link: 'https://news.google.com/rss/articles/CBMiYQ?oc=5',
-      source_url: 'https://www.straitstimes.com/business/property/cdl-wins-bid'
+      source_url: 'https://www.straitstimes.com/business/property/cdl-wins-bid-12345'
     });
-    assert.equal(articleSourceResult.resolution, 'source_url');
+    assert.equal(articleSourceResult.resolved_link_status, 'resolved');
     assert.equal(
       articleSourceResult.resolved_link,
-      'https://www.straitstimes.com/business/property/cdl-wins-bid'
+      'https://www.straitstimes.com/business/property/cdl-wins-bid-12345'
     );
   } finally {
     global.fetch = originalFetch;
