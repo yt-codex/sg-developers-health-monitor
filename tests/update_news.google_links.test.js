@@ -2,9 +2,12 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const {
+  buildGoogleDedupKeys,
+  buildTitleDateDedupKey,
   decodeGoogleLinkCandidate,
   isHomepageLikeUrl,
   isLikelyArticleUrl,
+  normalizeTitleForDedup,
   resolveGoogleLink
 } = require('../scripts/update_news');
 
@@ -63,4 +66,43 @@ test('resolveGoogleLink falls back to source_url when it is article-like', async
   } finally {
     global.fetch = originalFetch;
   }
+});
+
+
+test('normalizeTitleForDedup normalizes punctuation and ignorable articles', () => {
+  assert.equal(
+    normalizeTitleForDedup('CapitaLand Investment dragged into the red by China asset losses: What are the hits and misses?'),
+    'capitaland investment dragged into red by china asset losses what are hits and misses'
+  );
+  assert.equal(
+    normalizeTitleForDedup('Capitaland Investment dragged into red by China asset losses - What are hits and misses'),
+    'capitaland investment dragged into red by china asset losses what are hits and misses'
+  );
+});
+
+test('buildTitleDateDedupKey produces same key for near-identical titles on same date', () => {
+  const date = '2026-02-23T07:46:00.000Z';
+  const key1 = buildTitleDateDedupKey(
+    'CapitaLand Investment dragged into the red by China asset losses: What are the hits and misses?',
+    date
+  );
+  const key2 = buildTitleDateDedupKey(
+    'Capitaland Investment dragged into red by China asset losses: What are the hits and misses?',
+    date
+  );
+  assert.equal(key1, key2);
+});
+
+test('buildGoogleDedupKeys includes title-date dedup key for cross-source deduping', () => {
+  const title = 'Capitaland Investment dragged into red by China asset losses: What are the hits and misses?';
+  const pubDate = '2026-02-23T07:46:00.000Z';
+  const titleDateKey = buildTitleDateDedupKey(title, pubDate);
+  const keys = buildGoogleDedupKeys({
+    title,
+    pubDate,
+    publisher: 'The Straits Times',
+    resolved_link: 'https://news.google.com/rss/articles/ABC?oc=5',
+    original_link: 'https://news.google.com/rss/articles/ABC?oc=5&hl=en-US'
+  });
+  assert.ok(keys.includes(titleDateKey));
 });

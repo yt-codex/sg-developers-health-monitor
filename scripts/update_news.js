@@ -153,6 +153,15 @@ function normalizeTitle(text) {
   return (text || '').toLowerCase().replace(/\s+/g, ' ').trim();
 }
 
+function normalizeTitleForDedup(text) {
+  return normalizeTitle(text)
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter((token) => token && !['a', 'an', 'the'].includes(token))
+    .join(' ')
+    .trim();
+}
+
 function buildId(source, key) {
   return crypto.createHash('sha256').update(`${source}|${key}`).digest('hex').slice(0, 16);
 }
@@ -163,9 +172,15 @@ function buildFallbackDedupKey(title, publisher, pubDate) {
   return `fallback:${crypto.createHash('sha256').update(raw).digest('hex').slice(0, 24)}`;
 }
 
-function deriveDedupKey(item) {
+function buildTitleDateDedupKey(title, pubDate) {
+  const datePart = pubDate ? new Date(pubDate).toISOString().slice(0, 10) : 'unknown';
+  const raw = `${normalizeTitleForDedup(title)}|${datePart}`;
+  return `title_date:${crypto.createHash('sha256').update(raw).digest('hex').slice(0, 24)}`;
+}
+
+function deriveDedupKeys(item) {
   if (item.source === 'google_news') {
-    const keys = buildGoogleDedupKeys({
+    return buildGoogleDedupKeys({
       title: item.title,
       publisher: item.publisher,
       pubDate: item.pubDate,
@@ -173,10 +188,12 @@ function deriveDedupKey(item) {
       source_url: item.source_url,
       original_link: item.original_link || item.link
     });
-    return keys[0] || buildFallbackDedupKey(item.title, item.publisher, item.pubDate);
   }
-  if (item.link) return canonicalizeLink(item.link);
-  return buildFallbackDedupKey(item.title, item.publisher, item.pubDate);
+  const keys = [];
+  if (item.link) keys.push(canonicalizeLink(item.link));
+  keys.push(buildTitleDateDedupKey(item.title, item.pubDate));
+  keys.push(buildFallbackDedupKey(item.title, item.publisher || item.source, item.pubDate));
+  return [...new Set(keys.filter(Boolean))];
 }
 
 function compileRules(tagRules) {
@@ -625,6 +642,7 @@ function buildGoogleDedupKeys(item) {
   const keys = [];
   if (item.resolved_link) keys.push(canonicalizeLink(item.resolved_link));
   if (item.source_url) keys.push(canonicalizeLink(item.source_url));
+  keys.push(buildTitleDateDedupKey(item.title, item.pubDate));
   keys.push(buildFallbackDedupKey(item.title, item.publisher, item.pubDate));
   if (item.original_link) keys.push(canonicalizeLink(item.original_link));
   return [...new Set(keys.filter(Boolean))];
@@ -858,7 +876,7 @@ async function run() {
     writeJson(NEWS_ALL_PATH, { items: existingItems });
     logInfo('migrated legacy severities in data/news_all.json');
   }
-  const existingDedup = new Set(existingItems.map((item) => deriveDedupKey(item)));
+  const existingDedup = new Set(existingItems.flatMap((item) => deriveDedupKeys(item)));
   const fetchedAtSgt = nowSgtIso();
 
   const feedResults = [];
@@ -966,7 +984,12 @@ async function run() {
 
         for (const rawItem of parsedItems) {
           const canonicalLink = canonicalizeLink(rawItem.link);
-          if (existingDedup.has(canonicalLink)) continue;
+          const dedupKeys = [
+            canonicalLink,
+            buildTitleDateDedupKey(rawItem.title, rawItem.pubDate),
+            buildFallbackDedupKey(rawItem.title, rawItem.source, rawItem.pubDate)
+          ].filter(Boolean);
+          if (dedupKeys.some((key) => existingDedup.has(key))) continue;
 
           const combined = `${rawItem.title} ${rawItem.snippet}`.toLowerCase();
           const relevance = evaluateRelevance(combined, developerConfig, relevanceRules);
@@ -1000,7 +1023,7 @@ async function run() {
             relevance_reason: relevance.relevance_reason,
             relevance_terms: relevance.relevance_terms
           };
-          existingDedup.add(canonicalLink);
+          dedupKeys.forEach((key) => existingDedup.add(key));
           newItems.push(item);
         }
       } catch (error) {
@@ -1038,8 +1061,11 @@ if (require.main === module) {
 }
 
 module.exports = {
+  buildGoogleDedupKeys,
+  buildTitleDateDedupKey,
   decodeGoogleLinkCandidate,
   isHomepageLikeUrl,
   isLikelyArticleUrl,
+  normalizeTitleForDedup,
   resolveGoogleLink
 };
