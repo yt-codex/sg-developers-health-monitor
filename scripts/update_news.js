@@ -544,7 +544,11 @@ function isLikelyArticleUrl(link) {
 function isHomepageLikeUrl(link) {
   try {
     const url = new URL(link);
-    if (url.hostname.includes('news.google.com')) return true;
+    if (url.hostname.includes('news.google.com')) {
+      const path = (url.pathname || '').toLowerCase();
+      if (path.includes('/articles/') || path.includes('/rss/articles/')) return false;
+      return true;
+    }
     const pathname = (url.pathname || '').replace(/\/+$/, '');
     if (!pathname || pathname === '') return true;
     const segments = pathname.toLowerCase().split('/').filter(Boolean);
@@ -1035,6 +1039,7 @@ if (require.main === module) {
 
 module.exports = {
   decodeGoogleLinkCandidate,
+  isHomepageLikeUrl,
   isLikelyArticleUrl,
   resolveGoogleLink
 };
