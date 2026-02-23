@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 
 const {
   decodeGoogleLinkCandidate,
+  isHomepageLikeUrl,
   isLikelyArticleUrl,
   resolveGoogleLink
 } = require('../scripts/update_news');
@@ -20,7 +21,14 @@ test('isLikelyArticleUrl rejects homepage-like paths and accepts article paths',
   assert.equal(isLikelyArticleUrl('https://www.straitstimes.com/business/property/cdl-wins-bid-12345'), true);
 });
 
-test('resolveGoogleLink marks homepage redirects as rejected', async () => {
+
+
+test('isHomepageLikeUrl treats Google rss/articles links as article candidates', () => {
+  assert.equal(isHomepageLikeUrl('https://news.google.com/rss/articles/CBMiX2h0dHBzOi8vd3d3LnN0cmFpdHN0aW1lcy5jb20vYnVzaW5lc3MvcHJvcGVydHkvY2RsLXdpbnMtYmlkLTk4NzY1?oc=5'), false);
+  assert.equal(isHomepageLikeUrl('https://news.google.com/home?hl=en-SG&gl=SG&ceid=SG:en'), true);
+});
+
+test('resolveGoogleLink falls back to original Google article link when source_url is homepage-like', async () => {
   const originalFetch = global.fetch;
   global.fetch = async () => ({ url: 'https://www.theedgesingapore.com/' });
 
@@ -29,8 +37,8 @@ test('resolveGoogleLink marks homepage redirects as rejected', async () => {
       link: 'https://news.google.com/rss/articles/CBMiXw?oc=5',
       source_url: 'https://www.theedgesingapore.com/'
     });
-    assert.equal(result.resolved_link_status, 'homepage_rejected');
-    assert.equal(result.resolved_link, null);
+    assert.equal(result.resolved_link_status, 'fallback_google');
+    assert.equal(result.resolved_link, 'https://news.google.com/rss/articles/CBMiXw?oc=5');
   } finally {
     global.fetch = originalFetch;
   }
