@@ -14,9 +14,10 @@ const CONFIG_DIR = path.join(ROOT, 'config');
 const NEWS_ALL_PATH = path.join(DATA_DIR, 'news_all.json');
 const NEWS_90D_PATH = path.join(DATA_DIR, 'news_latest_90d.json');
 const META_PATH = path.join(DATA_DIR, 'meta.json');
+const REJECTED_LOG_PATH = path.join(DATA_DIR, 'rejected_items.log');
+const RELEVANCE_RULES_PATH = path.join(CONFIG_DIR, 'relevance_rules.json');
 
 const FEEDS = [
-  { source: 'CNA', url: 'https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml' },
   { source: 'CNA', url: 'https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=6936' },
   { source: 'CNA', url: 'https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=10416' },
   { source: 'BT', url: 'https://www.businesstimes.com.sg/rss/property' },
@@ -142,6 +143,138 @@ function extractDeveloper(text, developerConfig) {
   return hits[0].name;
 }
 
+function escapeRegex(text) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function termToRegex(term) {
+  const normalized = term.toLowerCase().trim().replace(/\s+/g, '\\s+');
+  const escaped = escapeRegex(normalized).replace(/\\\s\+/g, '\\s+');
+  const startsWord = /^[a-z0-9]/i.test(term);
+  const endsWord = /[a-z0-9]$/i.test(term);
+  const prefix = startsWord ? '\\b' : '';
+  const suffix = endsWord ? '\\b' : '';
+  return new RegExp(`${prefix}${escaped}${suffix}`, 'i');
+}
+
+function includesTerm(text, terms) {
+  for (const term of terms) {
+    if (termToRegex(term).test(text)) return term;
+  }
+  return null;
+}
+
+function findDeveloperMatches(text, developerConfig) {
+  const matches = [];
+  for (const dev of developerConfig.developers || []) {
+    for (const alias of dev.aliases || []) {
+      if (text.includes(alias.toLowerCase())) {
+        matches.push(alias);
+      }
+    }
+  }
+  return [...new Set(matches)];
+}
+
+function isSingaporeContext(text, relevanceRules) {
+  const directTerm = includesTerm(text, relevanceRules.singapore_context_terms || []);
+  if (directTerm) return { pass: true, terms: [directTerm] };
+
+  const optionalComboTerm = includesTerm(text, relevanceRules.singapore_optional_combo_terms || []);
+  if (optionalComboTerm) {
+    const anchor = includesTerm(text, relevanceRules.singapore_anchor_terms || []);
+    if (anchor) {
+      return { pass: true, terms: [optionalComboTerm, anchor] };
+    }
+  }
+
+  return { pass: false, terms: [] };
+}
+
+function isPropertyDeveloperTopic(text, relevanceRules) {
+  const groups = relevanceRules.property_developer_topic_groups || {};
+  const matched = [];
+  for (const terms of Object.values(groups)) {
+    const hit = includesTerm(text, terms || []);
+    if (hit) matched.push(hit);
+  }
+  return { pass: matched.length > 0, terms: matched };
+}
+
+function hasNegativeMatch(text, relevanceRules) {
+  for (const [group, terms] of Object.entries(relevanceRules.hard_negative_groups || {})) {
+    const term = includesTerm(text, terms || []);
+    if (term) {
+      return { group, term };
+    }
+  }
+  return null;
+}
+
+function matchesManualAllowlist(text, relevanceRules) {
+  const term = includesTerm(text, relevanceRules.manual_allowlist_terms || []);
+  if (!term) return [];
+  return [term];
+}
+
+function evaluateRelevance(text, developerConfig, relevanceRules) {
+  const developerMatches = findDeveloperMatches(text, developerConfig);
+  if (developerMatches.length > 0) {
+    return {
+      pass: true,
+      relevance_reason: 'developer_match',
+      relevance_terms: developerMatches,
+      reject_reason: null
+    };
+  }
+
+  const allowlistMatches = matchesManualAllowlist(text, relevanceRules);
+  if (allowlistMatches.length > 0) {
+    return {
+      pass: true,
+      relevance_reason: 'manual_allowlist',
+      relevance_terms: allowlistMatches,
+      reject_reason: null
+    };
+  }
+
+  const negative = hasNegativeMatch(text, relevanceRules);
+  if (negative) {
+    return {
+      pass: false,
+      relevance_reason: null,
+      relevance_terms: [],
+      reject_reason: `hard_negative:${negative.group}:${negative.term}`
+    };
+  }
+
+  const sgContext = isSingaporeContext(text, relevanceRules);
+  if (!sgContext.pass) {
+    return {
+      pass: false,
+      relevance_reason: null,
+      relevance_terms: [],
+      reject_reason: 'missing_singapore_context'
+    };
+  }
+
+  const propertyTopic = isPropertyDeveloperTopic(text, relevanceRules);
+  if (!propertyTopic.pass) {
+    return {
+      pass: false,
+      relevance_reason: null,
+      relevance_terms: [],
+      reject_reason: 'missing_property_developer_topic'
+    };
+  }
+
+  return {
+    pass: true,
+    relevance_reason: 'sg_property_topic',
+    relevance_terms: [...new Set([...sgContext.terms, ...propertyTopic.terms])],
+    reject_reason: null
+  };
+}
 
 function parseItemsWithRegex(xml, source) {
   const items = [];
@@ -200,13 +333,120 @@ function daysAgoCutoff(days) {
   return Date.now() - days * 24 * 60 * 60 * 1000;
 }
 
+function appendRejectedLog(entries) {
+  if (entries.length === 0) return;
+  const lines = entries.map((entry) => {
+    const safeTitle = entry.title.replace(/\s*\|\s*/g, ' / ').trim();
+    return `${entry.timestamp} | ${entry.source} | ${entry.reason} | ${safeTitle}`;
+  });
+  fs.appendFileSync(REJECTED_LOG_PATH, `${lines.join('\n')}\n`, 'utf8');
+}
+
+function refreshLatest90AndMeta(allItems, fetchedAtSgt, feedResults, existingCount, newItemsCount, rejectedCount) {
+  const latest90 = allItems
+    .filter((item) => new Date(item.pubDate).getTime() >= daysAgoCutoff(90))
+    .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+
+  const hasSuccessfulFeed = feedResults.some((r) => r.status === 'ok');
+  const hasFeedErrors = feedResults.some((r) => r.status === 'error');
+
+  if (latest90.length > 0 || hasSuccessfulFeed || fs.existsSync(NEWS_90D_PATH)) {
+    if (!(newItemsCount === 0 && !hasSuccessfulFeed && hasFeedErrors)) {
+      writeJson(NEWS_90D_PATH, { items: latest90 });
+    }
+  }
+
+  const meta = {
+    last_updated_sgt: fetchedAtSgt,
+    status: hasFeedErrors ? (hasSuccessfulFeed ? 'partial_success' : 'error') : 'success',
+    counts: {
+      existing_total: existingCount,
+      new_items: newItemsCount,
+      rejected_items: rejectedCount,
+      total_all: allItems.length,
+      latest_90d: latest90.length
+    },
+    feeds: feedResults
+  };
+  writeJson(META_PATH, meta);
+
+  return latest90;
+}
+
+function cleanupExistingNews(items, developerConfig, relevanceRules) {
+  const cleaned = [];
+  const rejectedLogs = [];
+
+  for (const item of items) {
+    const combined = `${item.title || ''} ${item.snippet || ''}`.toLowerCase();
+    const relevance = evaluateRelevance(combined, developerConfig, relevanceRules);
+    if (!relevance.pass) {
+      rejectedLogs.push({
+        title: item.title || 'Untitled',
+        source: item.source || 'unknown',
+        reason: `cleanup_${relevance.reject_reason}`,
+        timestamp: nowSgtIso()
+      });
+      continue;
+    }
+
+    cleaned.push({
+      ...item,
+      relevance_reason: relevance.relevance_reason,
+      relevance_terms: relevance.relevance_terms
+    });
+  }
+
+  return { cleaned, rejectedLogs };
+}
+
+function backupNewsAll() {
+  if (!fs.existsSync(NEWS_ALL_PATH)) return null;
+  const date = new Date().toISOString().slice(0, 10);
+  const backupPath = path.join(DATA_DIR, `news_all_backup_${date}.json`);
+  fs.copyFileSync(NEWS_ALL_PATH, backupPath);
+  return backupPath;
+}
+
 async function run() {
   ensureDir(DATA_DIR);
 
   const tagRules = readJson(path.join(CONFIG_DIR, 'tag_rules.json'), null);
   const developerConfig = readJson(path.join(CONFIG_DIR, 'developers.json'), null);
-  if (!tagRules || !developerConfig) {
-    throw new Error('Missing config/tag_rules.json or config/developers.json');
+  const relevanceRules = readJson(RELEVANCE_RULES_PATH, null);
+  if (!tagRules || !developerConfig || !relevanceRules) {
+    throw new Error('Missing config/tag_rules.json, config/developers.json, or config/relevance_rules.json');
+  }
+
+  const doCleanup = process.argv.includes('--cleanup');
+  if (doCleanup) {
+    const allStore = readJson(NEWS_ALL_PATH, { items: [] });
+    const existingItems = Array.isArray(allStore.items) ? allStore.items : [];
+    const backupPath = backupNewsAll();
+    const { cleaned, rejectedLogs } = cleanupExistingNews(existingItems, developerConfig, relevanceRules);
+
+    writeJson(NEWS_ALL_PATH, { items: cleaned });
+    const cleanup90 = cleaned
+      .filter((item) => new Date(item.pubDate).getTime() >= daysAgoCutoff(90))
+      .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+    writeJson(NEWS_90D_PATH, { items: cleanup90 });
+    appendRejectedLog(rejectedLogs);
+    writeJson(META_PATH, {
+      last_updated_sgt: nowSgtIso(),
+      status: 'success',
+      counts: {
+        existing_total: existingItems.length,
+        new_items: 0,
+        rejected_items: rejectedLogs.length,
+        total_all: cleaned.length,
+        latest_90d: cleanup90.length
+      },
+      feeds: []
+    });
+    console.log(
+      `[update_news] cleanup complete. backup=${backupPath || 'none'} original=${existingItems.length} cleaned=${cleaned.length} rejected=${rejectedLogs.length}`
+    );
+    return;
   }
 
   const compiledRules = compileRules(tagRules);
@@ -217,6 +457,7 @@ async function run() {
 
   const feedResults = [];
   const newItems = [];
+  const rejectedLogs = [];
 
   for (const feed of FEEDS) {
     try {
@@ -229,6 +470,17 @@ async function run() {
         if (existingIds.has(id)) continue;
 
         const combined = `${rawItem.title} ${rawItem.snippet}`.toLowerCase();
+        const relevance = evaluateRelevance(combined, developerConfig, relevanceRules);
+        if (!relevance.pass) {
+          rejectedLogs.push({
+            title: rawItem.title,
+            source: rawItem.source,
+            reason: relevance.reject_reason,
+            timestamp: fetchedAtSgt
+          });
+          continue;
+        }
+
         const { severity, tags, matched_terms } = classifySeverity(combined, compiledRules, tagRules.severity_order);
         const item = {
           id,
@@ -242,7 +494,9 @@ async function run() {
           tags,
           snippet: rawItem.snippet,
           matched_terms,
-          fetched_at_sgt: fetchedAtSgt
+          fetched_at_sgt: fetchedAtSgt,
+          relevance_reason: relevance.relevance_reason,
+          relevance_terms: relevance.relevance_terms
         };
         existingIds.add(id);
         newItems.push(item);
@@ -253,40 +507,26 @@ async function run() {
     }
   }
 
+  const mergedAllItems = newItems.length > 0 ? [...existingItems, ...newItems] : existingItems;
   if (newItems.length > 0) {
-    writeJson(NEWS_ALL_PATH, { items: [...existingItems, ...newItems] });
+    writeJson(NEWS_ALL_PATH, { items: mergedAllItems });
   } else if (!fs.existsSync(NEWS_ALL_PATH)) {
     writeJson(NEWS_ALL_PATH, { items: existingItems });
   }
 
-  const mergedAllItems = newItems.length > 0 ? [...existingItems, ...newItems] : existingItems;
-  const latest90 = mergedAllItems
-    .filter((item) => new Date(item.pubDate).getTime() >= daysAgoCutoff(90))
-    .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+  appendRejectedLog(rejectedLogs);
+  const latest90 = refreshLatest90AndMeta(
+    mergedAllItems,
+    fetchedAtSgt,
+    feedResults,
+    existingItems.length,
+    newItems.length,
+    rejectedLogs.length
+  );
 
-  const hasSuccessfulFeed = feedResults.some((r) => r.status === 'ok');
-  const hasFeedErrors = feedResults.some((r) => r.status === 'error');
-
-  if (latest90.length > 0 || hasSuccessfulFeed || fs.existsSync(NEWS_90D_PATH)) {
-    if (!(newItems.length === 0 && !hasSuccessfulFeed && hasFeedErrors)) {
-      writeJson(NEWS_90D_PATH, { items: latest90 });
-    }
-  }
-
-  const meta = {
-    last_updated_sgt: fetchedAtSgt,
-    status: hasFeedErrors ? (hasSuccessfulFeed ? 'partial_success' : 'error') : 'success',
-    counts: {
-      existing_total: existingItems.length,
-      new_items: newItems.length,
-      total_all: mergedAllItems.length,
-      latest_90d: latest90.length
-    },
-    feeds: feedResults
-  };
-  writeJson(META_PATH, meta);
-
-  console.log(`[update_news] done. new_items=${newItems.length} total_all=${mergedAllItems.length} latest_90d=${latest90.length}`);
+  console.log(
+    `[update_news] done. new_items=${newItems.length} rejected=${rejectedLogs.length} total_all=${mergedAllItems.length} latest_90d=${latest90.length}`
+  );
 }
 
 run().catch((error) => {
