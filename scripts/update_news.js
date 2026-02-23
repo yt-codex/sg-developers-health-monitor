@@ -460,11 +460,21 @@ function decodeGoogleLinkCandidate(link) {
   }
 }
 
+function isLikelyArticleUrl(link) {
+  try {
+    const url = new URL(link);
+    const pathname = (url.pathname || '').replace(/\/+$/, '');
+    if (!pathname || pathname === '') return false;
+    if (pathname === '/') return false;
+    if (pathname.split('/').filter(Boolean).length >= 2) return true;
+    return url.searchParams.size > 0;
+  } catch {
+    return false;
+  }
+}
+
 async function resolveGoogleLink(item) {
   const original = item.link;
-  if (item.source_url) {
-    return { original_link: original, resolved_link: canonicalizeLink(item.source_url), resolution: 'source_url' };
-  }
 
   const decoded = decodeGoogleLinkCandidate(original);
   if (decoded) {
@@ -479,6 +489,9 @@ async function resolveGoogleLink(item) {
     });
     return { original_link: original, resolved_link: canonicalizeLink(res.url), resolution: 'redirect' };
   } catch {
+    if (item.source_url && isLikelyArticleUrl(item.source_url)) {
+      return { original_link: original, resolved_link: canonicalizeLink(item.source_url), resolution: 'source_url' };
+    }
     return { original_link: original, resolved_link: canonicalizeLink(original), resolution: 'fallback' };
   }
 }
@@ -817,7 +830,15 @@ async function run() {
   logInfo(`done. source=${args.source} mode=${args.mode} days=${args.days} new_items=${newItems.length} rejected=${rejectedLogs.length} total_all=${mergedAllItems.length} latest_90d=${latest90.length}`);
 }
 
-run().catch((error) => {
-  logError(`fatal: ${error.message}`);
-  process.exitCode = 1;
-});
+if (require.main === module) {
+  run().catch((error) => {
+    logError(`fatal: ${error.message}`);
+    process.exitCode = 1;
+  });
+}
+
+module.exports = {
+  decodeGoogleLinkCandidate,
+  isLikelyArticleUrl,
+  resolveGoogleLink
+};
