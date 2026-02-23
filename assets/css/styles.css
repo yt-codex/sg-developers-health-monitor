@@ -443,6 +443,71 @@ small { font-size: 0.875rem; }
 }
 
 .sev-critical { background: #fef3f2; color: var(--crit); border-color: #fecdca; }
+.sev-warning { background: #fff7ed; color: var(--warn); border-color: #fed7aa; }
+.sev-watch { background: #fffbeb; color: var(--watch); border-color: #fde68a; }
+.sev-info { background: #eff6ff; color: var(--info); border-color: #bfdbfe; }
+
+.severity-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.severity-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+}
+
+.severity-tooltip-trigger {
+  width: 1rem;
+  height: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.severity-tooltip-content {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  left: 50%;
+  transform: translate(-50%, 6px);
+  width: min(300px, 78vw);
+  padding: 0.6rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: rgba(15, 23, 42, 0.96);
+  color: #e2e8f0;
+  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  z-index: 9;
+}
+
+.severity-tooltip-content strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: #f8fafc;
+}
+
+.severity-tooltip-content span {
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.severity-tooltip:hover .severity-tooltip-content,
+.severity-tooltip:focus-within .severity-tooltip-content {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
 .macro-stress-tags .status-pill.pill--normal { background: #ffffff; color: #1d4ed8; border-color: var(--border); }
 .macro-stress-tags .status-pill.pill--watch { background: #fffbeb; color: #92400e; border-color: #fcd34d; }
 .macro-stress-tags .status-pill.pill--stress { background: #fef2f2; color: #b42318; border-color: #fca5a5; }

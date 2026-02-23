@@ -7,6 +7,10 @@
     "update:macro": "node scripts/update_macro_indicators.js",
     "verify:macro-sources": "node scripts/update_macro_indicators.js --verify_sources",
     "test": "node --test",
-    "smoke": "node scripts/smoke_check.js"
+    "smoke": "node scripts/smoke_check.js",
+    "update:news": "node scripts/update_news.js"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^4.5.0"
   }
 }
