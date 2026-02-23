@@ -1,5 +1,9 @@
 {
-  "severity_order": ["warning", "watch", "info"],
+  "severity_order": [
+    "warning",
+    "watch",
+    "info"
+  ],
   "severity_definitions": {
     "warning": {
       "title": "Warning",
@@ -18,17 +22,70 @@
     {
       "severity": "warning",
       "tag": "default_risk",
-      "patterns": ["\\bdefault(?:ed|s|ing)?\\b", "\\bmiss(?:ed|ing)?\\s+payment\\b", "\\binsolvenc(?:y|ies)\\b", "\\bwinding\\s*up\\b", "\\bliquidation\\b", "\\breceivership\\b", "\\bcovenant\\s+breach\\b", "\\bdebt\\s+restructur(?:e|ing)\\b", "\\bjudicial\\s+management\\b"]
+      "patterns": [
+        "\\bdefault(?:ed|s|ing)?\\b",
+        "\\bmiss(?:ed|ing)?\\s+payment\\b",
+        "\\binsolvenc(?:y|ies)\\b",
+        "\\bwinding\\s*up\\b",
+        "\\bliquidation\\b",
+        "\\breceivership\\b",
+        "\\bcovenant\\s+breach\\b",
+        "\\bdebt\\s+restructur(?:e|ing)\\b",
+        "\\bjudicial\\s+management\\b"
+      ]
     },
     {
       "severity": "watch",
       "tag": "liquidity_action",
-      "patterns": ["\\brefinanc(?:e|ing|ed)\\b", "\\bmaturit(?:y|ies)\\b", "\\basset\\s+disposal\\b", "\\bdivest(?:ment|ing)?\\b", "\\bprofit\\s+warning\\b", "\\bliquidity\\s+stress\\b", "\\bdowngrade\\b", "\\bnegative\\s+outlook\\b", "\\brights\\s+issue\\b", "\\bshore\\s+up\\s+(?:its|their)?\\s*balance\\s+sheet\\b"]
+      "patterns": [
+        "\\brefinanc(?:e|ing|ed)\\b",
+        "\\bmaturit(?:y|ies)\\b",
+        "\\basset\\s+disposal\\b",
+        "\\bdivest(?:ment|ing)?\\b",
+        "\\bprofit\\s+warning\\b",
+        "\\bliquidity\\s+stress\\b",
+        "\\bdowngrade\\b",
+        "\\bnegative\\s+outlook\\b",
+        "\\brights\\s+issue\\b",
+        "\\bshore\\s+up\\s+(?:its|their)?\\s*balance\\s+sheet\\b"
+      ]
     },
     {
       "severity": "watch",
       "tag": "operating_pressure",
-      "patterns": ["\\bslower\\s+presales?\\b", "\\bweak\\s+take-?up\\b", "\\bunsold\\s+inventor(?:y|ies)\\b", "\\bmargin\\s+pressure\\b", "\\bcost\\s+pressures?\\b", "\\bconstruction\\s+delays?\\b", "\\bsoft(?:er)?\\s+sales\\b", "\\bslower\\s+sales\\s+momentum\\b"]
+      "patterns": [
+        "\\bslower\\s+presales?\\b",
+        "\\bweak\\s+take-?up\\b",
+        "\\bunsold\\s+inventor(?:y|ies)\\b",
+        "\\bmargin\\s+pressure\\b",
+        "\\bcost\\s+pressures?\\b",
+        "\\bconstruction\\s+delays?\\b",
+        "\\bsoft(?:er)?\\s+sales\\b",
+        "\\bslower\\s+sales\\s+momentum\\b"
+      ]
+    },
+    {
+      "severity": "watch",
+      "tag": "financial_deterioration",
+      "patterns": [
+        "\\bprofit(?:s)?\\s+(?:plunge|plunged|slump|fall|fell|declin(?:e|ed)|drop(?:ped)?)\\b",
+        "\\bplunge\\s+in\\b.{0,80}?\\bprofit(?:s)?\\b",
+        "\\bearnings?\\s+(?:fall|fell|declin(?:e|ed)|drop(?:ped)?)\\b",
+        "\\bdrag(?:ged)?\\s+into\\s+the\\s+red\\b",
+        "\\bsw(?:ing|ung)\\s+(?:to\\s+(?:a\\s+)?loss|into\\s+the\\s+red)\\b",
+        "\\bin\\s+the\\s+red\\b",
+        "\\bnet\\s+loss\\b",
+        "\\bloss-?making\\b",
+        "\\bwrite-?down(?:s)?\\b",
+        "\\bimpair(?:ment|ed)?(?:\\s+charge)?\\b",
+        "\\basset\\s+write-?down(?:s)?\\b",
+        "\\b(?:asset|valuation|fair\\s+value|revaluation)\\s+losses?\\b",
+        "\\bweighed\\s+by\\b",
+        "\\bdragged\\s+by\\b",
+        "\\bmargin\\s+compression\\b",
+        "\\bsoft\\s+demand\\b",
+        "\\bweak\\s+demand\\b"
+      ]
     }
   ]
 }
