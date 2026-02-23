@@ -1,49 +1,265 @@
 {
-  "last_updated_sgt": "2026-02-23T21:58:42.308+08:00",
+  "last_updated_sgt": "2026-02-23T21:59:59.243+08:00",
   "status": "success",
   "counts": {
     "existing_total": 2,
-    "new_items": 0,
-    "rejected_items": 113,
-    "total_all": 2,
-    "latest_90d": 2
+    "new_items": 62,
+    "rejected_items": 92,
+    "total_all": 64,
+    "latest_90d": 52
   },
   "feeds": [
     {
-      "source": "CNA",
-      "url": "https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=6936",
+      "source": "google_news",
+      "query": "(\"Singapore\" AND (developer OR \"property developer\") AND (GLS OR \"land bid\" OR tender OR \"new launch\" OR presales OR \"take-up\" OR \"unsold stock\"))",
+      "window_days": 7,
       "status": "ok",
-      "items_fetched": 15
+      "items_fetched": 1
     },
     {
-      "source": "CNA",
-      "url": "https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=10416",
+      "source": "google_news",
+      "query": "(\"Singapore\" AND (developer OR \"property developer\") AND (GLS OR \"land bid\" OR tender OR \"new launch\" OR presales OR \"take-up\" OR \"unsold stock\"))",
+      "window_days": 30,
+      "status": "ok",
+      "items_fetched": 12
+    },
+    {
+      "source": "google_news",
+      "query": "(\"Singapore\" AND (developer OR \"property developer\") AND (GLS OR \"land bid\" OR tender OR \"new launch\" OR presales OR \"take-up\" OR \"unsold stock\"))",
+      "window_days": 90,
+      "status": "ok",
+      "items_fetched": 45
+    },
+    {
+      "source": "google_news",
+      "query": "(\"Singapore\" AND (developer OR \"property developer\") AND (GLS OR \"land bid\" OR tender OR \"new launch\" OR presales OR \"take-up\" OR \"unsold stock\"))",
+      "window_days": 180,
+      "status": "ok",
+      "items_fetched": 47
+    },
+    {
+      "source": "google_news",
+      "query": "(\"Government Land Sales\" OR GLS) Singapore developer tender",
+      "window_days": 7,
+      "status": "ok",
+      "items_fetched": 0
+    },
+    {
+      "source": "google_news",
+      "query": "(\"Government Land Sales\" OR GLS) Singapore developer tender",
+      "window_days": 30,
+      "status": "ok",
+      "items_fetched": 10
+    },
+    {
+      "source": "google_news",
+      "query": "(\"Government Land Sales\" OR GLS) Singapore developer tender",
+      "window_days": 90,
+      "status": "ok",
+      "items_fetched": 19
+    },
+    {
+      "source": "google_news",
+      "query": "(\"Government Land Sales\" OR GLS) Singapore developer tender",
+      "window_days": 180,
+      "status": "ok",
+      "items_fetched": 17
+    },
+    {
+      "source": "google_news",
+      "query": "URA Singapore private housing supply developer",
+      "window_days": 7,
+      "status": "ok",
+      "items_fetched": 1
+    },
+    {
+      "source": "google_news",
+      "query": "URA Singapore private housing supply developer",
+      "window_days": 30,
+      "status": "ok",
+      "items_fetched": 11
+    },
+    {
+      "source": "google_news",
+      "query": "URA Singapore private housing supply developer",
+      "window_days": 90,
+      "status": "ok",
+      "items_fetched": 34
+    },
+    {
+      "source": "google_news",
+      "query": "URA Singapore private housing supply developer",
+      "window_days": 180,
+      "status": "ok",
+      "items_fetched": 48
+    },
+    {
+      "source": "google_news",
+      "query": "\"en bloc\" Singapore developer",
+      "window_days": 7,
+      "status": "ok",
+      "items_fetched": 0
+    },
+    {
+      "source": "google_news",
+      "query": "\"en bloc\" Singapore developer",
+      "window_days": 30,
+      "status": "ok",
+      "items_fetched": 10
+    },
+    {
+      "source": "google_news",
+      "query": "\"en bloc\" Singapore developer",
+      "window_days": 90,
       "status": "ok",
       "items_fetched": 20
     },
     {
-      "source": "BT",
-      "url": "https://www.businesstimes.com.sg/rss/property",
+      "source": "google_news",
+      "query": "\"en bloc\" Singapore developer",
+      "window_days": 180,
       "status": "ok",
-      "items_fetched": 16
+      "items_fetched": 35
     },
     {
-      "source": "BT",
-      "url": "https://www.businesstimes.com.sg/rss/reits-property",
+      "source": "google_news",
+      "query": "\"City Developments\" OR CDL Singapore",
+      "window_days": 7,
       "status": "ok",
-      "items_fetched": 2
+      "items_fetched": 13
     },
     {
-      "source": "ST",
-      "url": "https://www.straitstimes.com/news/singapore/rss.xml",
+      "source": "google_news",
+      "query": "\"City Developments\" OR CDL Singapore",
+      "window_days": 30,
       "status": "ok",
-      "items_fetched": 38
+      "items_fetched": 68
     },
     {
-      "source": "ST",
-      "url": "https://www.straitstimes.com/news/business/rss.xml",
+      "source": "google_news",
+      "query": "\"City Developments\" OR CDL Singapore",
+      "window_days": 90,
       "status": "ok",
-      "items_fetched": 24
+      "items_fetched": 100
+    },
+    {
+      "source": "google_news",
+      "query": "\"City Developments\" OR CDL Singapore",
+      "window_days": 180,
+      "status": "ok",
+      "items_fetched": 100
+    },
+    {
+      "source": "google_news",
+      "query": "UOL Singapore developer",
+      "window_days": 7,
+      "status": "ok",
+      "items_fetched": 0
+    },
+    {
+      "source": "google_news",
+      "query": "UOL Singapore developer",
+      "window_days": 30,
+      "status": "ok",
+      "items_fetched": 10
+    },
+    {
+      "source": "google_news",
+      "query": "UOL Singapore developer",
+      "window_days": 90,
+      "status": "ok",
+      "items_fetched": 22
+    },
+    {
+      "source": "google_news",
+      "query": "UOL Singapore developer",
+      "window_days": 180,
+      "status": "ok",
+      "items_fetched": 39
+    },
+    {
+      "source": "google_news",
+      "query": "GuocoLand Singapore",
+      "window_days": 7,
+      "status": "ok",
+      "items_fetched": 8
+    },
+    {
+      "source": "google_news",
+      "query": "GuocoLand Singapore",
+      "window_days": 30,
+      "status": "ok",
+      "items_fetched": 27
+    },
+    {
+      "source": "google_news",
+      "query": "GuocoLand Singapore",
+      "window_days": 90,
+      "status": "ok",
+      "items_fetched": 31
+    },
+    {
+      "source": "google_news",
+      "query": "GuocoLand Singapore",
+      "window_days": 180,
+      "status": "ok",
+      "items_fetched": 61
+    },
+    {
+      "source": "google_news",
+      "query": "CapitaLand Development Singapore",
+      "window_days": 7,
+      "status": "ok",
+      "items_fetched": 8
+    },
+    {
+      "source": "google_news",
+      "query": "CapitaLand Development Singapore",
+      "window_days": 30,
+      "status": "ok",
+      "items_fetched": 63
+    },
+    {
+      "source": "google_news",
+      "query": "CapitaLand Development Singapore",
+      "window_days": 90,
+      "status": "ok",
+      "items_fetched": 62
+    },
+    {
+      "source": "google_news",
+      "query": "CapitaLand Development Singapore",
+      "window_days": 180,
+      "status": "ok",
+      "items_fetched": 69
+    },
+    {
+      "source": "google_news",
+      "query": "Frasers Property Singapore developer",
+      "window_days": 7,
+      "status": "ok",
+      "items_fetched": 4
+    },
+    {
+      "source": "google_news",
+      "query": "Frasers Property Singapore developer",
+      "window_days": 30,
+      "status": "ok",
+      "items_fetched": 21
+    },
+    {
+      "source": "google_news",
+      "query": "Frasers Property Singapore developer",
+      "window_days": 90,
+      "status": "ok",
+      "items_fetched": 44
+    },
+    {
+      "source": "google_news",
+      "query": "Frasers Property Singapore developer",
+      "window_days": 180,
+      "status": "ok",
+      "items_fetched": 44
     }
   ]
 }
