@@ -56,6 +56,12 @@ function formatPercent(value) {
   })}%`;
 }
 
+function formatPayoutRatio(value) {
+  const numeric = parseNumberCandidate(value);
+  if (numeric == null) return '-';
+  return formatPercent(numeric);
+}
+
 function formatMarketCap(value) {
   const numeric = parseNumberCandidate(value);
   if (numeric == null) return 'Pending data';
@@ -223,7 +229,7 @@ async function initDevelopersPage() {
       const currentRatioDisplay = formatNumber(currentCurrentRatio);
       const roicDisplay = formatPercent(currentRoic);
       const roeDisplay = formatPercent(currentRoe);
-      const payoutRatioDisplay = formatPercent(currentPayoutRatio);
+      const payoutRatioDisplay = formatPayoutRatio(currentPayoutRatio);
       const assetTurnoverDisplay = formatNumber(currentAssetTurnover);
       const lastUpdatedDisplay = formatLastUpdatedShort(currentLastUpdated);
       return {
