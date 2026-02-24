@@ -19,6 +19,7 @@ const { computeHealthScore } = require('./lib/developer_health_score');
 const ROOT = path.resolve(__dirname, '..');
 const INPUT_CSV = path.join(ROOT, 'data', 'listed developer list.csv');
 const OUTPUT_JSON = path.join(ROOT, 'data', 'processed', 'developer_ratios_history.json');
+const DIAGNOSTICS_JSON = path.join(ROOT, 'data', 'processed', 'developer_health_diagnostics.json');
 const CACHE_DIR = path.join(ROOT, 'data', 'cache', 'stockanalysis');
 const DEBUG_DIR = path.join(ROOT, 'data', 'debug', 'stockanalysis');
 
@@ -151,6 +152,102 @@ async function processDeveloper(developer, { verbose = false } = {}) {
   return { record, debugReport };
 }
 
+
+function percentile(sortedValues, p) {
+  if (!sortedValues.length) return null;
+  const idx = (sortedValues.length - 1) * p;
+  const lower = Math.floor(idx);
+  const upper = Math.ceil(idx);
+  if (lower === upper) return sortedValues[lower];
+  const weight = idx - lower;
+  return sortedValues[lower] * (1 - weight) + sortedValues[upper] * weight;
+}
+
+function topContributors(record, limit = 3) {
+  const contributors = record?.healthScoreComponents?.weightedContributors || {};
+  return Object.entries(contributors)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([metric, weightedRiskContribution]) => ({
+      metric,
+      weightedRiskContribution: Number(weightedRiskContribution.toFixed(3)),
+      riskScore: record?.healthScoreComponents?.riskByMetric?.[metric] ?? null
+    }));
+}
+
+function summarizeDeveloper(record) {
+  return {
+    ticker: record.ticker,
+    name: record.name,
+    segment: record.segment || null,
+    healthScore: record.healthScore,
+    healthStatus: record.healthStatus,
+    scoreCoverage: record.scoreCoverage,
+    topRiskContributors: topContributors(record, 3)
+  };
+}
+
+function buildDiagnostics(developers = []) {
+  const coverage = { gte0_8: 0, gte0_5_lt0_8: 0, lt0_5: 0 };
+  const statusCounts = { Green: 0, Amber: 0, Red: 0, 'Pending data': 0 };
+
+  for (const dev of developers) {
+    const c = Number.isFinite(dev.scoreCoverage) ? dev.scoreCoverage : 0;
+    if (c >= 0.8) coverage.gte0_8 += 1;
+    else if (c >= 0.5) coverage.gte0_5_lt0_8 += 1;
+    else coverage.lt0_5 += 1;
+
+    const status = dev.healthStatus || 'Pending data';
+    statusCounts[status] = (statusCounts[status] || 0) + 1;
+  }
+
+  const scored = developers.filter((d) => Number.isFinite(d.healthScore));
+  const sortedScores = scored.map((d) => d.healthScore).sort((a, b) => a - b);
+
+  const distribution = sortedScores.length
+    ? {
+        min: sortedScores[0],
+        p10: Number(percentile(sortedScores, 0.1).toFixed(2)),
+        p25: Number(percentile(sortedScores, 0.25).toFixed(2)),
+        median: Number(percentile(sortedScores, 0.5).toFixed(2)),
+        p75: Number(percentile(sortedScores, 0.75).toFixed(2)),
+        p90: Number(percentile(sortedScores, 0.9).toFixed(2)),
+        max: sortedScores[sortedScores.length - 1]
+      }
+    : null;
+
+  const lowest = [...scored].sort((a, b) => a.healthScore - b.healthScore).slice(0, 10).map(summarizeDeveloper);
+  const highest = [...scored].sort((a, b) => b.healthScore - a.healthScore).slice(0, 10).map(summarizeDeveloper);
+
+  const hasSegment = developers.some((d) => d.segment);
+  const segmentBreakdown = hasSegment
+    ? Object.values(developers.reduce((acc, dev) => {
+        const key = dev.segment || 'Unspecified';
+        if (!acc[key]) acc[key] = { segment: key, count: 0, scores: [] };
+        acc[key].count += 1;
+        if (Number.isFinite(dev.healthScore)) acc[key].scores.push(dev.healthScore);
+        return acc;
+      }, {})).map((entry) => ({
+        segment: entry.segment,
+        count: entry.count,
+        medianHealthScore: entry.scores.length
+          ? Number(percentile(entry.scores.sort((a, b) => a - b), 0.5).toFixed(2))
+          : null
+      }))
+    : null;
+
+  return {
+    generatedAt: nowIso(),
+    totalDevelopers: developers.length,
+    coverageDistribution: coverage,
+    healthScoreDistribution: distribution,
+    statusCounts,
+    lowestScores: lowest,
+    highestScores: highest,
+    segmentBreakdown
+  };
+}
+
 async function main() {
   await fs.mkdir(path.dirname(OUTPUT_JSON), { recursive: true });
   await fs.mkdir(CACHE_DIR, { recursive: true });
@@ -174,10 +271,17 @@ async function main() {
   output.updatedAt = nowIso();
   await fs.writeFile(OUTPUT_JSON, JSON.stringify(output, null, 2), 'utf8');
 
+  const diagnostics = buildDiagnostics(output.developers);
+  await fs.writeFile(DIAGNOSTICS_JSON, JSON.stringify(diagnostics, null, 2), 'utf8');
+
   console.log(`[stockanalysis:write-output] ${JSON.stringify({
     filePathWritten: OUTPUT_JSON,
+    diagnosticsPathWritten: DIAGNOSTICS_JSON,
     developersProcessed: output.developers.length,
-    fetchStatusCounts: statusCounts
+    fetchStatusCounts: statusCounts,
+    coverageDistribution: diagnostics.coverageDistribution,
+    healthScoreDistribution: diagnostics.healthScoreDistribution,
+    statusCounts: diagnostics.statusCounts
   })}`);
 }
 
@@ -190,5 +294,6 @@ if (require.main === module) {
 
 module.exports = {
   processDeveloper,
-  main
+  main,
+  buildDiagnostics
 };

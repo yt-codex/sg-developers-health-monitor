@@ -14,16 +14,29 @@ const SCORE_METRICS = [
 ];
 
 const BASE_WEIGHTS = {
-  debtToEquity: 0.15,
-  netDebtToEbitda: 0.20,
-  debtToEbitda: 0.08,
+  netDebtToEbitda: 0.24,
+  debtToEquity: 0.16,
   netDebtToEquity: 0.12,
-  quickRatio: 0.15,
-  currentRatio: 0.10,
-  roic: 0.10,
-  roe: 0.05,
+  debtToEbitda: 0.08,
+  currentRatio: 0.12,
+  quickRatio: 0.05,
+  roic: 0.11,
+  roe: 0.07,
   assetTurnover: 0.03,
   payoutRatio: 0.02
+};
+
+const RISK_THRESHOLDS = {
+  debtToEquity: { direction: 'higherWorse', good: 0.8, bad: 2.5 },
+  netDebtToEquity: { direction: 'higherWorse', good: 0.4, bad: 1.8 },
+  netDebtToEbitda: { direction: 'higherWorse', good: 6, bad: 18 },
+  debtToEbitda: { direction: 'higherWorse', good: 8, bad: 22 },
+  quickRatio: { direction: 'lowerWorse', good: 1.0, bad: 0.3 },
+  currentRatio: { direction: 'lowerWorse', good: 2.0, bad: 1.0 },
+  roic: { direction: 'lowerWorse', good: 10, bad: 1 },
+  roe: { direction: 'lowerWorse', good: 12, bad: 2 },
+  assetTurnover: { direction: 'lowerWorse', good: 0.18, bad: 0.04 },
+  payoutRatio: { direction: 'higherWorse', good: 100, bad: 250 }
 };
 
 function clamp(value, min = 0, max = 100) {
@@ -46,30 +59,15 @@ function scaleRiskLowerWorse(value, highGood, lowBad) {
 
 function riskForMetric(metricKey, value) {
   if (!Number.isFinite(value)) return null;
-  switch (metricKey) {
-    case 'debtToEquity':
-      return scaleRiskHigherWorse(value, 0.5, 1.5);
-    case 'netDebtToEbitda':
-      return scaleRiskHigherWorse(value, 4, 12);
-    case 'debtToEbitda':
-      return scaleRiskHigherWorse(value, 5, 14);
-    case 'quickRatio':
-      return scaleRiskLowerWorse(value, 1.2, 0.6);
-    case 'currentRatio':
-      return scaleRiskLowerWorse(value, 1.8, 1.0);
-    case 'roic':
-      return scaleRiskLowerWorse(value, 8, 2);
-    case 'roe':
-      return scaleRiskLowerWorse(value, 10, 3);
-    case 'assetTurnover':
-      return scaleRiskLowerWorse(value, 0.15, 0.05);
-    case 'payoutRatio':
-      return value < 0 ? null : scaleRiskHigherWorse(value, 80, 200);
-    case 'netDebtToEquity':
-      return scaleRiskHigherWorse(value, 0.3, 1.2);
-    default:
-      return null;
-  }
+
+  if (metricKey === 'payoutRatio' && value < 0) return null;
+
+  const threshold = RISK_THRESHOLDS[metricKey];
+  if (!threshold) return null;
+
+  return threshold.direction === 'higherWorse'
+    ? scaleRiskHigherWorse(value, threshold.good, threshold.bad)
+    : scaleRiskLowerWorse(value, threshold.good, threshold.bad);
 }
 
 function getCurrentValue(metricObj) {
@@ -110,12 +108,12 @@ function computeTrendPenalty(metrics = {}) {
   let trendPenalty = 0;
 
   const rules = [
-    { key: 'netDebtToEbitda', direction: 'higherWorse', base: 4, consecutive: 6 },
-    { key: 'debtToEquity', direction: 'higherWorse', base: 3, consecutive: 5 },
-    { key: 'quickRatio', direction: 'lowerWorse', base: 3, consecutive: 5 },
-    { key: 'currentRatio', direction: 'lowerWorse', base: 2, consecutive: 3 },
-    { key: 'roic', direction: 'lowerWorse', base: 3, consecutive: 5 },
-    { key: 'roe', direction: 'lowerWorse', base: 2, consecutive: 3 }
+    { key: 'netDebtToEbitda', direction: 'higherWorse', base: 2, consecutive: 3 },
+    { key: 'debtToEquity', direction: 'higherWorse', base: 1.5, consecutive: 2.5 },
+    { key: 'quickRatio', direction: 'lowerWorse', base: 1, consecutive: 1.5 },
+    { key: 'currentRatio', direction: 'lowerWorse', base: 1, consecutive: 1.5 },
+    { key: 'roic', direction: 'lowerWorse', base: 1.5, consecutive: 2.5 },
+    { key: 'roe', direction: 'lowerWorse', base: 1, consecutive: 1.5 }
   ];
 
   for (const rule of rules) {
@@ -133,7 +131,7 @@ function computeTrendPenalty(metrics = {}) {
 
   const payoutTrend = evaluateTrendForMetric(extractFySeries(metrics.payoutRatio), 'higherWorse');
   const roeTrend = evaluateTrendForMetric(extractFySeries(metrics.roe), 'lowerWorse');
-  const interactionPenalty = payoutTrend.latestWorsened && roeTrend.latestWorsened ? 2 : 0;
+  const interactionPenalty = payoutTrend.latestWorsened && roeTrend.latestWorsened ? 1 : 0;
 
   trendBreakdown.payoutRoeInteraction = {
     payoutLatestWorsened: payoutTrend.latestWorsened,
@@ -142,7 +140,7 @@ function computeTrendPenalty(metrics = {}) {
   };
 
   trendPenalty += interactionPenalty;
-  trendPenalty = Math.min(15, trendPenalty);
+  trendPenalty = Math.min(8, trendPenalty);
 
   return { trendPenalty, trendBreakdown };
 }
@@ -258,6 +256,7 @@ function computeHealthScore(record = {}) {
 
 module.exports = {
   BASE_WEIGHTS,
+  RISK_THRESHOLDS,
   SCORE_METRICS,
   clamp,
   scaleRiskHigherWorse,
