@@ -79,6 +79,8 @@ npm run validate:news
 npm run enrich:stockanalysis-urls
 npm run build:developer-ratios
 npm run refresh:developer-ratios
+npm run refresh:dashboard-data
+npm run refresh:developer-dashboard
 npm run smoke
 npm test
 ```
@@ -89,6 +91,8 @@ npm test
 - `enrich:stockanalysis-urls` updates `data/listed developer list.csv` with normalized SGX symbols and StockAnalysis ratios URLs.
 - `build:developer-ratios` fetches StockAnalysis ratios pages and writes normalized history output to `data/processed/developer_ratios_history.json` (plus optional cache files under `data/cache/stockanalysis/`).
 - `refresh:developer-ratios` runs URL enrichment then ratios build in one command.
+- `refresh:dashboard-data` rebuilds the normalized ratios dataset consumed by the developers table.
+- `refresh:developer-dashboard` runs URL enrichment and both ratios/dashboard refresh steps.
 - `smoke` runs local smoke checks for required runtime files and key macro page hooks.
 
 ## News ingestion logic
