@@ -4,6 +4,13 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 1 * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'data/**'
+      - 'scripts/**'
+      - '.github/workflows/**'
+      - 'package.json'
 
 permissions:
   contents: write
