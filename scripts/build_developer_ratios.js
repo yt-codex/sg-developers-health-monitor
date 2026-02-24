@@ -117,10 +117,10 @@ async function processDeveloper(developer, { verbose = false } = {}) {
     stageLog('parse-summary', { fetchStatus: record.fetchStatus, ...debugReport.output });
   } catch (error) {
     record.fetchStatus = 'error';
-    record.fetchError = error.message;
+    record.fetchError = error?.message || String(error);
     debugReport.fetchStatus = 'error';
-    debugReport.fetchError = error.message;
-    stageLog('error', { message: error.message });
+    debugReport.fetchError = error?.message || String(error);
+    stageLog('error', { message: error?.message || String(error), context: error?.context || null });
   }
 
   if (process.env.DEBUG_STOCKANALYSIS === 'true') {

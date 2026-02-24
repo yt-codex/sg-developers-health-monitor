@@ -41,6 +41,72 @@ test('fixture parser parses periods and key rows while allowing missing metrics'
   assert.doesNotThrow(() => parseRatiosTable(fixtureHtml));
 });
 
+
+test('parser classifies blocked/interstitial html distinctly', () => {
+  const blockedHtml = '<html><head><title>Attention Required!</title></head><body><h1>Checking your browser before accessing stockanalysis.com</h1></body></html>';
+  assert.throws(
+    () => parseRatiosTable(blockedHtml),
+    (error) => error.code === 'BLOCKED_INTERSTITIAL_CONTENT' && /blocked\/interstitial content detected/i.test(error.message)
+  );
+});
+
+test('fetchWithRetry rotates request profile and keeps detailed context', async (t) => {
+  const originalFetch = global.fetch;
+  let callCount = 0;
+  global.fetch = async (_url, options) => {
+    callCount += 1;
+    if (callCount === 1) {
+      assert.match(options.headers['user-agent'], /Chrome/);
+      return {
+        ok: false,
+        status: 403,
+        url: 'https://stockanalysis.com/blocked',
+        headers: { get: () => 'text/html' },
+        text: async () => '<html>blocked</html>'
+      };
+    }
+    assert.match(options.headers['user-agent'], /Safari/);
+    return {
+      ok: true,
+      status: 200,
+      url: 'https://stockanalysis.com/quote/sgx/9CI/financials/ratios/',
+      headers: { get: () => 'text/html; charset=utf-8' },
+      text: async () => fixtureHtml
+    };
+  };
+
+  t.after(() => {
+    global.fetch = originalFetch;
+  });
+
+  const result = await fetchWithRetry('https://example.test', { retries: 0, logger: { warn: () => {} } });
+  assert.equal(result.status, 200);
+  assert.equal(result.profile, 'fallback');
+});
+
+test('processDeveloper preserves original fetch error context', async (t) => {
+  const originalFetch = global.fetch;
+  global.fetch = async () => {
+    throw new Error('socket hang up');
+  };
+
+  t.after(() => {
+    global.fetch = originalFetch;
+  });
+
+  const { record } = await processDeveloper({
+    ticker: '9CI',
+    name: 'CapitaLand Investment',
+    segment: 'Mainboard',
+    stockanalysis_ratios_url: 'https://example.test'
+  }, { verbose: false });
+
+  assert.equal(record.fetchStatus, 'error');
+  assert.match(record.fetchError, /network\/request failure/);
+  assert.match(record.fetchError, /socket hang up/);
+  assert.match(record.fetchError, /context=/);
+});
+
 test('mocked fetch smoke test produces normalized output shape', async (t) => {
   const originalFetch = global.fetch;
   global.fetch = async () => ({

@@ -16,6 +16,17 @@ const METRIC_SCHEMA = {
 
 const MISSING_VALUE_RE = /^(?:-|--|n\/?a|na|none|null)?$/i;
 const TABLE_SELECTORS = ['table'];
+const BLOCKED_CONTENT_PATTERNS = [
+  /cf-browser-verification/i,
+  /cloudflare/i,
+  /attention required/i,
+  /captcha/i,
+  /verify you are human/i,
+  /access denied/i,
+  /enable javascript/i,
+  /checking your browser/i,
+  /security check/i
+];
 
 function nowIso() {
   return new Date().toISOString();
@@ -114,6 +125,13 @@ function parseRatiosTable(html, options = {}) {
   const debug = typeof options === 'object' && options ? (options.debug || null) : null;
   const tables = extractTableRows(html);
 
+  const blockedPattern = BLOCKED_CONTENT_PATTERNS.find((pattern) => pattern.test(html));
+  if (blockedPattern) {
+    const blockedError = new Error(`blocked/interstitial content detected (${blockedPattern.source})`);
+    blockedError.code = 'BLOCKED_INTERSTITIAL_CONTENT';
+    throw blockedError;
+  }
+
   if (debug) {
     debug.dom = {
       selectorsAttempted: TABLE_SELECTORS,
@@ -142,7 +160,11 @@ function parseRatiosTable(html, options = {}) {
     }
   }
 
-  if (headerRowIndex < 0) throw new Error('Unable to locate StockAnalysis ratios table header');
+  if (headerRowIndex < 0) {
+    const parseError = new Error('ratios table parse failure: unable to locate StockAnalysis ratios table header');
+    parseError.code = 'RATIOS_TABLE_PARSE_FAILURE';
+    throw parseError;
+  }
 
   if (debug) {
     debug.dom.rowCount = selectedTable.length;
@@ -151,7 +173,11 @@ function parseRatiosTable(html, options = {}) {
 
   const periods = selectedTable[headerRowIndex].slice(1).map(parsePeriodLabel).filter(Boolean);
   if (debug) debug.dom.extractedHeaders = periods;
-  if (!periods.length) throw new Error('No periods parsed from ratios table');
+  if (!periods.length) {
+    const parseError = new Error('ratios table parse failure: no periods parsed from table header');
+    parseError.code = 'RATIOS_TABLE_PARSE_FAILURE';
+    throw parseError;
+  }
 
   const periodEndingMap = {};
   const metrics = emptyMetrics();
@@ -219,33 +245,107 @@ function parseRatiosTable(html, options = {}) {
 }
 
 async function fetchWithRetry(url, { retries = 2, timeoutMs = 30000, logger = console } = {}) {
+  const requestProfiles = [
+    {
+      label: 'primary',
+      headers: {
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'accept-language': 'en-SG,en-US;q=0.9,en;q=0.8',
+        referer: 'https://stockanalysis.com/',
+        'cache-control': 'no-cache',
+        pragma: 'no-cache'
+      }
+    },
+    {
+      label: 'fallback',
+      headers: {
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15',
+        accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'accept-language': 'en-US,en;q=0.9',
+        referer: 'https://www.google.com/',
+        'cache-control': 'max-age=0'
+      }
+    }
+  ];
+
+  const createFetchError = ({ message, reason, attempt, profile, status, responseUrl, timeout }) => {
+    const details = {
+      url,
+      attempt,
+      profile,
+      status: status || null,
+      responseUrl: responseUrl || null,
+      timeout: Boolean(timeout),
+      reason: reason || null
+    };
+    const error = new Error(`${message}; context=${JSON.stringify(details)}`);
+    error.context = details;
+    return error;
+  };
+
   let lastError;
-  for (let attempt = 0; attempt <= retries; attempt += 1) {
-    try {
+  for (const profile of requestProfiles) {
+    for (let attempt = 0; attempt <= retries; attempt += 1) {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), timeoutMs);
-      const response = await fetch(url, {
-        headers: {
-          'user-agent': 'Mozilla/5.0 (SGDevelopersHealthMonitor/1.0)',
-          accept: 'text/html,application/xhtml+xml'
-        },
-        signal: controller.signal
-      });
-      clearTimeout(timer);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const html = await response.text();
-      return {
-        html,
-        status: response.status,
-        contentType: response.headers.get('content-type') || null,
-        finalUrl: response.url || url
-      };
-    } catch (error) {
-      lastError = error;
-      if (attempt < retries) {
-        const delayMs = 500 * (2 ** attempt);
-        logger.warn(`Retrying ${url} after error: ${error.message}`);
-        await new Promise((resolve) => setTimeout(resolve, delayMs));
+      let timedOut = false;
+      const timer = setTimeout(() => {
+        timedOut = true;
+        controller.abort(new Error(`timeout ${timeoutMs}ms`));
+      }, timeoutMs);
+
+      try {
+        const response = await fetch(url, {
+          headers: profile.headers,
+          signal: controller.signal
+        });
+        clearTimeout(timer);
+
+        if (!response.ok) {
+          throw createFetchError({
+            message: `HTTP ${response.status}`,
+            reason: `non-2xx response`,
+            attempt,
+            profile: profile.label,
+            status: response.status,
+            responseUrl: response.url || url
+          });
+        }
+
+        const html = await response.text();
+        return {
+          html,
+          status: response.status,
+          contentType: response.headers.get('content-type') || null,
+          finalUrl: response.url || url,
+          profile: profile.label
+        };
+      } catch (error) {
+        clearTimeout(timer);
+        if (error?.name === 'AbortError' || timedOut) {
+          lastError = createFetchError({
+            message: 'request aborted',
+            reason: timedOut ? `timeout after ${timeoutMs}ms` : (error.message || 'abort signal'),
+            attempt,
+            profile: profile.label,
+            timeout: true
+          });
+        } else if (error?.context) {
+          lastError = error;
+        } else {
+          lastError = createFetchError({
+            message: 'network/request failure',
+            reason: error?.message || String(error),
+            attempt,
+            profile: profile.label
+          });
+        }
+
+        if (attempt < retries || profile !== requestProfiles[requestProfiles.length - 1]) {
+          const delayMs = 500 * (2 ** attempt);
+          logger.warn(`Retrying ${url} using ${profile.label} profile after error: ${lastError.message}`);
+          await new Promise((resolve) => setTimeout(resolve, delayMs));
+        }
       }
     }
   }
