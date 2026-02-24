@@ -65,12 +65,14 @@ function formatPayoutRatio(value) {
 function formatMarketCap(value) {
   const numeric = parseNumberCandidate(value);
   if (numeric == null) return 'Pending data';
-  const absoluteValue = numeric >= 1000 ? numeric * 1_000_000 : numeric;
+  const absoluteValue = numeric * 1_000_000;
   const compact = new Intl.NumberFormat('en-SG', {
     notation: 'compact',
+    compactDisplay: 'short',
+    minimumFractionDigits: 0,
     maximumFractionDigits: 1
   }).format(absoluteValue);
-  return `S$${compact}`;
+  return `S$${compact.toUpperCase()}`;
 }
 
 function formatLastUpdatedShort(value) {
@@ -163,12 +165,6 @@ function renderRows(tableBody, rows, sortState) {
   const sortedRows = [...rows].sort((a, b) => compareRows(a, b, sortState));
   tableBody.innerHTML = sortedRows.map((row) => row.markup).join('');
 
-  tableBody.querySelectorAll('button[data-target]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const row = document.getElementById(btn.dataset.target);
-      row.hidden = !row.hidden;
-    });
-  });
 }
 
 function getCurrentMetric(metricObj) {
@@ -207,7 +203,6 @@ async function initDevelopersPage() {
       const score = 'Pending';
       const status = 'Pending';
       const cls = 'status-amber';
-      const id = dev.ticker.replace(/\W/g, '');
       const currentMarketCap = ratioEntry?.current?.marketCap ?? getCurrentMetric(ratioEntry?.metrics?.marketCap);
       const currentNetDebtToEbitda = ratioEntry?.current?.netDebtToEbitda ?? getCurrentMetric(ratioEntry?.metrics?.netDebtToEbitda);
       const currentDebtToEquity = ratioEntry?.current?.debtToEquity ?? getCurrentMetric(ratioEntry?.metrics?.debtToEquity);
@@ -251,8 +246,7 @@ async function initDevelopersPage() {
           roe: currentRoe,
           payoutRatio: currentPayoutRatio,
           assetTurnover: currentAssetTurnover,
-          lastUpdated: lastUpdatedDisplay,
-          details: 'Details'
+          lastUpdated: lastUpdatedDisplay
         },
         markup: `
           <tr>
@@ -261,14 +255,7 @@ async function initDevelopersPage() {
             <td>${marketCapDisplay}</td><td>${netDebtToEbitdaDisplay}</td><td>${debtToEquityDisplay}</td>
             <td>${netDebtToEquityDisplay}</td><td>${debtToEbitdaDisplay}</td><td>${quickRatioDisplay}</td><td>${currentRatioDisplay}</td>
             <td>${roicDisplay}</td><td>${roeDisplay}</td><td>${payoutRatioDisplay}</td><td>${assetTurnoverDisplay}</td>
-            <td>${lastUpdatedDisplay}</td><td><button data-target="${id}">Details</button></td>
-          </tr>
-          <tr id="${id}" hidden>
-            <td colspan="18">
-              <strong>Driver notes:</strong>
-              <ul>${dev.notes.map((n) => `<li>${n}</li>`).join('')}</ul>
-              <div class="meta-row">Last updated: ${App.formatDate(dev.lastUpdated)}</div>
-            </td>
+            <td>${lastUpdatedDisplay}</td>
           </tr>
         `
       };
@@ -280,7 +267,7 @@ async function initDevelopersPage() {
     initSortableHeaders(table, state, onSortChange);
     renderRows(tableBody, rows, state.sortState);
   } catch (e) {
-    tableBody.innerHTML = `<tr><td colspan="18" class="empty">Unable to load developer data: ${e.message}</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="17" class="empty">Unable to load developer data: ${e.message}</td></tr>`;
   }
 }
 
