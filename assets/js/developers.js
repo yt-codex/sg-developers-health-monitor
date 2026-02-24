@@ -173,9 +173,13 @@ function getCurrentMetric(metricObj) {
   return fallbackKey ? metricObj.values[fallbackKey] : null;
 }
 
+function normalizeTicker(value) {
+  return String(value || '').trim().toUpperCase().replace(/\.SI$/, '');
+}
+
 function buildRatiosMap(payload) {
   if (!payload || !Array.isArray(payload.developers)) return new Map();
-  return new Map(payload.developers.map((dev) => [dev.ticker, dev]));
+  return new Map(payload.developers.map((dev) => [normalizeTicker(dev.ticker), dev]));
 }
 
 async function initDevelopersPage() {
@@ -193,23 +197,22 @@ async function initDevelopersPage() {
     methodology.textContent = `Score = Σ(weight × normalized metric). Weights: ${JSON.stringify(data.scoringModel.weights)}. Status bands: Green ≥ ${data.scoringModel.bands.status.green}, Amber ≥ ${data.scoringModel.bands.status.amber}, otherwise Red.`;
 
     const rows = data.developers.map((dev, index) => {
-      const ratioEntry = ratiosMap.get(dev.ticker);
-      const scoreObj = computeScore(dev, data.scoringModel);
-      const score = dev.precomputedHealthScore ?? scoreObj.total;
-      const status = dev.statusOverride ?? statusFromScore(score, data.scoringModel);
-      const cls = `status-${status.toLowerCase()}`;
+      const ratioEntry = ratiosMap.get(normalizeTicker(dev.ticker));
+      const score = 'Pending';
+      const status = 'Pending';
+      const cls = 'status-amber';
       const id = dev.ticker.replace(/\W/g, '');
-      const currentMarketCap = getCurrentMetric(ratioEntry?.metrics?.marketCap) ?? dev.marketCap;
-      const currentNetDebtToEbitda = getCurrentMetric(ratioEntry?.metrics?.netDebtToEbitda) ?? dev.netDebtToEbitda;
-      const currentDebtToEquity = getCurrentMetric(ratioEntry?.metrics?.debtToEquity) ?? dev.debtToEquity;
-      const currentNetDebtToEquity = getCurrentMetric(ratioEntry?.metrics?.netDebtToEquity) ?? dev.netDebtToEquity;
-      const currentDebtToEbitda = getCurrentMetric(ratioEntry?.metrics?.debtToEbitda) ?? dev.debtToEbitda;
-      const currentQuickRatio = getCurrentMetric(ratioEntry?.metrics?.quickRatio) ?? dev.quickRatio;
-      const currentCurrentRatio = getCurrentMetric(ratioEntry?.metrics?.currentRatio) ?? dev.currentRatio;
-      const currentRoic = getCurrentMetric(ratioEntry?.metrics?.roic) ?? dev.roic;
-      const currentRoe = getCurrentMetric(ratioEntry?.metrics?.roe) ?? dev.roe;
-      const currentPayoutRatio = getCurrentMetric(ratioEntry?.metrics?.payoutRatio) ?? dev.payoutRatio;
-      const currentAssetTurnover = getCurrentMetric(ratioEntry?.metrics?.assetTurnover) ?? dev.assetTurnover;
+      const currentMarketCap = ratioEntry?.current?.marketCap ?? getCurrentMetric(ratioEntry?.metrics?.marketCap);
+      const currentNetDebtToEbitda = ratioEntry?.current?.netDebtToEbitda ?? getCurrentMetric(ratioEntry?.metrics?.netDebtToEbitda);
+      const currentDebtToEquity = ratioEntry?.current?.debtToEquity ?? getCurrentMetric(ratioEntry?.metrics?.debtToEquity);
+      const currentNetDebtToEquity = ratioEntry?.current?.netDebtToEquity ?? getCurrentMetric(ratioEntry?.metrics?.netDebtToEquity);
+      const currentDebtToEbitda = ratioEntry?.current?.debtToEbitda ?? getCurrentMetric(ratioEntry?.metrics?.debtToEbitda);
+      const currentQuickRatio = ratioEntry?.current?.quickRatio ?? getCurrentMetric(ratioEntry?.metrics?.quickRatio);
+      const currentCurrentRatio = ratioEntry?.current?.currentRatio ?? getCurrentMetric(ratioEntry?.metrics?.currentRatio);
+      const currentRoic = ratioEntry?.current?.roic ?? getCurrentMetric(ratioEntry?.metrics?.roic);
+      const currentRoe = ratioEntry?.current?.roe ?? getCurrentMetric(ratioEntry?.metrics?.roe);
+      const currentPayoutRatio = ratioEntry?.current?.payoutRatio ?? getCurrentMetric(ratioEntry?.metrics?.payoutRatio);
+      const currentAssetTurnover = ratioEntry?.current?.assetTurnover ?? getCurrentMetric(ratioEntry?.metrics?.assetTurnover);
       const currentLastUpdated = ratioEntry?.lastFetchedAt || dev.lastUpdated;
       const marketCapDisplay = formatMarketCap(currentMarketCap);
       const netDebtToEbitdaDisplay = formatNumber(currentNetDebtToEbitda);
