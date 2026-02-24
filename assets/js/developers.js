@@ -152,6 +152,40 @@ function normalizeTicker(value) {
   return String(value || '').trim().toUpperCase().replace(/\.SI$/, '');
 }
 
+function readFirstDefined(...values) {
+  return values.find((value) => value !== undefined && value !== null);
+}
+
+function resolveHealthScore(entry) {
+  if (!entry) return null;
+  return readFirstDefined(
+    entry.healthScore,
+    entry.health_score,
+    entry.score,
+    entry.scoring?.healthScore,
+    entry.scoring?.health_score,
+    entry.scoring?.score,
+    entry.current?.healthScore,
+    entry.current?.health_score,
+    entry.current?.score
+  );
+}
+
+function resolveHealthStatus(entry) {
+  if (!entry) return null;
+  return readFirstDefined(
+    entry.healthStatus,
+    entry.health_status,
+    entry.status,
+    entry.scoring?.healthStatus,
+    entry.scoring?.health_status,
+    entry.scoring?.status,
+    entry.current?.healthStatus,
+    entry.current?.health_status,
+    entry.current?.status
+  );
+}
+
 function buildRatiosMap(payload) {
   if (!payload || !Array.isArray(payload.developers)) return new Map();
   return new Map(payload.developers.map((dev) => [normalizeTicker(dev.ticker), dev]));
@@ -173,8 +207,8 @@ async function initDevelopersPage() {
 
     const rows = data.developers.map((dev, index) => {
       const ratioEntry = ratiosMap.get(normalizeTicker(dev.ticker));
-      const scoreValue = ratioEntry?.healthScore;
-      const status = ratioEntry?.healthStatus || 'Pending data';
+      const scoreValue = resolveHealthScore(ratioEntry);
+      const status = resolveHealthStatus(ratioEntry) || 'Pending data';
       const score = scoreValue == null ? 'Pending' : String(scoreValue);
       const cls = status === 'Green' ? 'status-green' : status === 'Red' ? 'status-red' : 'status-amber';
       const currentMarketCap = ratioEntry?.current?.marketCap ?? getCurrentMetric(ratioEntry?.metrics?.marketCap);
