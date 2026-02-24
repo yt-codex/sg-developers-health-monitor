@@ -171,6 +171,39 @@ function resolveHealthScore(entry) {
   );
 }
 
+
+function resolveScoreCoverage(entry) {
+  if (!entry) return null;
+  return readFirstDefined(
+    entry.scoreCoverage,
+    entry.score_coverage,
+    entry.scoring?.scoreCoverage,
+    entry.scoring?.score_coverage,
+    entry.current?.scoreCoverage,
+    entry.current?.score_coverage
+  );
+}
+
+function buildScoreTooltip(entry) {
+  const components = entry?.healthScoreComponents;
+  if (!components) return null;
+  const staticScore = components.staticHealthScore;
+  const trendPenalty = components.trendPenalty;
+  const coverage = resolveScoreCoverage(entry);
+  const top3 = Object.entries(components.weightedContributors || {})
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([metric, contribution]) => `${metric}: ${contribution.toFixed(2)}`)
+    .join(', ');
+
+  return [
+    Number.isFinite(staticScore) ? `Static: ${staticScore.toFixed(1)}` : null,
+    Number.isFinite(trendPenalty) ? `Trend penalty: ${trendPenalty.toFixed(1)}` : null,
+    Number.isFinite(coverage) ? `Coverage: ${(coverage * 100).toFixed(0)}%` : null,
+    top3 ? `Top contributors: ${top3}` : null
+  ].filter(Boolean).join(' | ');
+}
+
 function resolveHealthStatus(entry) {
   if (!entry) return null;
   return readFirstDefined(
@@ -208,8 +241,10 @@ async function initDevelopersPage() {
     const rows = data.developers.map((dev, index) => {
       const ratioEntry = ratiosMap.get(normalizeTicker(dev.ticker));
       const scoreValue = resolveHealthScore(ratioEntry);
-      const status = resolveHealthStatus(ratioEntry) || 'Pending data';
-      const score = scoreValue == null ? 'Pending' : String(scoreValue);
+      const scoreCoverage = resolveScoreCoverage(ratioEntry);
+      const insufficientCoverage = Number.isFinite(scoreCoverage) && scoreCoverage < 0.5;
+      const status = insufficientCoverage ? 'Pending data' : (resolveHealthStatus(ratioEntry) || 'Pending data');
+      const score = insufficientCoverage || scoreValue == null ? 'Pending' : String(scoreValue);
       const cls = status === 'Green' ? 'status-green' : status === 'Red' ? 'status-red' : 'status-amber';
       const currentMarketCap = ratioEntry?.current?.marketCap ?? getCurrentMetric(ratioEntry?.metrics?.marketCap);
       const currentNetDebtToEbitda = ratioEntry?.current?.netDebtToEbitda ?? getCurrentMetric(ratioEntry?.metrics?.netDebtToEbitda);
@@ -235,6 +270,7 @@ async function initDevelopersPage() {
       const payoutRatioDisplay = formatPayoutRatio(currentPayoutRatio);
       const assetTurnoverDisplay = formatNumber(currentAssetTurnover);
       const lastUpdatedDisplay = formatLastUpdatedShort(currentLastUpdated);
+      const scoreTooltip = buildScoreTooltip(ratioEntry);
       return {
         originalIndex: index,
         sortData: {
@@ -259,7 +295,7 @@ async function initDevelopersPage() {
         markup: `
           <tr>
             <td data-sticky-col="1">${dev.name}</td><td>${dev.ticker}</td><td>${dev.segment}</td>
-            <td><strong>${score}</strong></td><td><span class="status-pill ${cls}">${status}</span></td>
+            <td><strong title="${scoreTooltip || ''}">${score}</strong></td><td><span class="status-pill ${cls}" title="${scoreTooltip || ''}">${status}</span></td>
             <td>${marketCapDisplay}</td><td>${netDebtToEbitdaDisplay}</td><td>${debtToEquityDisplay}</td>
             <td>${netDebtToEquityDisplay}</td><td>${debtToEbitdaDisplay}</td><td>${quickRatioDisplay}</td><td>${currentRatioDisplay}</td>
             <td>${roicDisplay}</td><td>${roeDisplay}</td><td>${payoutRatioDisplay}</td><td>${assetTurnoverDisplay}</td>
