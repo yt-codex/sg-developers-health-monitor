@@ -14,6 +14,7 @@ const {
   sanitizeHtmlSnippet,
   buildRatiosUrl
 } = require('./lib/developer_ratios');
+const { computeHealthScore } = require('./lib/developer_health_score');
 
 const ROOT = path.resolve(__dirname, '..');
 const INPUT_CSV = path.join(ROOT, 'data', 'listed developer list.csv');
@@ -48,7 +49,13 @@ async function processDeveloper(developer, { verbose = false } = {}) {
     current: buildCurrent(emptyMetrics()),
     lastFetchedAt: nowIso(),
     fetchStatus: 'error',
-    fetchError: null
+    fetchError: null,
+    healthScore: null,
+    healthStatus: 'Pending data',
+    scoreCoverage: 0,
+    scoreNote: 'Insufficient ratio coverage',
+    healthScoreComponents: null,
+    lastScoredAt: null
   };
 
   const stageLog = (stage, details = {}) => {
@@ -122,6 +129,15 @@ async function processDeveloper(developer, { verbose = false } = {}) {
     debugReport.fetchError = error?.message || String(error);
     stageLog('error', { message: error?.message || String(error), context: error?.context || null });
   }
+
+
+  const scoring = computeHealthScore(record);
+  record.healthScore = scoring.healthScore;
+  record.healthStatus = scoring.healthStatus;
+  record.scoreCoverage = scoring.scoreCoverage;
+  record.scoreNote = scoring.scoreNote;
+  record.healthScoreComponents = scoring.healthScoreComponents;
+  record.lastScoredAt = scoring.lastScoredAt;
 
   if (process.env.DEBUG_STOCKANALYSIS === 'true') {
     await fs.mkdir(DEBUG_DIR, { recursive: true });

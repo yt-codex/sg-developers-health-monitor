@@ -1,30 +1,3 @@
-function normalize(value, lowRiskGood = true) {
-  const v = Math.max(0, Math.min(1.5, value));
-  const score = Math.max(0, Math.min(100, (1 - v / 1.5) * 100));
-  return lowRiskGood ? score : 100 - score;
-}
-
-function computeScore(dev, model) {
-  const w = model.weights;
-  const m = dev.metrics;
-  const componentScores = {
-    leverage: normalize(m.netGearing, true),
-    liquidity: normalize(m.cashToShortDebt, false),
-    maturity: normalize(m.debtMaturity12mPct, true),
-    coverage: normalize(m.interestCoverage / 5, false),
-    sales: normalize(m.presalesCoverage, false)
-  };
-  const weighted = Object.entries(w).reduce((acc, [k, wt]) => acc + componentScores[k] * wt, 0);
-  return { total: Math.round(weighted), componentScores };
-}
-
-function statusFromScore(score, model) {
-  const bands = model.bands.status;
-  if (score >= bands.green) return 'Green';
-  if (score >= bands.amber) return 'Amber';
-  return 'Red';
-}
-
 const SORT_DIRECTIONS = ['none', 'ascending', 'descending'];
 const PENDING_RE = /pending/i;
 
@@ -200,9 +173,10 @@ async function initDevelopersPage() {
 
     const rows = data.developers.map((dev, index) => {
       const ratioEntry = ratiosMap.get(normalizeTicker(dev.ticker));
-      const score = 'Pending';
-      const status = 'Pending';
-      const cls = 'status-amber';
+      const scoreValue = ratioEntry?.healthScore;
+      const status = ratioEntry?.healthStatus || 'Pending data';
+      const score = scoreValue == null ? 'Pending' : String(scoreValue);
+      const cls = status === 'Green' ? 'status-green' : status === 'Red' ? 'status-red' : 'status-amber';
       const currentMarketCap = ratioEntry?.current?.marketCap ?? getCurrentMetric(ratioEntry?.metrics?.marketCap);
       const currentNetDebtToEbitda = ratioEntry?.current?.netDebtToEbitda ?? getCurrentMetric(ratioEntry?.metrics?.netDebtToEbitda);
       const currentDebtToEquity = ratioEntry?.current?.debtToEquity ?? getCurrentMetric(ratioEntry?.metrics?.debtToEquity);
