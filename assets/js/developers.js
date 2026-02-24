@@ -36,6 +36,45 @@ function parseNumberCandidate(value) {
   return Number.isFinite(numeric) ? numeric : null;
 }
 
+
+function formatNumber(value, decimals = 2) {
+  const numeric = parseNumberCandidate(value);
+  if (numeric == null) return 'Pending data';
+  return numeric.toLocaleString('en-SG', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  });
+}
+
+function formatPercent(value) {
+  const numeric = parseNumberCandidate(value);
+  if (numeric == null) return 'Pending data';
+  const percentValue = Math.abs(numeric) <= 1 ? numeric * 100 : numeric;
+  return `${percentValue.toLocaleString('en-SG', {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1
+  })}%`;
+}
+
+function formatMarketCap(value) {
+  const numeric = parseNumberCandidate(value);
+  if (numeric == null) return 'Pending data';
+  const compact = new Intl.NumberFormat('en-SG', {
+    notation: 'compact',
+    maximumFractionDigits: 1
+  }).format(numeric);
+  const raw = value == null ? '' : String(value).toUpperCase();
+  const hasCurrency = /S\$|SGD/.test(raw);
+  return hasCurrency ? `S$${compact}` : compact;
+}
+
+function formatLastUpdatedShort(value) {
+  if (!value) return 'Pending data';
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return 'Pending data';
+  return d.toISOString().slice(0, 10);
+}
+
 function sortValue(row, key, type) {
   const raw = row.sortData[key];
   if (type === 'number') {
@@ -143,6 +182,18 @@ async function initDevelopersPage() {
       const status = dev.statusOverride ?? statusFromScore(score, data.scoringModel);
       const cls = `status-${status.toLowerCase()}`;
       const id = dev.ticker.replace(/\W/g, '');
+      const marketCapDisplay = formatMarketCap(dev.marketCap);
+      const netDebtToEbitdaDisplay = formatNumber(dev.netDebtToEbitda);
+      const debtToEquityDisplay = formatNumber(dev.debtToEquity);
+      const netDebtToEquityDisplay = formatNumber(dev.netDebtToEquity);
+      const debtToEbitdaDisplay = formatNumber(dev.debtToEbitda);
+      const quickRatioDisplay = formatNumber(dev.quickRatio);
+      const currentRatioDisplay = formatNumber(dev.currentRatio);
+      const roicDisplay = formatPercent(dev.roic);
+      const roeDisplay = formatPercent(dev.roe);
+      const payoutRatioDisplay = formatPercent(dev.payoutRatio);
+      const assetTurnoverDisplay = formatNumber(dev.assetTurnover);
+      const lastUpdatedDisplay = formatLastUpdatedShort(dev.lastUpdated);
       return {
         originalIndex: index,
         sortData: {
@@ -151,23 +202,31 @@ async function initDevelopersPage() {
           segment: dev.segment,
           score,
           status,
-          leverage: dev.drivers.leverage,
-          coverage: dev.drivers.coverage,
-          maturity: dev.drivers.maturity,
-          liquidity: dev.drivers.liquidity,
-          sales: dev.drivers.sales,
-          exposure: dev.drivers.exposure
+          marketCap: dev.marketCap,
+          netDebtToEbitda: dev.netDebtToEbitda,
+          debtToEquity: dev.debtToEquity,
+          netDebtToEquity: dev.netDebtToEquity,
+          debtToEbitda: dev.debtToEbitda,
+          quickRatio: dev.quickRatio,
+          currentRatio: dev.currentRatio,
+          roic: dev.roic,
+          roe: dev.roe,
+          payoutRatio: dev.payoutRatio,
+          assetTurnover: dev.assetTurnover,
+          lastUpdated: lastUpdatedDisplay,
+          details: 'Details'
         },
         markup: `
           <tr>
             <td data-sticky-col="1">${dev.name}</td><td>${dev.ticker}</td><td>${dev.segment}</td>
             <td><strong>${score}</strong></td><td><span class="status-pill ${cls}">${status}</span></td>
-            <td>${dev.drivers.leverage}</td><td>${dev.drivers.coverage}</td><td>${dev.drivers.maturity}</td>
-            <td>${dev.drivers.liquidity}</td><td>${dev.drivers.sales}</td><td>${dev.drivers.exposure}</td>
-            <td><button data-target="${id}">Details</button></td>
+            <td>${marketCapDisplay}</td><td>${netDebtToEbitdaDisplay}</td><td>${debtToEquityDisplay}</td>
+            <td>${netDebtToEquityDisplay}</td><td>${debtToEbitdaDisplay}</td><td>${quickRatioDisplay}</td><td>${currentRatioDisplay}</td>
+            <td>${roicDisplay}</td><td>${roeDisplay}</td><td>${payoutRatioDisplay}</td><td>${assetTurnoverDisplay}</td>
+            <td>${lastUpdatedDisplay}</td><td><button data-target="${id}">Details</button></td>
           </tr>
           <tr id="${id}" hidden>
-            <td colspan="12">
+            <td colspan="18">
               <strong>Driver notes:</strong>
               <ul>${dev.notes.map((n) => `<li>${n}</li>`).join('')}</ul>
               <div class="meta-row">Last updated: ${App.formatDate(dev.lastUpdated)}</div>
@@ -183,7 +242,7 @@ async function initDevelopersPage() {
     initSortableHeaders(table, state, onSortChange);
     renderRows(tableBody, rows, state.sortState);
   } catch (e) {
-    tableBody.innerHTML = `<tr><td colspan="12" class="empty">Unable to load developer data: ${e.message}</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="18" class="empty">Unable to load developer data: ${e.message}</td></tr>`;
   }
 }
 
