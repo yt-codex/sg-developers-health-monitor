@@ -9,7 +9,10 @@
     "test": "node --test",
     "smoke": "node scripts/smoke_check.js",
     "update:news": "node scripts/update_news.js",
-    "validate:news": "node scripts/validate_news_data.js"
+    "validate:news": "node scripts/validate_news_data.js",
+    "enrich:stockanalysis-urls": "node scripts/enrich_stockanalysis_urls.js",
+    "build:developer-ratios": "python scripts/build_developer_ratios.py",
+    "refresh:developer-ratios": "npm run enrich:stockanalysis-urls && npm run build:developer-ratios"
   },
   "dependencies": {
     "fast-xml-parser": "^4.5.0"
