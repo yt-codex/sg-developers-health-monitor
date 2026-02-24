@@ -1,5 +1,4 @@
 const fs = require('fs/promises');
-const path = require('path');
 
 const METRIC_SCHEMA = {
   marketCap: { label: 'Market Capitalization', aliases: ['Market Capitalization'], unit: 'millions SGD', type: 'number' },
@@ -16,6 +15,7 @@ const METRIC_SCHEMA = {
 };
 
 const MISSING_VALUE_RE = /^(?:-|--|n\/?a|na|none|null)?$/i;
+const TABLE_SELECTORS = ['table'];
 
 function nowIso() {
   return new Date().toISOString();
@@ -57,6 +57,12 @@ function parseNumeric(raw) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function formatMarketCapCompact(millionsValue, currency = 'S$') {
+  if (millionsValue == null || !Number.isFinite(millionsValue)) return null;
+  if (Math.abs(millionsValue) >= 1000) return `${currency}${(millionsValue / 1000).toFixed(1)}B`;
+  return `${currency}${millionsValue.toFixed(1)}M`;
+}
+
 function emptyMetrics() {
   return Object.fromEntries(
     Object.entries(METRIC_SCHEMA).map(([key, schema]) => [
@@ -79,32 +85,79 @@ function countParsedMetrics(metrics) {
 }
 
 function extractTableRows(html) {
-  const tableMatch = html.match(/<table[^>]*>([\s\S]*?)<\/table>/i);
-  if (!tableMatch) return [];
-  const rowMatches = [...tableMatch[0].matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
-  return rowMatches.map((row) => {
-    const cellMatches = [...row[1].matchAll(/<(?:th|td)[^>]*>([\s\S]*?)<\/(?:th|td)>/gi)];
-    return cellMatches.map((cell) => cell[1].replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim());
+  const tableMatches = [...html.matchAll(/<table[^>]*>([\s\S]*?)<\/table>/gi)];
+  if (!tableMatches.length) return [];
+  return tableMatches.map((tableMatch) => {
+    const rowMatches = [...tableMatch[0].matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
+    return rowMatches.map((row) => {
+      const cellMatches = [...row[1].matchAll(/<(?:th|td)[^>]*>([\s\S]*?)<\/(?:th|td)>/gi)];
+      return cellMatches.map((cell) => cell[1].replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim());
+    });
   });
 }
 
-function parseRatiosTable(html, log = () => {}) {
-  const rows = extractTableRows(html);
-  const headerRowIndex = rows.findIndex((row) => row[0] && (/ratio/i.test(row[0]) || row.some((cell) => /current/i.test(cell))));
-  if (headerRowIndex < 0) {
-    throw new Error('Unable to locate StockAnalysis ratios table header');
+function findMetricKeyByLabel(rowLabel = '') {
+  return aliasLookup.get(normalizeLabel(rowLabel));
+}
+
+function sanitizeHtmlSnippet(html = '', maxLength = 300) {
+  return String(html)
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .slice(0, maxLength)
+    .trim();
+}
+
+function parseRatiosTable(html, options = {}) {
+  const log = typeof options === 'function' ? options : (options.log || (() => {}));
+  const debug = typeof options === 'object' && options ? (options.debug || null) : null;
+  const tables = extractTableRows(html);
+
+  if (debug) {
+    debug.dom = {
+      selectorsAttempted: TABLE_SELECTORS,
+      tableCount: tables.length,
+      targetTableFound: false,
+      targetTableIndex: null,
+      rowCount: 0,
+      headerCellCount: 0,
+      extractedHeaders: []
+    };
   }
 
-  const periodCells = rows[headerRowIndex].slice(1).map(parsePeriodLabel);
-  const periods = periodCells.filter(Boolean);
-  if (!periods.length) {
-    throw new Error('No periods parsed from ratios table');
+  let selectedTable = [];
+  let headerRowIndex = -1;
+  for (let tableIndex = 0; tableIndex < tables.length; tableIndex += 1) {
+    const rows = tables[tableIndex];
+    const maybeHeaderIndex = rows.findIndex((row) => row[0] && (/ratio/i.test(row[0]) || row.some((cell) => /current/i.test(cell))));
+    if (maybeHeaderIndex >= 0) {
+      selectedTable = rows;
+      headerRowIndex = maybeHeaderIndex;
+      if (debug) {
+        debug.dom.targetTableFound = true;
+        debug.dom.targetTableIndex = tableIndex;
+      }
+      break;
+    }
   }
+
+  if (headerRowIndex < 0) throw new Error('Unable to locate StockAnalysis ratios table header');
+
+  if (debug) {
+    debug.dom.rowCount = selectedTable.length;
+    debug.dom.headerCellCount = selectedTable[headerRowIndex]?.length || 0;
+  }
+
+  const periods = selectedTable[headerRowIndex].slice(1).map(parsePeriodLabel).filter(Boolean);
+  if (debug) debug.dom.extractedHeaders = periods;
+  if (!periods.length) throw new Error('No periods parsed from ratios table');
 
   const periodEndingMap = {};
   const metrics = emptyMetrics();
+  const metricRows = [];
 
-  rows.slice(headerRowIndex + 1).forEach((row) => {
+  selectedTable.slice(headerRowIndex + 1).forEach((row) => {
     if (!row.length) return;
     const rowLabel = row[0];
     if (/^period ending$/i.test(rowLabel)) {
@@ -114,19 +167,49 @@ function parseRatiosTable(html, log = () => {}) {
       return;
     }
 
-    const metricKey = aliasLookup.get(normalizeLabel(rowLabel));
+    const metricKey = findMetricKeyByLabel(rowLabel);
     if (!metricKey) return;
+
+    const metricDebug = {
+      canonicalKey: metricKey,
+      aliasesAttempted: METRIC_SCHEMA[metricKey].aliases,
+      matchedRowLabel: rowLabel,
+      rawRowCells: row.slice(1),
+      parsedValues: {},
+      status: 'matched'
+    };
 
     periods.forEach((periodLabel, idx) => {
       const rawValue = row[idx + 1] || null;
       metrics[metricKey].rawValues[periodLabel] = rawValue;
       const parsedValue = parseNumeric(rawValue);
       metrics[metricKey].values[periodLabel] = parsedValue;
+      metricDebug.parsedValues[periodLabel] = parsedValue;
       if (rawValue && parsedValue == null && !MISSING_VALUE_RE.test(rawValue)) {
+        metricDebug.status = 'parse_error';
         log(`parse-failure metric=${metricKey} period=${periodLabel} raw=${rawValue}`);
       }
     });
+
+    metricRows.push(metricDebug);
   });
+
+  if (debug) {
+    const seen = new Set(metricRows.map((row) => row.canonicalKey));
+    debug.metricRows = [
+      ...metricRows,
+      ...Object.keys(METRIC_SCHEMA)
+        .filter((key) => !seen.has(key))
+        .map((key) => ({
+          canonicalKey: key,
+          aliasesAttempted: METRIC_SCHEMA[key].aliases,
+          matchedRowLabel: null,
+          rawRowCells: [],
+          parsedValues: {},
+          status: 'missing'
+        }))
+    ];
+  }
 
   return {
     periods: periods.map((periodLabel) => ({ label: periodLabel, periodEnding: periodEndingMap[periodLabel] || null })),
@@ -149,10 +232,14 @@ async function fetchWithRetry(url, { retries = 2, timeoutMs = 30000, logger = co
         signal: controller.signal
       });
       clearTimeout(timer);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      return await response.text();
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const html = await response.text();
+      return {
+        html,
+        status: response.status,
+        contentType: response.headers.get('content-type') || null,
+        finalUrl: response.url || url
+      };
     } catch (error) {
       lastError = error;
       if (attempt < retries) {
@@ -162,10 +249,8 @@ async function fetchWithRetry(url, { retries = 2, timeoutMs = 30000, logger = co
       }
     }
   }
-
   throw lastError;
 }
-
 
 function parseCsvLine(line = '') {
   const out = [];
@@ -212,6 +297,10 @@ module.exports = {
   METRIC_SCHEMA,
   nowIso,
   normalizeTicker,
+  parseNumeric,
+  formatMarketCapCompact,
+  findMetricKeyByLabel,
+  sanitizeHtmlSnippet,
   buildRatiosUrl,
   parseRatiosTable,
   fetchWithRetry,

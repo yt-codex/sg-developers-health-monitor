@@ -14,7 +14,8 @@
     "build:developer-ratios": "node scripts/build_developer_ratios.js",
     "refresh:developer-ratios": "npm run enrich:stockanalysis-urls && npm run build:developer-ratios",
     "refresh:dashboard-data": "npm run build:developer-ratios",
-    "refresh:developer-dashboard": "npm run refresh:developer-ratios && npm run refresh:dashboard-data"
+    "refresh:developer-dashboard": "npm run refresh:developer-ratios && npm run refresh:dashboard-data",
+    "debug:stockanalysis": "node scripts/debug_stockanalysis_ticker.js"
   },
   "dependencies": {
     "fast-xml-parser": "^4.5.0"
