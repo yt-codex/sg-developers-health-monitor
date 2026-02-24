@@ -616,8 +616,11 @@ button:disabled {
 }
 
 .table-wrap {
+  padding: 0;
   overflow: auto;
   max-height: 70vh;
+  position: relative;
+  isolation: isolate;
 }
 
 table {
@@ -639,9 +642,43 @@ td {
 th {
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: 30;
   background: var(--surface-2);
   font-weight: 600;
+}
+
+th[data-sticky-col] {
+  z-index: 40;
+}
+
+td[data-sticky-col] {
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  background: var(--surface);
+}
+
+.sort-btn {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: inherit;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sort-btn-icon {
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1;
+  flex: 0 0 auto;
 }
 
 tbody tr:nth-child(even) {
