@@ -76,12 +76,19 @@ npm run verify:macro-sources
 npm run update:macro
 npm run update:news
 npm run validate:news
+npm run enrich:stockanalysis-urls
+npm run build:developer-ratios
+npm run refresh:developer-ratios
 npm run smoke
 npm test
 ```
 
 - `update:news` refreshes developer news from configured RSS feeds, applies relevance + severity tagging, appends only new items to `data/news_all.json`, and derives `data/news_latest_90d.json`.
 - `validate:news` verifies `data/news_all.json` and `data/news_latest_90d.json` parse correctly and include required fields.
+
+- `enrich:stockanalysis-urls` updates `data/listed developer list.csv` with normalized SGX symbols and StockAnalysis ratios URLs.
+- `build:developer-ratios` fetches StockAnalysis ratios pages and writes normalized history output to `data/processed/developer_ratios_history.json` (plus optional cache files under `data/cache/stockanalysis/`).
+- `refresh:developer-ratios` runs URL enrichment then ratios build in one command.
 - `smoke` runs local smoke checks for required runtime files and key macro page hooks.
 
 ## News ingestion logic

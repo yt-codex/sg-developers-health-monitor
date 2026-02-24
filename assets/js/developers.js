@@ -59,13 +59,12 @@ function formatPercent(value) {
 function formatMarketCap(value) {
   const numeric = parseNumberCandidate(value);
   if (numeric == null) return 'Pending data';
+  const absoluteValue = numeric >= 1000 ? numeric * 1_000_000 : numeric;
   const compact = new Intl.NumberFormat('en-SG', {
     notation: 'compact',
     maximumFractionDigits: 1
-  }).format(numeric);
-  const raw = value == null ? '' : String(value).toUpperCase();
-  const hasCurrency = /S\$|SGD/.test(raw);
-  return hasCurrency ? `S$${compact}` : compact;
+  }).format(absoluteValue);
+  return `S$${compact}`;
 }
 
 function formatLastUpdatedShort(value) {
@@ -166,6 +165,19 @@ function renderRows(tableBody, rows, sortState) {
   });
 }
 
+function getCurrentMetric(metricObj) {
+  if (!metricObj) return null;
+  const current = metricObj.values?.Current;
+  if (current != null) return current;
+  const fallbackKey = Object.keys(metricObj.values || {}).find((label) => /^FY\s+\d{4}$/i.test(label));
+  return fallbackKey ? metricObj.values[fallbackKey] : null;
+}
+
+function buildRatiosMap(payload) {
+  if (!payload || !Array.isArray(payload.developers)) return new Map();
+  return new Map(payload.developers.map((dev) => [dev.ticker, dev]));
+}
+
 async function initDevelopersPage() {
   const tableBody = document.getElementById('developers-body');
   const methodology = document.getElementById('methodology-content');
@@ -173,27 +185,44 @@ async function initDevelopersPage() {
   if (!tableBody || !table) return;
 
   try {
-    const data = await App.fetchJson('./data/listed_developers.json');
+    const [data, ratiosData] = await Promise.all([
+      App.fetchJson('./data/listed_developers.json'),
+      App.fetchJson('./data/processed/developer_ratios_history.json').catch(() => null)
+    ]);
+    const ratiosMap = buildRatiosMap(ratiosData);
     methodology.textContent = `Score = Σ(weight × normalized metric). Weights: ${JSON.stringify(data.scoringModel.weights)}. Status bands: Green ≥ ${data.scoringModel.bands.status.green}, Amber ≥ ${data.scoringModel.bands.status.amber}, otherwise Red.`;
 
     const rows = data.developers.map((dev, index) => {
+      const ratioEntry = ratiosMap.get(dev.ticker);
       const scoreObj = computeScore(dev, data.scoringModel);
       const score = dev.precomputedHealthScore ?? scoreObj.total;
       const status = dev.statusOverride ?? statusFromScore(score, data.scoringModel);
       const cls = `status-${status.toLowerCase()}`;
       const id = dev.ticker.replace(/\W/g, '');
-      const marketCapDisplay = formatMarketCap(dev.marketCap);
-      const netDebtToEbitdaDisplay = formatNumber(dev.netDebtToEbitda);
-      const debtToEquityDisplay = formatNumber(dev.debtToEquity);
-      const netDebtToEquityDisplay = formatNumber(dev.netDebtToEquity);
-      const debtToEbitdaDisplay = formatNumber(dev.debtToEbitda);
-      const quickRatioDisplay = formatNumber(dev.quickRatio);
-      const currentRatioDisplay = formatNumber(dev.currentRatio);
-      const roicDisplay = formatPercent(dev.roic);
-      const roeDisplay = formatPercent(dev.roe);
-      const payoutRatioDisplay = formatPercent(dev.payoutRatio);
-      const assetTurnoverDisplay = formatNumber(dev.assetTurnover);
-      const lastUpdatedDisplay = formatLastUpdatedShort(dev.lastUpdated);
+      const currentMarketCap = getCurrentMetric(ratioEntry?.metrics?.marketCap) ?? dev.marketCap;
+      const currentNetDebtToEbitda = getCurrentMetric(ratioEntry?.metrics?.netDebtToEbitda) ?? dev.netDebtToEbitda;
+      const currentDebtToEquity = getCurrentMetric(ratioEntry?.metrics?.debtToEquity) ?? dev.debtToEquity;
+      const currentNetDebtToEquity = getCurrentMetric(ratioEntry?.metrics?.netDebtToEquity) ?? dev.netDebtToEquity;
+      const currentDebtToEbitda = getCurrentMetric(ratioEntry?.metrics?.debtToEbitda) ?? dev.debtToEbitda;
+      const currentQuickRatio = getCurrentMetric(ratioEntry?.metrics?.quickRatio) ?? dev.quickRatio;
+      const currentCurrentRatio = getCurrentMetric(ratioEntry?.metrics?.currentRatio) ?? dev.currentRatio;
+      const currentRoic = getCurrentMetric(ratioEntry?.metrics?.roic) ?? dev.roic;
+      const currentRoe = getCurrentMetric(ratioEntry?.metrics?.roe) ?? dev.roe;
+      const currentPayoutRatio = getCurrentMetric(ratioEntry?.metrics?.payoutRatio) ?? dev.payoutRatio;
+      const currentAssetTurnover = getCurrentMetric(ratioEntry?.metrics?.assetTurnover) ?? dev.assetTurnover;
+      const currentLastUpdated = ratioEntry?.lastFetchedAt || dev.lastUpdated;
+      const marketCapDisplay = formatMarketCap(currentMarketCap);
+      const netDebtToEbitdaDisplay = formatNumber(currentNetDebtToEbitda);
+      const debtToEquityDisplay = formatNumber(currentDebtToEquity);
+      const netDebtToEquityDisplay = formatNumber(currentNetDebtToEquity);
+      const debtToEbitdaDisplay = formatNumber(currentDebtToEbitda);
+      const quickRatioDisplay = formatNumber(currentQuickRatio);
+      const currentRatioDisplay = formatNumber(currentCurrentRatio);
+      const roicDisplay = formatPercent(currentRoic);
+      const roeDisplay = formatPercent(currentRoe);
+      const payoutRatioDisplay = formatPercent(currentPayoutRatio);
+      const assetTurnoverDisplay = formatNumber(currentAssetTurnover);
+      const lastUpdatedDisplay = formatLastUpdatedShort(currentLastUpdated);
       return {
         originalIndex: index,
         sortData: {
@@ -202,17 +231,17 @@ async function initDevelopersPage() {
           segment: dev.segment,
           score,
           status,
-          marketCap: dev.marketCap,
-          netDebtToEbitda: dev.netDebtToEbitda,
-          debtToEquity: dev.debtToEquity,
-          netDebtToEquity: dev.netDebtToEquity,
-          debtToEbitda: dev.debtToEbitda,
-          quickRatio: dev.quickRatio,
-          currentRatio: dev.currentRatio,
-          roic: dev.roic,
-          roe: dev.roe,
-          payoutRatio: dev.payoutRatio,
-          assetTurnover: dev.assetTurnover,
+          marketCap: currentMarketCap,
+          netDebtToEbitda: currentNetDebtToEbitda,
+          debtToEquity: currentDebtToEquity,
+          netDebtToEquity: currentNetDebtToEquity,
+          debtToEbitda: currentDebtToEbitda,
+          quickRatio: currentQuickRatio,
+          currentRatio: currentCurrentRatio,
+          roic: currentRoic,
+          roe: currentRoe,
+          payoutRatio: currentPayoutRatio,
+          assetTurnover: currentAssetTurnover,
           lastUpdated: lastUpdatedDisplay,
           details: 'Details'
         },
