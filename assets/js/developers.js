@@ -196,11 +196,17 @@ function buildScoreTooltip(entry) {
     .map(([metric, contribution]) => `${metric}: ${contribution.toFixed(2)}`)
     .join(', ');
 
+  const excluded = Array.isArray(components.excludedMetrics) ? components.excludedMetrics : [];
+  const debtToEbitdaReferenceOnly = excluded.includes('debtToEbitda')
+    ? 'Debt / EBITDA shown for reference only (not used in score)'
+    : null;
+
   return [
     Number.isFinite(staticScore) ? `Static: ${staticScore.toFixed(1)}` : null,
     Number.isFinite(trendPenalty) ? `Trend penalty: ${trendPenalty.toFixed(1)}` : null,
     Number.isFinite(coverage) ? `Coverage: ${(coverage * 100).toFixed(0)}%` : null,
-    top3 ? `Top contributors: ${top3}` : null
+    top3 ? `Top contributors: ${top3}` : null,
+    debtToEbitdaReferenceOnly
   ].filter(Boolean).join(' | ');
 }
 

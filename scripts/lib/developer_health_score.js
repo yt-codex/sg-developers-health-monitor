@@ -14,15 +14,15 @@ const SCORE_METRICS = [
 ];
 
 const BASE_WEIGHTS = {
-  netDebtToEbitda: 0.24,
-  debtToEquity: 0.16,
+  netDebtToEbitda: 0.26,
+  debtToEquity: 0.17,
   netDebtToEquity: 0.12,
-  debtToEbitda: 0.08,
+  debtToEbitda: 0,
   currentRatio: 0.12,
-  quickRatio: 0.05,
-  roic: 0.11,
-  roe: 0.07,
-  assetTurnover: 0.03,
+  quickRatio: 0.03,
+  roic: 0.16,
+  roe: 0.10,
+  assetTurnover: 0.02,
   payoutRatio: 0.02
 };
 
@@ -158,11 +158,18 @@ function computeHealthScore(record = {}) {
   const weightedContributors = {};
   const usedMetrics = [];
   const missingMetrics = [];
+  const excludedMetrics = [];
 
   let weightedRiskSum = 0;
   let availableWeight = 0;
 
   for (const metricKey of SCORE_METRICS) {
+    const metricWeight = BASE_WEIGHTS[metricKey] || 0;
+    if (metricWeight <= 0) {
+      excludedMetrics.push(metricKey);
+      continue;
+    }
+
     const currentValue = getCurrentValue(metrics[metricKey]);
     const risk = riskForMetric(metricKey, currentValue);
     if (risk == null) {
@@ -170,7 +177,6 @@ function computeHealthScore(record = {}) {
       continue;
     }
 
-    const metricWeight = BASE_WEIGHTS[metricKey] || 0;
     usedMetrics.push(metricKey);
     riskByMetric[metricKey] = risk;
     availableWeight += metricWeight;
@@ -190,6 +196,7 @@ function computeHealthScore(record = {}) {
         finalHealthScore: null,
         scoreCoverage: 0,
         missingMetrics,
+        excludedMetrics,
         usedMetrics,
         riskByMetric,
         weightedContributors,
@@ -224,6 +231,7 @@ function computeHealthScore(record = {}) {
         finalHealthScore: roundedFinal,
         scoreCoverage: availableWeight,
         missingMetrics,
+        excludedMetrics,
         usedMetrics,
         riskByMetric,
         weightedContributors,
@@ -245,6 +253,7 @@ function computeHealthScore(record = {}) {
       finalHealthScore: roundedFinal,
       scoreCoverage: availableWeight,
       missingMetrics,
+      excludedMetrics,
       usedMetrics,
       riskByMetric,
       weightedContributors,
