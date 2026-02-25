@@ -42,7 +42,6 @@ test('one missing metric renormalizes and still computes', () => {
     netDebtToEbitda: { Current: 8 },
     debtToEquity: { Current: 1.2 },
     netDebtToEquity: { Current: 0.9 },
-    debtToEbitda: { Current: 10 },
     quickRatio: { Current: 0.7 },
     currentRatio: { Current: 1.5 },
     roic: { Current: 6 },
@@ -83,6 +82,74 @@ test('trend penalty is capped at 8', () => {
 
   const trend = computeTrendPenalty(metrics);
   assert.equal(trend.trendPenalty, 8);
+});
+
+test('debtToEbitda is excluded from score even when present', () => {
+  const base = buildRecord({
+    netDebtToEbitda: { Current: 8 },
+    debtToEquity: { Current: 1.2 },
+    netDebtToEquity: { Current: 0.9 },
+    quickRatio: { Current: 0.7 },
+    currentRatio: { Current: 1.5 },
+    roic: { Current: 6 },
+    roe: { Current: 8 },
+    payoutRatio: { Current: 90 },
+    assetTurnover: { Current: 0.08 }
+  });
+
+  const withDebtToEbitda = buildRecord({
+    netDebtToEbitda: { Current: 8 },
+    debtToEquity: { Current: 1.2 },
+    netDebtToEquity: { Current: 0.9 },
+    debtToEbitda: { Current: 999 },
+    quickRatio: { Current: 0.7 },
+    currentRatio: { Current: 1.5 },
+    roic: { Current: 6 },
+    roe: { Current: 8 },
+    payoutRatio: { Current: 90 },
+    assetTurnover: { Current: 0.08 }
+  });
+
+  const without = computeHealthScore(base);
+  const withMetric = computeHealthScore(withDebtToEbitda);
+
+  assert.equal(without.healthScore, withMetric.healthScore);
+  assert.equal(withMetric.scoreCoverage, without.scoreCoverage);
+  assert.ok(withMetric.healthScoreComponents.excludedMetrics.includes('debtToEbitda'));
+  assert.equal(withMetric.healthScoreComponents.riskByMetric.debtToEbitda, undefined);
+});
+
+test('zero-weight metrics do not affect availableWeight or coverage', () => {
+  const onlyZeroWeight = buildRecord({
+    debtToEbitda: { Current: 10 }
+  });
+
+  const result = computeHealthScore(onlyZeroWeight);
+  assert.equal(result.scoreCoverage, 0);
+  assert.equal(result.healthScore, null);
+  assert.ok(result.healthScoreComponents.excludedMetrics.includes('debtToEbitda'));
+  assert.equal(result.healthScoreComponents.usedMetrics.length, 0);
+});
+
+test('trend penalty excludes debtToEbitda', () => {
+  const trend = computeTrendPenalty({
+    debtToEbitda: metric({ 'FY 2025': 40, 'FY 2024': 20, 'FY 2023': 5 })
+  });
+
+  assert.equal(trend.trendPenalty, 0);
+  assert.equal(trend.trendBreakdown.debtToEbitda, undefined);
+});
+
+test('partial metric sets can still compute when positive-weight coverage is sufficient', () => {
+  const record = buildRecord({
+    netDebtToEbitda: { Current: 9 },
+    debtToEquity: { Current: 1.4 },
+    netDebtToEquity: { Current: 1.1 }
+  });
+
+  const result = computeHealthScore(record);
+  assert.notEqual(result.healthScore, null);
+  assert.ok(result.scoreCoverage >= 0.5);
 });
 
 test('high leverage mixed profile no longer trivially collapses to 0', () => {
