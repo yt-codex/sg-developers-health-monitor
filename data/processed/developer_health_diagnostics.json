@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-25T05:41:29.516Z",
+  "generatedAt": "2026-02-26T05:36:31.305Z",
   "totalDevelopers": 23,
   "coverageDistribution": {
     "gte0_8": 23,
@@ -9,15 +9,15 @@
   "healthScoreDistribution": {
     "min": 21,
     "p10": 31.4,
-    "p25": 46,
-    "median": 59,
-    "p75": 74.5,
+    "p25": 45.5,
+    "median": 54,
+    "p75": 71.5,
     "p90": 83.8,
     "max": 91
   },
   "statusCounts": {
-    "Green": 7,
-    "Amber": 11,
+    "Green": 6,
+    "Amber": 12,
     "Red": 5,
     "Pending data": 0
   },
@@ -148,6 +148,31 @@
       ]
     },
     {
+      "ticker": "H13",
+      "name": "Ho Bee Land Ltd",
+      "segment": "mixed",
+      "healthScore": 45,
+      "healthStatus": "Amber",
+      "scoreCoverage": 1,
+      "topRiskContributors": [
+        {
+          "metric": "roic",
+          "weightedRiskContribution": 12.764,
+          "riskScore": 79.77777777777777
+        },
+        {
+          "metric": "currentRatio",
+          "weightedRiskContribution": 10.8,
+          "riskScore": 89.99999999999999
+        },
+        {
+          "metric": "roe",
+          "weightedRiskContribution": 9.26,
+          "riskScore": 92.6
+        }
+      ]
+    },
+    {
       "ticker": "F17",
       "name": "GuocoLand Ltd",
       "segment": "mixed",
@@ -244,31 +269,6 @@
           "metric": "netDebtToEbitda",
           "weightedRiskContribution": 8.753,
           "riskScore": 33.666666666666664
-        }
-      ]
-    },
-    {
-      "ticker": "W05",
-      "name": "Wing Tai Holdings Ltd",
-      "segment": "mixed",
-      "healthScore": 53,
-      "healthStatus": "Amber",
-      "scoreCoverage": 0.9800000000000001,
-      "topRiskContributors": [
-        {
-          "metric": "roic",
-          "weightedRiskContribution": 16.327,
-          "riskScore": 100
-        },
-        {
-          "metric": "netDebtToEbitda",
-          "weightedRiskContribution": 11.541,
-          "riskScore": 43.50000000000001
-        },
-        {
-          "metric": "roe",
-          "weightedRiskContribution": 10.204,
-          "riskScore": 100
         }
       ]
     }
@@ -375,31 +375,6 @@
       ]
     },
     {
-      "ticker": "BTE",
-      "name": "Lian Beng Group Ltd",
-      "segment": "mixed",
-      "healthScore": 77,
-      "healthStatus": "Green",
-      "scoreCoverage": 1,
-      "topRiskContributors": [
-        {
-          "metric": "roic",
-          "weightedRiskContribution": 13.867,
-          "riskScore": 86.66666666666667
-        },
-        {
-          "metric": "roe",
-          "weightedRiskContribution": 9.33,
-          "riskScore": 93.30000000000001
-        },
-        {
-          "metric": "payoutRatio",
-          "weightedRiskContribution": 0.151,
-          "riskScore": 7.546666666666662
-        }
-      ]
-    },
-    {
       "ticker": "ER0",
       "name": "KSH Holdings Ltd",
       "segment": "mixed",
@@ -450,6 +425,31 @@
       ]
     },
     {
+      "ticker": "BTE",
+      "name": "Lian Beng Group Ltd",
+      "segment": "mixed",
+      "healthScore": 69,
+      "healthStatus": "Amber",
+      "scoreCoverage": 1,
+      "topRiskContributors": [
+        {
+          "metric": "roic",
+          "weightedRiskContribution": 15.271,
+          "riskScore": 95.44444444444444
+        },
+        {
+          "metric": "roe",
+          "weightedRiskContribution": 9.81,
+          "riskScore": 98.10000000000001
+        },
+        {
+          "metric": "payoutRatio",
+          "weightedRiskContribution": 2,
+          "riskScore": 100
+        }
+      ]
+    },
+    {
       "ticker": "C33",
       "name": "Chuan Hup Holdings Ltd",
       "segment": "mixed",
@@ -471,31 +471,6 @@
           "metric": "assetTurnover",
           "weightedRiskContribution": 1.429,
           "riskScore": 71.42857142857143
-        }
-      ]
-    },
-    {
-      "ticker": "H13",
-      "name": "Ho Bee Land Ltd",
-      "segment": "mixed",
-      "healthScore": 66,
-      "healthStatus": "Amber",
-      "scoreCoverage": 1,
-      "topRiskContributors": [
-        {
-          "metric": "roic",
-          "weightedRiskContribution": 11.271,
-          "riskScore": 70.44444444444444
-        },
-        {
-          "metric": "roe",
-          "weightedRiskContribution": 7.91,
-          "riskScore": 79.10000000000001
-        },
-        {
-          "metric": "netDebtToEbitda",
-          "weightedRiskContribution": 5.915,
-          "riskScore": 22.750000000000004
         }
       ]
     },
@@ -523,13 +498,38 @@
           "riskScore": 15.999999999999995
         }
       ]
+    },
+    {
+      "ticker": "H78",
+      "name": "Hongkong Land Holdings Ltd",
+      "segment": "mixed",
+      "healthScore": 64,
+      "healthStatus": "Amber",
+      "scoreCoverage": 0.9800000000000001,
+      "topRiskContributors": [
+        {
+          "metric": "roic",
+          "weightedRiskContribution": 13.823,
+          "riskScore": 84.66666666666667
+        },
+        {
+          "metric": "roe",
+          "weightedRiskContribution": 10.204,
+          "riskScore": 100
+        },
+        {
+          "metric": "currentRatio",
+          "weightedRiskContribution": 3.184,
+          "riskScore": 26
+        }
+      ]
     }
   ],
   "segmentBreakdown": [
     {
       "segment": "mixed",
       "count": 19,
-      "medianHealthScore": 53
+      "medianHealthScore": 49
     },
     {
       "segment": "residential",
