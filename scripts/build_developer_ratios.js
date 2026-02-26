@@ -16,6 +16,7 @@ const {
 } = require('./lib/developer_ratios');
 const {
   BASE_WEIGHTS,
+  NEGATIVE_LEVERAGE_SUPPORT,
   SCORE_COVERAGE_MIN,
   STATUS_BANDS,
   TREND_PENALTY_CAP,
@@ -268,6 +269,19 @@ async function main() {
       weights: { ...BASE_WEIGHTS },
       coverageThreshold: SCORE_COVERAGE_MIN,
       trendPenaltyCap: TREND_PENALTY_CAP,
+      negativeLeverageHandling: {
+        targetMetrics: [...NEGATIVE_LEVERAGE_SUPPORT.targetMetrics],
+        supportMetrics: [...NEGATIVE_LEVERAGE_SUPPORT.supportMetrics],
+        supportBands: {
+          strongMinHealthScore: NEGATIVE_LEVERAGE_SUPPORT.strongMinHealthScore,
+          mixedMinHealthScore: NEGATIVE_LEVERAGE_SUPPORT.mixedMinHealthScore
+        },
+        riskFloors: {
+          noSupport: NEGATIVE_LEVERAGE_SUPPORT.noSupportRiskFloor,
+          mixedSupport: NEGATIVE_LEVERAGE_SUPPORT.mixedSupportRiskFloor,
+          weakSupport: NEGATIVE_LEVERAGE_SUPPORT.weakSupportRiskFloor
+        }
+      },
       bands: {
         status: {
           green: STATUS_BANDS.green,

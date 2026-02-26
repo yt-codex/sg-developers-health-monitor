@@ -56,6 +56,16 @@ const TREND_RULES = [
   { key: 'roe', direction: 'lowerWorse', base: 1, consecutive: 1.5 }
 ];
 
+const NEGATIVE_LEVERAGE_SUPPORT = {
+  targetMetrics: ['netDebtToEbitda', 'netDebtToEquity'],
+  supportMetrics: ['quickRatio', 'currentRatio', 'roic', 'roe'],
+  strongMinHealthScore: 70,
+  mixedMinHealthScore: 40,
+  noSupportRiskFloor: 50,
+  mixedSupportRiskFloor: 25,
+  weakSupportRiskFloor: 55
+};
+
 function clamp(value, min = 0, max = 100) {
   return Math.min(max, Math.max(min, value));
 }
@@ -122,6 +132,78 @@ function evaluateTrendForMetric(series, direction) {
 
 function isMetricIncluded(metricKey, includedMetricsSet) {
   return !includedMetricsSet || includedMetricsSet.has(metricKey);
+}
+
+function average(values = []) {
+  if (!values.length) return null;
+  const sum = values.reduce((acc, value) => acc + value, 0);
+  return sum / values.length;
+}
+
+function computeSupportHealthScore(metrics = {}, riskByMetric = {}) {
+  const supportMetricsUsed = [];
+  const supportHealthValues = [];
+
+  for (const metricKey of NEGATIVE_LEVERAGE_SUPPORT.supportMetrics) {
+    let risk = riskByMetric[metricKey];
+    if (!Number.isFinite(risk)) {
+      const currentValue = getCurrentValue(metrics[metricKey]);
+      risk = riskForMetric(metricKey, currentValue);
+    }
+    if (!Number.isFinite(risk)) continue;
+    supportMetricsUsed.push(metricKey);
+    supportHealthValues.push(100 - risk);
+  }
+
+  return {
+    supportMetricsUsed,
+    supportHealthScore: average(supportHealthValues)
+  };
+}
+
+function adjustNegativeLeverageRisks(metrics = {}, riskByMetric = {}, usedMetrics = []) {
+  const usedMetricsSet = new Set(usedMetrics);
+  const { supportMetricsUsed, supportHealthScore } = computeSupportHealthScore(metrics, riskByMetric);
+  const metricAdjustments = {};
+
+  for (const metricKey of NEGATIVE_LEVERAGE_SUPPORT.targetMetrics) {
+    if (!usedMetricsSet.has(metricKey)) continue;
+    const currentValue = getCurrentValue(metrics[metricKey]);
+    if (!Number.isFinite(currentValue) || currentValue >= 0) continue;
+
+    const originalRisk = riskByMetric[metricKey];
+    let riskFloor;
+    let supportBand;
+
+    if (!Number.isFinite(supportHealthScore)) {
+      riskFloor = NEGATIVE_LEVERAGE_SUPPORT.noSupportRiskFloor;
+      supportBand = 'no_support';
+    } else if (supportHealthScore >= NEGATIVE_LEVERAGE_SUPPORT.strongMinHealthScore) {
+      riskFloor = 0;
+      supportBand = 'strong';
+    } else if (supportHealthScore >= NEGATIVE_LEVERAGE_SUPPORT.mixedMinHealthScore) {
+      riskFloor = NEGATIVE_LEVERAGE_SUPPORT.mixedSupportRiskFloor;
+      supportBand = 'mixed';
+    } else {
+      riskFloor = NEGATIVE_LEVERAGE_SUPPORT.weakSupportRiskFloor;
+      supportBand = 'weak';
+    }
+
+    const adjustedRisk = Math.max(originalRisk, riskFloor);
+    riskByMetric[metricKey] = adjustedRisk;
+    metricAdjustments[metricKey] = {
+      rule: 'negativeLeverageSupportGate',
+      currentValue,
+      originalRisk,
+      adjustedRisk,
+      supportBand,
+      supportHealthScore,
+      supportMetricsUsed,
+      applied: adjustedRisk !== originalRisk
+    };
+  }
+
+  return metricAdjustments;
 }
 
 function computeTrendPenalty(metrics = {}, options = {}) {
@@ -193,8 +275,8 @@ function computeHealthScore(record = {}) {
   const usedMetrics = [];
   const missingMetrics = [];
   const excludedMetrics = [];
+  let metricAdjustments = {};
 
-  let weightedRiskSum = 0;
   let availableWeight = 0;
 
   for (const metricKey of SCORE_METRICS) {
@@ -214,7 +296,6 @@ function computeHealthScore(record = {}) {
     usedMetrics.push(metricKey);
     riskByMetric[metricKey] = risk;
     availableWeight += metricWeight;
-    weightedRiskSum += risk * metricWeight;
   }
 
   if (availableWeight === 0) {
@@ -234,11 +315,21 @@ function computeHealthScore(record = {}) {
         usedMetrics,
         riskByMetric,
         weightedContributors,
+        metricAdjustments: {},
         trendBreakdown: {}
       },
       lastScoredAt: nowIso()
     };
   }
+
+  metricAdjustments = adjustNegativeLeverageRisks(metrics, riskByMetric, usedMetrics);
+
+  const weightedRiskSum = usedMetrics.reduce((sum, metricKey) => {
+    const metricWeight = BASE_WEIGHTS[metricKey] || 0;
+    const metricRisk = riskByMetric[metricKey];
+    if (!Number.isFinite(metricRisk)) return sum;
+    return sum + (metricRisk * metricWeight);
+  }, 0);
 
   const staticRiskScore = weightedRiskSum / availableWeight;
   const staticHealthScore = 100 - staticRiskScore;
@@ -269,6 +360,7 @@ function computeHealthScore(record = {}) {
         usedMetrics,
         riskByMetric,
         weightedContributors,
+        metricAdjustments,
         trendBreakdown
       },
       lastScoredAt: nowIso()
@@ -291,6 +383,7 @@ function computeHealthScore(record = {}) {
       usedMetrics,
       riskByMetric,
       weightedContributors,
+      metricAdjustments,
       trendBreakdown
     },
     lastScoredAt: nowIso()
@@ -303,6 +396,7 @@ module.exports = {
   STATUS_BANDS,
   TREND_PENALTY_CAP,
   TREND_RULES,
+  NEGATIVE_LEVERAGE_SUPPORT,
   RISK_THRESHOLDS,
   SCORE_METRICS,
   clamp,

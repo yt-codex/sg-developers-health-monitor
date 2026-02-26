@@ -231,6 +231,19 @@ function buildMethodologyText(scoringModel) {
   const excluded = Array.isArray(scoringModel.excludedMetrics) && scoringModel.excludedMetrics.length
     ? scoringModel.excludedMetrics.join(', ')
     : null;
+  const negativeLeverageHandling = scoringModel.negativeLeverageHandling;
+  const negativeTargets = Array.isArray(negativeLeverageHandling?.targetMetrics)
+    ? negativeLeverageHandling.targetMetrics
+    : [];
+  const negativeSupportMetrics = Array.isArray(negativeLeverageHandling?.supportMetrics)
+    ? negativeLeverageHandling.supportMetrics
+    : [];
+  const noSupportFloor = negativeLeverageHandling?.riskFloors?.noSupport;
+  const mixedSupportFloor = negativeLeverageHandling?.riskFloors?.mixedSupport;
+  const weakSupportFloor = negativeLeverageHandling?.riskFloors?.weakSupport;
+  const negativeLeverageSummary = negativeLeverageHandling
+    ? `Negative leverage handling: ${negativeTargets.join(', ')} require support from ${negativeSupportMetrics.join(', ')}; risk floors no/mixed/weak support = ${noSupportFloor}/${mixedSupportFloor}/${weakSupportFloor}`
+    : null;
 
   return [
     scoringModel.formula ? `Formula: ${scoringModel.formula}` : null,
@@ -241,7 +254,8 @@ function buildMethodologyText(scoringModel) {
       : null,
     coverageThreshold ? `Minimum coverage to score: ${coverageThreshold}` : null,
     trendPenaltyCap ? `Trend penalty cap: ${trendPenaltyCap}` : null,
-    excluded ? `Reference-only metrics (excluded from score): ${excluded}` : null
+    excluded ? `Reference-only metrics (excluded from score): ${excluded}` : null,
+    negativeLeverageSummary
   ].filter(Boolean).join('. ');
 }
 

@@ -6,6 +6,7 @@ const path = require('path');
 const { parseRatiosTable } = require('../scripts/lib/developer_ratios');
 const {
   BASE_WEIGHTS,
+  NEGATIVE_LEVERAGE_SUPPORT,
   SCORE_COVERAGE_MIN,
   STATUS_BANDS,
   computeHealthScore,
@@ -175,6 +176,58 @@ test('missing payout current value does not trigger payout/roe interaction in fi
   assert.ok(result.healthScoreComponents.missingMetrics.includes('payoutRatio'));
   assert.equal(result.healthScoreComponents.trendBreakdown.payoutRoeInteraction.eligible, false);
   assert.equal(result.healthScoreComponents.trendBreakdown.payoutRoeInteraction.appliedPenalty, 0);
+});
+
+test('negative leverage is not auto-low-risk when support metrics are weak', () => {
+  const record = buildRecord({
+    netDebtToEbitda: { Current: -2.0 },
+    debtToEquity: { Current: 1.1 },
+    netDebtToEquity: { Current: -0.2 },
+    quickRatio: { Current: 0.2 },
+    currentRatio: { Current: 0.9 },
+    roic: { Current: 0.5 },
+    roe: { Current: 0.8 },
+    assetTurnover: { Current: 0.08 }
+  });
+
+  const result = computeHealthScore(record);
+  assert.equal(result.healthScoreComponents.riskByMetric.netDebtToEbitda, NEGATIVE_LEVERAGE_SUPPORT.weakSupportRiskFloor);
+  assert.equal(result.healthScoreComponents.riskByMetric.netDebtToEquity, NEGATIVE_LEVERAGE_SUPPORT.weakSupportRiskFloor);
+  assert.equal(result.healthScoreComponents.metricAdjustments.netDebtToEbitda.supportBand, 'weak');
+  assert.equal(result.healthScoreComponents.metricAdjustments.netDebtToEbitda.applied, true);
+});
+
+test('negative leverage stays low-risk when support metrics are strong', () => {
+  const record = buildRecord({
+    netDebtToEbitda: { Current: -1.4 },
+    debtToEquity: { Current: 0.6 },
+    netDebtToEquity: { Current: -0.1 },
+    quickRatio: { Current: 1.2 },
+    currentRatio: { Current: 2.3 },
+    roic: { Current: 14 },
+    roe: { Current: 16 },
+    payoutRatio: { Current: 80 },
+    assetTurnover: { Current: 0.2 }
+  });
+
+  const result = computeHealthScore(record);
+  assert.equal(result.healthScoreComponents.riskByMetric.netDebtToEbitda, 0);
+  assert.equal(result.healthScoreComponents.riskByMetric.netDebtToEquity, 0);
+  assert.equal(result.healthScoreComponents.metricAdjustments.netDebtToEbitda.supportBand, 'strong');
+  assert.equal(result.healthScoreComponents.metricAdjustments.netDebtToEbitda.applied, false);
+});
+
+test('negative leverage uses neutral floor when support metrics are unavailable', () => {
+  const record = buildRecord({
+    netDebtToEbitda: { Current: -0.5 },
+    debtToEquity: { Current: 1.2 },
+    netDebtToEquity: { Current: -0.1 }
+  });
+
+  const result = computeHealthScore(record);
+  assert.equal(result.healthScoreComponents.riskByMetric.netDebtToEbitda, NEGATIVE_LEVERAGE_SUPPORT.noSupportRiskFloor);
+  assert.equal(result.healthScoreComponents.riskByMetric.netDebtToEquity, NEGATIVE_LEVERAGE_SUPPORT.noSupportRiskFloor);
+  assert.equal(result.healthScoreComponents.metricAdjustments.netDebtToEbitda.supportBand, 'no_support');
 });
 
 test('partial metric sets can still compute when positive-weight coverage is sufficient', () => {
