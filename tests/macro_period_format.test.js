@@ -53,8 +53,21 @@ test('inference distinguishes monthly vs quarterly from month gaps', () => {
 test('strict period parsing and quarter mapping helpers', () => {
   assert.deepEqual(parseYearMonth('2025 Oct'), { year: 2025, month: 10 });
   assert.deepEqual(parseYearMonth('2025Oct'), { year: 2025, month: 10 });
+  assert.deepEqual(parseYearMonth('2025-10'), { year: 2025, month: 10 });
+  assert.deepEqual(parseYearMonth('2025 Q4'), { year: 2025, month: 12 });
+  assert.deepEqual(parseYearMonth('2025Q4'), { year: 2025, month: 12 });
   assert.equal(parseYearMonth('2025 October'), null);
   assert.equal(toQuarterLabel({ year: 2025, month: 10 }), '2025 Q4');
+});
+
+test('formatLastPointLabel preserves quarterly format for quarter tokens from latest data', () => {
+  const result = formatLastPointLabel(
+    'unit_labour_cost_construction',
+    '2025 Q4',
+    { freq: 'Q' },
+    [{ period: '2025 Q4' }]
+  );
+  assert.equal(result, '2025 Q4');
 });
 
 test('fallback whitelist only marks configured IDs as quarterly when inference unavailable', () => {

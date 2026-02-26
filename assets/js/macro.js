@@ -74,7 +74,7 @@ const MACRO_INDICATOR_METADATA = [
 function inferFrequency(point, fallbackFrequency = null) {
   if (fallbackFrequency) return fallbackFrequency;
   const raw = String(point?.rawDate || '');
-  if (/^\d{4}Q[1-4]$/.test(raw) || /^\d{4}[1-4]Q$/.test(raw)) return 'Q';
+  if (/^\d{4}\s*Q[1-4]$/.test(raw) || /^\d{4}[1-4]Q$/.test(raw)) return 'Q';
   if (/^\d{4}-(\d{2})$/.test(raw)) return 'M';
   return null;
 }
@@ -92,7 +92,9 @@ function formatPointDate(point, fallbackFrequency = null) {
   }
 
   if (frequency === 'Q') {
-    const quarterMatch = String(point.rawDate).match(/^(\d{4})Q([1-4])$/) || String(point.rawDate).match(/^(\d{4})([1-4])Q$/);
+    const quarterMatch =
+      String(point.rawDate).match(/^(\d{4})\s*Q([1-4])$/) ||
+      String(point.rawDate).match(/^(\d{4})([1-4])Q$/);
     if (quarterMatch) return `${quarterMatch[1]} Q${quarterMatch[2]}`;
     if (point.date) {
       const date = new Date(point.date);
@@ -297,7 +299,7 @@ function parsePeriodToDate(period) {
     if (month) return `${monthlyText[1]}-${month}-01`;
   }
 
-  const quarter = raw.match(/^(\d{4})Q([1-4])$/) || raw.match(/^(\d{4})([1-4])Q$/);
+  const quarter = raw.match(/^(\d{4})\s*Q([1-4])$/) || raw.match(/^(\d{4})([1-4])Q$/);
   if (!quarter) return null;
 
   const year = Number(quarter[1]);
@@ -325,16 +327,36 @@ const PERIOD_MONTH_MAP = {
 const QUARTERLY_SERIES_FALLBACK_IDS = new Set(['unit_labour_cost_construction']);
 
 function parseYearMonth(periodStr) {
-  const match = String(periodStr || '').trim().match(/^(\d{4})(?:\s)?([A-Za-z]{3})$/);
-  if (!match) return null;
+  const raw = String(periodStr || '').trim();
+  const monthLabelMatch = raw.match(/^(\d{4})(?:\s)?([A-Za-z]{3})$/);
+  if (monthLabelMatch) {
+    const month = PERIOD_MONTH_MAP[monthLabelMatch[2].toLowerCase()];
+    if (!month) return null;
+    return {
+      year: Number(monthLabelMatch[1]),
+      month
+    };
+  }
 
-  const month = PERIOD_MONTH_MAP[match[2].toLowerCase()];
-  if (!month) return null;
+  const isoMonthMatch = raw.match(/^(\d{4})-(\d{2})$/);
+  if (isoMonthMatch) {
+    const month = Number(isoMonthMatch[2]);
+    if (month < 1 || month > 12) return null;
+    return {
+      year: Number(isoMonthMatch[1]),
+      month
+    };
+  }
 
-  return {
-    year: Number(match[1]),
-    month
-  };
+  const quarterMatch = raw.match(/^(\d{4})\s*Q([1-4])$/) || raw.match(/^(\d{4})([1-4])Q$/);
+  if (quarterMatch) {
+    return {
+      year: Number(quarterMatch[1]),
+      month: Number(quarterMatch[2]) * 3
+    };
+  }
+
+  return null;
 }
 
 function formatYearMonthLabel(yearMonth) {

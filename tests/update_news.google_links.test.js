@@ -2,6 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const {
+  dedupeNewsItems,
   buildGoogleDedupKeys,
   buildTitleDateDedupKey,
   decodeGoogleLinkCandidate,
@@ -105,4 +106,47 @@ test('buildGoogleDedupKeys includes title-date dedup key for cross-source dedupi
     original_link: 'https://news.google.com/rss/articles/ABC?oc=5&hl=en-US'
   });
   assert.ok(keys.includes(titleDateKey));
+});
+
+test('dedupeNewsItems drops duplicate stories and keeps latest copy in append-only order', () => {
+  const items = [
+    {
+      id: 'older',
+      source: 'google_news',
+      title: 'CapitaLand Investment dragged into the red by China asset losses: What are the hits and misses?',
+      pubDate: '2026-02-23T07:46:00.000Z',
+      publisher: 'The Straits Times',
+      link: 'https://news.google.com/rss/articles/ABC?oc=5&utm_source=x'
+    },
+    {
+      id: 'latest',
+      source: 'channelnewsasia',
+      title: 'Capitaland Investment dragged into red by China asset losses - What are hits and misses',
+      pubDate: '2026-02-23T09:10:00.000Z',
+      publisher: 'CNA',
+      link: 'https://www.channelnewsasia.com/business/property/capitaland-losses'
+    },
+    {
+      id: 'unique',
+      source: 'businesstimes',
+      title: 'Another independent developer story',
+      pubDate: '2026-02-22T03:00:00.000Z',
+      publisher: 'Business Times',
+      link: 'https://www.businesstimes.com.sg/property/another-story'
+    }
+  ];
+
+  const result = dedupeNewsItems(items);
+  assert.equal(result.dropped, 1);
+  assert.deepEqual(result.items.map((item) => item.id), ['latest', 'unique']);
+});
+
+test('dedupe key helpers handle invalid pubDate safely', () => {
+  assert.doesNotThrow(() => buildTitleDateDedupKey('Sample headline', 'not-a-date'));
+
+  const result = dedupeNewsItems([
+    { id: 'a', source: 'alpha', title: 'Same headline', pubDate: 'not-a-date', link: 'https://example.com/1' },
+    { id: 'b', source: 'beta', title: 'Same headline', pubDate: 'also-bad-date', link: 'https://example.com/2' }
+  ]);
+  assert.equal(result.dropped, 1);
 });

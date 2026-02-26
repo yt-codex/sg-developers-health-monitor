@@ -1,6 +1,7 @@
 const ITEMS_PER_PAGE = App.newsConfig.pageSize;
 const SEVERITY_META = App.newsConfig.severityMeta;
 const DATE_RANGE_OPTIONS = App.newsConfig.dateRangeOptions;
+const TRACKING_PREFIXES = ['utm_', 'fbclid', 'gclid', 'mc_cid', 'mc_eid', 'cmpid', 'igshid', 's_cid'];
 
 function escapeHtml(value = '') {
   return value
@@ -103,6 +104,59 @@ function renderNewsItems(items, currentPage) {
   `;
 }
 
+function canonicalizeNewsLink(link) {
+  try {
+    const url = new URL(link);
+    for (const key of [...url.searchParams.keys()]) {
+      const lower = key.toLowerCase();
+      if (TRACKING_PREFIXES.some((prefix) => lower === prefix || lower.startsWith(prefix))) {
+        url.searchParams.delete(key);
+      }
+    }
+    url.hash = '';
+    if (url.pathname.length > 1) url.pathname = url.pathname.replace(/\/+$/, '');
+    return url.toString();
+  } catch {
+    return String(link || '').trim();
+  }
+}
+
+function datePartForDedup(pubDate) {
+  const parsed = new Date(pubDate);
+  if (Number.isNaN(parsed.getTime())) return 'unknown';
+  return parsed.toISOString().slice(0, 10);
+}
+
+function normalizeTitleForDedup(text) {
+  return String(text || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter((token) => token && !['a', 'an', 'the'].includes(token))
+    .join(' ')
+    .trim();
+}
+
+function dedupeNewsItems(items = []) {
+  const seen = new Set();
+  const deduped = [];
+  let dropped = 0;
+
+  for (const item of items) {
+    const titleDateKey = `title_date:${normalizeTitleForDedup(item.title)}|${datePartForDedup(item.pubDate)}`;
+    const fallbackKey = `fallback:${String(item.source || '').toLowerCase().trim()}|${String(item.publisher || '').toLowerCase().trim()}|${datePartForDedup(item.pubDate)}`;
+    const keys = [canonicalizeNewsLink(item.link), titleDateKey, fallbackKey].filter(Boolean);
+    if (keys.some((key) => seen.has(key))) {
+      dropped += 1;
+      continue;
+    }
+    keys.forEach((key) => seen.add(key));
+    deduped.push(item);
+  }
+
+  return { items: deduped, dropped };
+}
+
 async function loadNewsData() {
   try {
     const latest = await App.fetchJson('./data/news_latest_90d.json');
@@ -133,9 +187,14 @@ function initNewsPage() {
         .map((item) => ({ ...item, severity: App.normalizeNewsSeverity(item.severity) }))
         .filter((item) => new Date(item.pubDate).getTime() >= ninetyDayCutoff)
         .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+      const deduped = dedupeNewsItems(processed);
+      const processedItems = deduped.items;
+      if (deduped.dropped > 0) {
+        console.info(`[news] filtered ${deduped.dropped} duplicate items from dashboard feed`);
+      }
 
-      const developers = Array.from(new Set(processed.map((i) => i.developer || 'Unknown'))).sort();
-      const sources = Array.from(new Set(processed.map((i) => i.source))).sort();
+      const developers = Array.from(new Set(processedItems.map((i) => i.developer || 'Unknown'))).sort();
+      const sources = Array.from(new Set(processedItems.map((i) => i.source))).sort();
 
       const sevSelect = document.getElementById('severity-filter');
       const devSelect = document.getElementById('developer-filter');
@@ -172,7 +231,7 @@ function initNewsPage() {
         const searchText = searchInput.value.trim().toLowerCase();
         const cutoff = Date.now() - rangeDays * 24 * 60 * 60 * 1000;
 
-        filteredItems = processed.filter((item) => {
+        filteredItems = processedItems.filter((item) => {
           if (new Date(item.pubDate).getTime() < cutoff) return false;
           if (selectedSeverity !== 'all' && item.severity !== selectedSeverity) return false;
           if (selectedDeveloper !== 'all' && (item.developer || 'Unknown') !== selectedDeveloper) return false;

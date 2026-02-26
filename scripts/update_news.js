@@ -22,6 +22,7 @@ const GOOGLE_PUBLISHERS_ALLOWLIST_PATH = path.join(CONFIG_DIR, 'google_news_publ
 
 const TRACKING_PREFIXES = ['utm_', 'fbclid', 'gclid', 'mc_cid', 'mc_eid', 'cmpid', 'igshid', 's_cid'];
 const SEVERITY_SCORE = { warning: 3, watch: 2, info: 1 };
+const NEWS_BACKUP_NAME_RE = /^news_all_backup_\d{4}-\d{2}-\d{2}(?:T[\d-]+Z)?\.json$/;
 
 function mapSeverityToCurrent(severity) {
   const key = String(severity || 'info').toLowerCase();
@@ -166,14 +167,21 @@ function buildId(source, key) {
   return crypto.createHash('sha256').update(`${source}|${key}`).digest('hex').slice(0, 16);
 }
 
+function datePartForDedup(pubDate) {
+  if (!pubDate) return 'unknown';
+  const parsed = new Date(pubDate);
+  if (Number.isNaN(parsed.getTime())) return 'unknown';
+  return parsed.toISOString().slice(0, 10);
+}
+
 function buildFallbackDedupKey(title, publisher, pubDate) {
-  const datePart = pubDate ? new Date(pubDate).toISOString().slice(0, 10) : 'unknown';
+  const datePart = datePartForDedup(pubDate);
   const raw = `${normalizeTitle(title)}|${normalizeTitle(publisher || '')}|${datePart}`;
   return `fallback:${crypto.createHash('sha256').update(raw).digest('hex').slice(0, 24)}`;
 }
 
 function buildTitleDateDedupKey(title, pubDate) {
-  const datePart = pubDate ? new Date(pubDate).toISOString().slice(0, 10) : 'unknown';
+  const datePart = datePartForDedup(pubDate);
   const raw = `${normalizeTitleForDedup(title)}|${datePart}`;
   return `title_date:${crypto.createHash('sha256').update(raw).digest('hex').slice(0, 24)}`;
 }
@@ -194,6 +202,30 @@ function deriveDedupKeys(item) {
   keys.push(buildTitleDateDedupKey(item.title, item.pubDate));
   keys.push(buildFallbackDedupKey(item.title, item.publisher || item.source, item.pubDate));
   return [...new Set(keys.filter(Boolean))];
+}
+
+function dedupeNewsItems(items = []) {
+  const seen = new Set();
+  const keepIndexes = [];
+  let dropped = 0;
+
+  // Process from newest to oldest so append-only updates keep the freshest copy.
+  for (let idx = items.length - 1; idx >= 0; idx -= 1) {
+    const item = items[idx];
+    const keys = deriveDedupKeys(item);
+    if (keys.some((key) => seen.has(key))) {
+      dropped += 1;
+      continue;
+    }
+    keys.forEach((key) => seen.add(key));
+    keepIndexes.push(idx);
+  }
+
+  keepIndexes.sort((a, b) => a - b);
+  return {
+    items: keepIndexes.map((idx) => items[idx]),
+    dropped
+  };
 }
 
 function compileRules(tagRules) {
@@ -816,6 +848,28 @@ function migrateLegacySeverities(items) {
   return { items: migrated, changed };
 }
 
+function findNewsAllBackups() {
+  if (!fs.existsSync(DATA_DIR)) return [];
+  return fs
+    .readdirSync(DATA_DIR)
+    .filter((name) => NEWS_BACKUP_NAME_RE.test(name))
+    .map((name) => path.join(DATA_DIR, name));
+}
+
+function pruneNewsBackups(maxKeep = 2) {
+  if (!Number.isFinite(maxKeep) || maxKeep < 1) return;
+  const backups = findNewsAllBackups()
+    .map((backupPath) => {
+      const stat = fs.statSync(backupPath);
+      return { backupPath, mtimeMs: stat.mtimeMs };
+    })
+    .sort((a, b) => b.mtimeMs - a.mtimeMs);
+
+  for (const stale of backups.slice(maxKeep)) {
+    fs.unlinkSync(stale.backupPath);
+  }
+}
+
 function backupNewsAll() {
   if (!fs.existsSync(NEWS_ALL_PATH)) return null;
   const now = new Date();
@@ -825,6 +879,7 @@ function backupNewsAll() {
   const stampedPath = path.join(DATA_DIR, `news_all_backup_${stamp}.json`);
   const backupPath = fs.existsSync(datedPath) ? stampedPath : datedPath;
   fs.copyFileSync(NEWS_ALL_PATH, backupPath);
+  pruneNewsBackups(2);
   return backupPath;
 }
 
@@ -843,9 +898,13 @@ async function run() {
     const existingItems = migrated.items;
     const compiledRules = compileRules(tagRules);
     const { cleaned, rejectedLogs } = await cleanupExistingNews(existingItems, developerConfig, relevanceRules, compiledRules, tagRules.severity_order, googleAllowlistConfig);
+    const dedupedCleanup = dedupeNewsItems(cleaned);
+    if (dedupedCleanup.dropped > 0) {
+      logInfo(`cleanup removed ${dedupedCleanup.dropped} duplicate item(s) from news_all`);
+    }
 
-    writeJson(NEWS_ALL_PATH, { items: cleaned });
-    const cleanup90 = cleaned
+    writeJson(NEWS_ALL_PATH, { items: dedupedCleanup.items });
+    const cleanup90 = dedupedCleanup.items
       .filter((item) => new Date(item.pubDate).getTime() >= daysAgoCutoff(90))
       .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
     writeJson(NEWS_90D_PATH, { items: cleanup90 });
@@ -857,12 +916,14 @@ async function run() {
         existing_total: existingItems.length,
         new_items: 0,
         rejected_items: rejectedLogs.length,
-        total_all: cleaned.length,
+        total_all: dedupedCleanup.items.length,
         latest_90d: cleanup90.length
       },
       feeds: []
     });
-    logInfo(`cleanup complete. backup=${backupPath || 'none'} original=${existingItems.length} cleaned=${cleaned.length} rejected=${rejectedLogs.length}`);
+    logInfo(
+      `cleanup complete. backup=${backupPath || 'none'} original=${existingItems.length} cleaned=${dedupedCleanup.items.length} rejected=${rejectedLogs.length}`
+    );
     return;
   }
 
@@ -870,11 +931,22 @@ async function run() {
   const allStore = readJson(NEWS_ALL_PATH, { items: [] });
   let existingItems = Array.isArray(allStore.items) ? allStore.items : [];
   const migrated = migrateLegacySeverities(existingItems);
-  if (migrated.changed) {
+  let rewriteExistingStore = migrated.changed;
+  existingItems = migrated.items;
+
+  const dedupedExisting = dedupeNewsItems(existingItems);
+  if (dedupedExisting.dropped > 0) {
+    rewriteExistingStore = true;
+    existingItems = dedupedExisting.items;
+    logInfo(`removed ${dedupedExisting.dropped} duplicate existing item(s) from news_all`);
+  }
+
+  if (rewriteExistingStore) {
     backupNewsAll();
-    existingItems = migrated.items;
     writeJson(NEWS_ALL_PATH, { items: existingItems });
-    logInfo('migrated legacy severities in data/news_all.json');
+    if (migrated.changed) {
+      logInfo('migrated legacy severities in data/news_all.json');
+    }
   }
   const existingDedup = new Set(existingItems.flatMap((item) => deriveDedupKeys(item)));
   const fetchedAtSgt = nowSgtIso();
@@ -1033,11 +1105,19 @@ async function run() {
     }
   }
 
-  const mergedAllItems = newItems.length > 0 ? [...existingItems, ...newItems] : existingItems;
-  if (newItems.length > 0) {
+  const mergedAllItemsRaw = newItems.length > 0 ? [...existingItems, ...newItems] : existingItems;
+  const dedupedMerged = dedupeNewsItems(mergedAllItemsRaw);
+  const mergedAllItems = dedupedMerged.items;
+  const effectiveNewItems = Math.max(0, mergedAllItems.length - existingItems.length);
+
+  if (newItems.length > 0 || dedupedMerged.dropped > 0) {
     writeJson(NEWS_ALL_PATH, { items: mergedAllItems });
   } else if (!fs.existsSync(NEWS_ALL_PATH)) {
     writeJson(NEWS_ALL_PATH, { items: existingItems });
+  }
+
+  if (dedupedMerged.dropped > 0) {
+    logInfo(`collapsed ${dedupedMerged.dropped} duplicate item(s) while writing merged news_all`);
   }
 
   appendRejectedLog(rejectedLogs);
@@ -1046,11 +1126,13 @@ async function run() {
     fetchedAtSgt,
     feedResults,
     existingItems.length,
-    newItems.length,
+    effectiveNewItems,
     rejectedLogs.length
   );
 
-  logInfo(`done. source=${args.source} mode=${args.mode} days=${args.days} new_items=${newItems.length} rejected=${rejectedLogs.length} total_all=${mergedAllItems.length} latest_90d=${latest90.length}`);
+  logInfo(
+    `done. source=${args.source} mode=${args.mode} days=${args.days} new_items=${effectiveNewItems} rejected=${rejectedLogs.length} total_all=${mergedAllItems.length} latest_90d=${latest90.length}`
+  );
 }
 
 if (require.main === module) {
@@ -1061,6 +1143,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+  dedupeNewsItems,
   buildGoogleDedupKeys,
   buildTitleDateDedupKey,
   decodeGoogleLinkCandidate,
