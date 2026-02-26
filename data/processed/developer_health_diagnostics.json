@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-26T05:36:31.305Z",
+  "generatedAt": "2026-02-26T12:08:40.760Z",
   "totalDevelopers": 23,
   "coverageDistribution": {
     "gte0_8": 23,
@@ -7,8 +7,8 @@
     "lt0_5": 0
   },
   "healthScoreDistribution": {
-    "min": 21,
-    "p10": 31.4,
+    "min": 16,
+    "p10": 29.4,
     "p25": 45.5,
     "median": 54,
     "p75": 71.5,
@@ -22,6 +22,31 @@
     "Pending data": 0
   },
   "lowestScores": [
+    {
+      "ticker": "5DP",
+      "name": "Heeton Holdings Ltd",
+      "segment": "mixed",
+      "healthScore": 16,
+      "healthStatus": "Red",
+      "scoreCoverage": 0.9800000000000001,
+      "topRiskContributors": [
+        {
+          "metric": "netDebtToEbitda",
+          "weightedRiskContribution": 26.531,
+          "riskScore": 100
+        },
+        {
+          "metric": "roic",
+          "weightedRiskContribution": 13.914,
+          "riskScore": 85.22222222222223
+        },
+        {
+          "metric": "currentRatio",
+          "weightedRiskContribution": 12.245,
+          "riskScore": 100
+        }
+      ]
+    },
     {
       "ticker": "C09",
       "name": "City Developments Ltd",
@@ -93,31 +118,6 @@
         {
           "metric": "roe",
           "weightedRiskContribution": 10,
-          "riskScore": 100
-        }
-      ]
-    },
-    {
-      "ticker": "5DP",
-      "name": "Heeton Holdings Ltd",
-      "segment": "mixed",
-      "healthScore": 33,
-      "healthStatus": "Red",
-      "scoreCoverage": 0.9800000000000001,
-      "topRiskContributors": [
-        {
-          "metric": "netDebtToEbitda",
-          "weightedRiskContribution": 26.531,
-          "riskScore": 100
-        },
-        {
-          "metric": "roic",
-          "weightedRiskContribution": 14.585,
-          "riskScore": 89.33333333333331
-        },
-        {
-          "metric": "roe",
-          "weightedRiskContribution": 10.204,
           "riskScore": 100
         }
       ]
