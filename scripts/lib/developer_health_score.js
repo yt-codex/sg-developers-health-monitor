@@ -47,8 +47,8 @@ const POLICY_PILLAR_AGGREGATION = {
 const POLICY_NEGATIVE_NET_CASH_SOFTEN = 0.7;
 
 const STATUS_BANDS = {
-  green: 65,
-  amber: 40
+  green: 50,
+  amber: 35
 };
 
 const SCORE_COVERAGE_MIN = 0.5;

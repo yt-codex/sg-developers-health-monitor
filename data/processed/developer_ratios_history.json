@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-02-26T14:01:26.124Z",
+  "updatedAt": "2026-02-26T14:15:30.762350Z",
   "source": "stockanalysis",
   "scoringModel": {
     "formula": "round(clamp((100 - weightedPillarRisk) - trendPenalty, 0, 100))",
@@ -113,8 +113,8 @@
     },
     "bands": {
       "status": {
-        "green": 65,
-        "amber": 40
+        "green": 50,
+        "amber": 35
       }
     },
     "excludedMetrics": [
@@ -1607,7 +1607,7 @@
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 39,
-      "healthStatus": "Red",
+      "healthStatus": "Amber",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
@@ -2415,7 +2415,7 @@
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 61,
-      "healthStatus": "Amber",
+      "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
@@ -2819,7 +2819,7 @@
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 37,
-      "healthStatus": "Red",
+      "healthStatus": "Amber",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
@@ -3223,7 +3223,7 @@
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 62,
-      "healthStatus": "Amber",
+      "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
@@ -4464,7 +4464,7 @@
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 51,
-      "healthStatus": "Amber",
+      "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
@@ -4868,7 +4868,7 @@
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 50,
-      "healthStatus": "Amber",
+      "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
@@ -6080,7 +6080,7 @@
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 62,
-      "healthStatus": "Amber",
+      "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
@@ -6484,7 +6484,7 @@
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 51,
-      "healthStatus": "Amber",
+      "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
@@ -7307,7 +7307,7 @@
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 64,
-      "healthStatus": "Amber",
+      "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
@@ -7740,7 +7740,7 @@
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 38,
-      "healthStatus": "Red",
+      "healthStatus": "Amber",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
@@ -8981,7 +8981,7 @@
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 62,
-      "healthStatus": "Amber",
+      "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
