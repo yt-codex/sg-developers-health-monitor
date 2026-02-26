@@ -26,6 +26,14 @@ const BASE_WEIGHTS = {
   payoutRatio: 0.02
 };
 
+const STATUS_BANDS = {
+  green: 70,
+  amber: 40
+};
+
+const SCORE_COVERAGE_MIN = 0.5;
+const TREND_PENALTY_CAP = 8;
+
 const RISK_THRESHOLDS = {
   debtToEquity: { direction: 'higherWorse', good: 0.8, bad: 2.5 },
   netDebtToEquity: { direction: 'higherWorse', good: 0.4, bad: 1.8 },
@@ -38,6 +46,15 @@ const RISK_THRESHOLDS = {
   assetTurnover: { direction: 'lowerWorse', good: 0.18, bad: 0.04 },
   payoutRatio: { direction: 'higherWorse', good: 100, bad: 250 }
 };
+
+const TREND_RULES = [
+  { key: 'netDebtToEbitda', direction: 'higherWorse', base: 2, consecutive: 3 },
+  { key: 'debtToEquity', direction: 'higherWorse', base: 1.5, consecutive: 2.5 },
+  { key: 'quickRatio', direction: 'lowerWorse', base: 1, consecutive: 1.5 },
+  { key: 'currentRatio', direction: 'lowerWorse', base: 1, consecutive: 1.5 },
+  { key: 'roic', direction: 'lowerWorse', base: 1.5, consecutive: 2.5 },
+  { key: 'roe', direction: 'lowerWorse', base: 1, consecutive: 1.5 }
+];
 
 function clamp(value, min = 0, max = 100) {
   return Math.min(max, Math.max(min, value));
@@ -103,52 +120,69 @@ function evaluateTrendForMetric(series, direction) {
   return { latestWorsened, consecutiveWorsened: secondWorsened };
 }
 
-function computeTrendPenalty(metrics = {}) {
+function isMetricIncluded(metricKey, includedMetricsSet) {
+  return !includedMetricsSet || includedMetricsSet.has(metricKey);
+}
+
+function computeTrendPenalty(metrics = {}, options = {}) {
+  const includedMetricsSet = Array.isArray(options.includedMetrics)
+    ? new Set(options.includedMetrics)
+    : null;
   const trendBreakdown = {};
   let trendPenalty = 0;
 
-  const rules = [
-    { key: 'netDebtToEbitda', direction: 'higherWorse', base: 2, consecutive: 3 },
-    { key: 'debtToEquity', direction: 'higherWorse', base: 1.5, consecutive: 2.5 },
-    { key: 'quickRatio', direction: 'lowerWorse', base: 1, consecutive: 1.5 },
-    { key: 'currentRatio', direction: 'lowerWorse', base: 1, consecutive: 1.5 },
-    { key: 'roic', direction: 'lowerWorse', base: 1.5, consecutive: 2.5 },
-    { key: 'roe', direction: 'lowerWorse', base: 1, consecutive: 1.5 }
-  ];
+  for (const rule of TREND_RULES) {
+    if (!isMetricIncluded(rule.key, includedMetricsSet)) {
+      trendBreakdown[rule.key] = {
+        comparedYears: [],
+        latestWorsened: false,
+        consecutiveWorsened: false,
+        appliedPenalty: 0,
+        skipped: true
+      };
+      continue;
+    }
 
-  for (const rule of rules) {
     const series = extractFySeries(metrics[rule.key]);
     const trend = evaluateTrendForMetric(series, rule.direction);
     const appliedPenalty = trend.latestWorsened ? (trend.consecutiveWorsened ? rule.consecutive : rule.base) : 0;
     trendBreakdown[rule.key] = {
-      comparedYears: series.slice(0, 3).map((entry) => entry.label),
-      latestWorsened: trend.latestWorsened,
-      consecutiveWorsened: trend.consecutiveWorsened,
-      appliedPenalty
-    };
-    trendPenalty += appliedPenalty;
+        comparedYears: series.slice(0, 3).map((entry) => entry.label),
+        latestWorsened: trend.latestWorsened,
+        consecutiveWorsened: trend.consecutiveWorsened,
+        appliedPenalty,
+        skipped: false
+      };
+      trendPenalty += appliedPenalty;
   }
 
-  const payoutTrend = evaluateTrendForMetric(extractFySeries(metrics.payoutRatio), 'higherWorse');
-  const roeTrend = evaluateTrendForMetric(extractFySeries(metrics.roe), 'lowerWorse');
-  const interactionPenalty = payoutTrend.latestWorsened && roeTrend.latestWorsened ? 1 : 0;
+  const payoutAndRoeEligible = isMetricIncluded('payoutRatio', includedMetricsSet)
+    && isMetricIncluded('roe', includedMetricsSet);
+  const payoutTrend = payoutAndRoeEligible
+    ? evaluateTrendForMetric(extractFySeries(metrics.payoutRatio), 'higherWorse')
+    : { latestWorsened: false, consecutiveWorsened: false };
+  const roeTrend = payoutAndRoeEligible
+    ? evaluateTrendForMetric(extractFySeries(metrics.roe), 'lowerWorse')
+    : { latestWorsened: false, consecutiveWorsened: false };
+  const interactionPenalty = payoutAndRoeEligible && payoutTrend.latestWorsened && roeTrend.latestWorsened ? 1 : 0;
 
   trendBreakdown.payoutRoeInteraction = {
+    eligible: payoutAndRoeEligible,
     payoutLatestWorsened: payoutTrend.latestWorsened,
     roeLatestWorsened: roeTrend.latestWorsened,
     appliedPenalty: interactionPenalty
   };
 
   trendPenalty += interactionPenalty;
-  trendPenalty = Math.min(8, trendPenalty);
+  trendPenalty = Math.min(TREND_PENALTY_CAP, trendPenalty);
 
   return { trendPenalty, trendBreakdown };
 }
 
 function statusFromScore(score) {
   if (score == null) return 'Pending data';
-  if (score >= 70) return 'Green';
-  if (score >= 40) return 'Amber';
+  if (score >= STATUS_BANDS.green) return 'Green';
+  if (score >= STATUS_BANDS.amber) return 'Amber';
   return 'Red';
 }
 
@@ -214,11 +248,11 @@ function computeHealthScore(record = {}) {
     weightedContributors[metricKey] = (metricWeight * riskByMetric[metricKey]) / availableWeight;
   }
 
-  const { trendPenalty, trendBreakdown } = computeTrendPenalty(metrics);
+  const { trendPenalty, trendBreakdown } = computeTrendPenalty(metrics, { includedMetrics: usedMetrics });
   const provisionalFinal = clamp(staticHealthScore - trendPenalty, 0, 100);
   const roundedFinal = Math.round(provisionalFinal);
 
-  if (availableWeight < 0.5) {
+  if (availableWeight < SCORE_COVERAGE_MIN) {
     return {
       healthScore: null,
       healthStatus: 'Pending data',
@@ -265,6 +299,10 @@ function computeHealthScore(record = {}) {
 
 module.exports = {
   BASE_WEIGHTS,
+  SCORE_COVERAGE_MIN,
+  STATUS_BANDS,
+  TREND_PENALTY_CAP,
+  TREND_RULES,
   RISK_THRESHOLDS,
   SCORE_METRICS,
   clamp,

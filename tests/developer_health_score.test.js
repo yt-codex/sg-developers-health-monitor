@@ -6,9 +6,12 @@ const path = require('path');
 const { parseRatiosTable } = require('../scripts/lib/developer_ratios');
 const {
   BASE_WEIGHTS,
+  SCORE_COVERAGE_MIN,
+  STATUS_BANDS,
   computeHealthScore,
   computeTrendPenalty,
-  riskForMetric
+  riskForMetric,
+  statusFromScore
 } = require('../scripts/lib/developer_health_score');
 
 function metric(values = {}) {
@@ -66,7 +69,7 @@ test('coverage below threshold returns Pending data', () => {
   assert.equal(result.healthScore, null);
   assert.equal(result.healthStatus, 'Pending data');
   assert.equal(result.scoreNote, 'Insufficient ratio coverage');
-  assert.ok(result.scoreCoverage < 0.5);
+  assert.ok(result.scoreCoverage < SCORE_COVERAGE_MIN);
 });
 
 test('trend penalty is capped at 8', () => {
@@ -140,6 +143,40 @@ test('trend penalty excludes debtToEbitda', () => {
   assert.equal(trend.trendBreakdown.debtToEbitda, undefined);
 });
 
+test('payout/roe interaction penalty requires both metrics in included coverage set', () => {
+  const metrics = {
+    payoutRatio: metric({ 'FY 2025': 260, 'FY 2024': 180, 'FY 2023': 90 }),
+    roe: metric({ 'FY 2025': 1, 'FY 2024': 4, 'FY 2023': 9 })
+  };
+
+  const eligible = computeTrendPenalty(metrics, { includedMetrics: ['payoutRatio', 'roe'] });
+  const missingPayout = computeTrendPenalty(metrics, { includedMetrics: ['roe'] });
+
+  assert.equal(eligible.trendBreakdown.payoutRoeInteraction.eligible, true);
+  assert.equal(eligible.trendBreakdown.payoutRoeInteraction.appliedPenalty, 1);
+  assert.equal(missingPayout.trendBreakdown.payoutRoeInteraction.eligible, false);
+  assert.equal(missingPayout.trendBreakdown.payoutRoeInteraction.appliedPenalty, 0);
+});
+
+test('missing payout current value does not trigger payout/roe interaction in final score', () => {
+  const record = buildRecord({
+    netDebtToEbitda: { Current: 8 },
+    debtToEquity: { Current: 1.2 },
+    netDebtToEquity: { Current: 0.9 },
+    quickRatio: { Current: 0.7 },
+    currentRatio: { Current: 1.5 },
+    roic: { Current: 6, 'FY 2025': 6, 'FY 2024': 7 },
+    roe: { Current: 8, 'FY 2025': 8, 'FY 2024': 9 },
+    payoutRatio: { 'FY 2025': 260, 'FY 2024': 180, 'FY 2023': 90 },
+    assetTurnover: { Current: 0.08 }
+  });
+
+  const result = computeHealthScore(record);
+  assert.ok(result.healthScoreComponents.missingMetrics.includes('payoutRatio'));
+  assert.equal(result.healthScoreComponents.trendBreakdown.payoutRoeInteraction.eligible, false);
+  assert.equal(result.healthScoreComponents.trendBreakdown.payoutRoeInteraction.appliedPenalty, 0);
+});
+
 test('partial metric sets can still compute when positive-weight coverage is sufficient', () => {
   const record = buildRecord({
     netDebtToEbitda: { Current: 9 },
@@ -202,6 +239,13 @@ test('risk boundaries obey v2 threshold edges', () => {
   assert.equal(riskForMetric('payoutRatio', 100), 0);
   assert.equal(riskForMetric('payoutRatio', 250), 100);
   assert.equal(riskForMetric('payoutRatio', -1), null);
+});
+
+test('status bands are consistent with scoring constants', () => {
+  assert.equal(statusFromScore(STATUS_BANDS.green), 'Green');
+  assert.equal(statusFromScore(STATUS_BANDS.green - 1), 'Amber');
+  assert.equal(statusFromScore(STATUS_BANDS.amber), 'Amber');
+  assert.equal(statusFromScore(STATUS_BANDS.amber - 1), 'Red');
 });
 
 test("'-' parsed as null from fixture does not crash score and keeps computing", () => {

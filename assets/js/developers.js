@@ -210,6 +210,41 @@ function buildScoreTooltip(entry) {
   ].filter(Boolean).join(' | ');
 }
 
+function buildMethodologyText(scoringModel) {
+  if (!scoringModel) {
+    return 'Health score uses weighted risk metrics plus a capped trend penalty. Detailed methodology is unavailable when ratios data is not loaded.';
+  }
+
+  const weights = scoringModel.weights || {};
+  const weightedMetrics = Object.entries(weights)
+    .filter(([, weight]) => Number.isFinite(weight) && weight > 0)
+    .sort((a, b) => b[1] - a[1])
+    .map(([metric, weight]) => `${metric}: ${weight.toFixed(2)}`)
+    .join(', ');
+  const statusBands = scoringModel.bands?.status || {};
+  const coverageThreshold = Number.isFinite(scoringModel.coverageThreshold)
+    ? `${Math.round(scoringModel.coverageThreshold * 100)}%`
+    : null;
+  const trendPenaltyCap = Number.isFinite(scoringModel.trendPenaltyCap)
+    ? String(scoringModel.trendPenaltyCap)
+    : null;
+  const excluded = Array.isArray(scoringModel.excludedMetrics) && scoringModel.excludedMetrics.length
+    ? scoringModel.excludedMetrics.join(', ')
+    : null;
+
+  return [
+    scoringModel.formula ? `Formula: ${scoringModel.formula}` : null,
+    scoringModel.weightedRisk ? `Weighted risk: ${scoringModel.weightedRisk}` : null,
+    weightedMetrics ? `Metric weights: ${weightedMetrics}` : null,
+    statusBands.green != null && statusBands.amber != null
+      ? `Status bands: Green ≥ ${statusBands.green}, Amber ≥ ${statusBands.amber}, otherwise Red`
+      : null,
+    coverageThreshold ? `Minimum coverage to score: ${coverageThreshold}` : null,
+    trendPenaltyCap ? `Trend penalty cap: ${trendPenaltyCap}` : null,
+    excluded ? `Reference-only metrics (excluded from score): ${excluded}` : null
+  ].filter(Boolean).join('. ');
+}
+
 function resolveHealthStatus(entry) {
   if (!entry) return null;
   return readFirstDefined(
@@ -242,16 +277,25 @@ async function initDevelopersPage() {
       App.fetchJson('./data/processed/developer_ratios_history.json').catch(() => null)
     ]);
     const ratiosMap = buildRatiosMap(ratiosData);
-    methodology.textContent = `Score = Σ(weight × normalized metric). Weights: ${JSON.stringify(data.scoringModel.weights)}. Status bands: Green ≥ ${data.scoringModel.bands.status.green}, Amber ≥ ${data.scoringModel.bands.status.amber}, otherwise Red.`;
+    const minimumCoverage = Number.isFinite(ratiosData?.scoringModel?.coverageThreshold)
+      ? ratiosData.scoringModel.coverageThreshold
+      : 0.5;
+    methodology.textContent = buildMethodologyText(ratiosData?.scoringModel);
 
     const rows = data.developers.map((dev, index) => {
       const ratioEntry = ratiosMap.get(normalizeTicker(dev.ticker));
       const scoreValue = resolveHealthScore(ratioEntry);
       const scoreCoverage = resolveScoreCoverage(ratioEntry);
-      const insufficientCoverage = Number.isFinite(scoreCoverage) && scoreCoverage < 0.5;
+      const insufficientCoverage = Number.isFinite(scoreCoverage) && scoreCoverage < minimumCoverage;
       const status = insufficientCoverage ? 'Pending data' : (resolveHealthStatus(ratioEntry) || 'Pending data');
       const score = insufficientCoverage || scoreValue == null ? 'Pending' : String(scoreValue);
-      const cls = status === 'Green' ? 'status-green' : status === 'Red' ? 'status-red' : 'status-amber';
+      const cls = status === 'Green'
+        ? 'status-green'
+        : status === 'Red'
+          ? 'status-red'
+          : status === 'Pending data'
+            ? 'status-pending'
+            : 'status-amber';
       const currentMarketCap = ratioEntry?.current?.marketCap ?? getCurrentMetric(ratioEntry?.metrics?.marketCap);
       const currentNetDebtToEbitda = ratioEntry?.current?.netDebtToEbitda ?? getCurrentMetric(ratioEntry?.metrics?.netDebtToEbitda);
       const currentDebtToEquity = ratioEntry?.current?.debtToEquity ?? getCurrentMetric(ratioEntry?.metrics?.debtToEquity);

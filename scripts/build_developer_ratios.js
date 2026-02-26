@@ -14,7 +14,13 @@ const {
   sanitizeHtmlSnippet,
   buildRatiosUrl
 } = require('./lib/developer_ratios');
-const { computeHealthScore } = require('./lib/developer_health_score');
+const {
+  BASE_WEIGHTS,
+  SCORE_COVERAGE_MIN,
+  STATUS_BANDS,
+  TREND_PENALTY_CAP,
+  computeHealthScore
+} = require('./lib/developer_health_score');
 
 const ROOT = path.resolve(__dirname, '..');
 const INPUT_CSV = path.join(ROOT, 'data', 'listed developer list.csv');
@@ -194,7 +200,7 @@ function buildDiagnostics(developers = []) {
   for (const dev of developers) {
     const c = Number.isFinite(dev.scoreCoverage) ? dev.scoreCoverage : 0;
     if (c >= 0.8) coverage.gte0_8 += 1;
-    else if (c >= 0.5) coverage.gte0_5_lt0_8 += 1;
+    else if (c >= SCORE_COVERAGE_MIN) coverage.gte0_5_lt0_8 += 1;
     else coverage.lt0_5 += 1;
 
     const status = dev.healthStatus || 'Pending data';
@@ -256,6 +262,22 @@ async function main() {
   const output = {
     updatedAt: nowIso(),
     source: 'stockanalysis',
+    scoringModel: {
+      formula: 'round(clamp((100 - weightedRisk) - trendPenalty, 0, 100))',
+      weightedRisk: 'sum(metricWeight * metricRisk) / sum(availableMetricWeight)',
+      weights: { ...BASE_WEIGHTS },
+      coverageThreshold: SCORE_COVERAGE_MIN,
+      trendPenaltyCap: TREND_PENALTY_CAP,
+      bands: {
+        status: {
+          green: STATUS_BANDS.green,
+          amber: STATUS_BANDS.amber
+        }
+      },
+      excludedMetrics: Object.entries(BASE_WEIGHTS)
+        .filter(([, weight]) => !Number.isFinite(weight) || weight <= 0)
+        .map(([metricKey]) => metricKey)
+    },
     developers: []
   };
 
