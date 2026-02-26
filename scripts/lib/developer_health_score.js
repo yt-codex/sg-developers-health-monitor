@@ -14,16 +14,16 @@ const SCORE_METRICS = [
 ];
 
 const BASE_WEIGHTS = {
-  netDebtToEbitda: 0.26,
-  debtToEquity: 0.17,
-  netDebtToEquity: 0.12,
+  netDebtToEbitda: 0.20,
+  debtToEquity: 0.15,
+  netDebtToEquity: 0.10,
   debtToEbitda: 0,
-  currentRatio: 0.12,
-  quickRatio: 0.03,
-  roic: 0.16,
-  roe: 0.10,
-  assetTurnover: 0.02,
-  payoutRatio: 0.02
+  currentRatio: 0.20,
+  quickRatio: 0,
+  roic: 0.20,
+  roe: 0.15,
+  assetTurnover: 0,
+  payoutRatio: 0
 };
 
 const STATUS_BANDS = {
@@ -50,7 +50,6 @@ const RISK_THRESHOLDS = {
 const TREND_RULES = [
   { key: 'netDebtToEbitda', direction: 'higherWorse', base: 2, consecutive: 3 },
   { key: 'debtToEquity', direction: 'higherWorse', base: 1.5, consecutive: 2.5 },
-  { key: 'quickRatio', direction: 'lowerWorse', base: 1, consecutive: 1.5 },
   { key: 'currentRatio', direction: 'lowerWorse', base: 1, consecutive: 1.5 },
   { key: 'roic', direction: 'lowerWorse', base: 1.5, consecutive: 2.5 },
   { key: 'roe', direction: 'lowerWorse', base: 1, consecutive: 1.5 }
@@ -58,7 +57,7 @@ const TREND_RULES = [
 
 const NEGATIVE_LEVERAGE_SUPPORT = {
   targetMetrics: ['netDebtToEbitda', 'netDebtToEquity'],
-  supportMetrics: ['quickRatio', 'currentRatio', 'roic', 'roe'],
+  supportMetrics: ['currentRatio', 'roic', 'roe'],
   strongMinHealthScore: 70,
   mixedMinHealthScore: 40,
   noSupportRiskFloor: 50,

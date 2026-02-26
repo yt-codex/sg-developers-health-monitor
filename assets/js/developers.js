@@ -1,5 +1,63 @@
 const SORT_DIRECTIONS = ['none', 'ascending', 'descending'];
 const PENDING_RE = /pending/i;
+const STATUS_LABEL_MAP = {
+  Green: 'Stable',
+  Amber: 'Watch',
+  Red: 'Elevated',
+  'Pending data': 'Data pending'
+};
+const METRIC_EXPLANATIONS = {
+  netDebtToEbitda: {
+    label: 'Net Debt / EBITDA',
+    category: 'Leverage',
+    rationale: 'Primary debt burden signal against operating cash generation.'
+  },
+  debtToEquity: {
+    label: 'Debt / Equity',
+    category: 'Leverage',
+    rationale: 'Capital structure stress signal when debt dominates equity.'
+  },
+  netDebtToEquity: {
+    label: 'Net Debt / Equity',
+    category: 'Leverage',
+    rationale: 'Balance-sheet leverage after cash offset, useful for net cash cases.'
+  },
+  currentRatio: {
+    label: 'Current Ratio',
+    category: 'Liquidity',
+    rationale: 'Near-term obligations buffer for refinancing and working capital.'
+  },
+  quickRatio: {
+    label: 'Quick Ratio',
+    category: 'Liquidity',
+    rationale: 'More conservative liquidity check excluding less liquid current assets.'
+  },
+  roic: {
+    label: 'ROIC',
+    category: 'Profitability',
+    rationale: 'Capital efficiency quality check for long-cycle project deployment.'
+  },
+  roe: {
+    label: 'ROE',
+    category: 'Profitability',
+    rationale: 'Shareholder return quality check across the cycle.'
+  },
+  payoutRatio: {
+    label: 'Payout Ratio',
+    category: 'Distribution policy',
+    rationale: 'Flags over-distribution risk when payouts exceed sustainable earnings.'
+  },
+  assetTurnover: {
+    label: 'Asset Turnover',
+    category: 'Efficiency',
+    rationale: 'Secondary operating velocity signal for asset-heavy developers.'
+  },
+  debtToEbitda: {
+    label: 'Debt / EBITDA',
+    category: 'Leverage',
+    rationale: 'Display reference only in current model.'
+  }
+};
 
 function parseNumberCandidate(value) {
   if (value == null) return null;
@@ -210,17 +268,57 @@ function buildScoreTooltip(entry) {
   ].filter(Boolean).join(' | ');
 }
 
-function buildMethodologyText(scoringModel) {
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function resolveMetricExplanation(metricKey) {
+  return METRIC_EXPLANATIONS[metricKey] || {
+    label: metricKey,
+    category: 'Other',
+    rationale: 'Model input metric.'
+  };
+}
+
+function renderStatusLegend(statusBands = {}) {
+  if (statusBands.green == null || statusBands.amber == null) return '';
+  return `
+    <p class="methodology-line">
+      <strong>Status labels (UI):</strong> Stable (model Green, score >= ${statusBands.green}),
+      Watch (model Amber, score >= ${statusBands.amber}),
+      Elevated (model Red, score &lt; ${statusBands.amber}).
+    </p>
+  `;
+}
+
+function buildMethodologyHtml(scoringModel) {
   if (!scoringModel) {
-    return 'Health score uses weighted risk metrics plus a capped trend penalty. Detailed methodology is unavailable when ratios data is not loaded.';
+    return '<p class="methodology-line">Health score uses weighted risk metrics plus a capped trend penalty. Detailed methodology is unavailable when ratios data is not loaded.</p>';
   }
 
   const weights = scoringModel.weights || {};
   const weightedMetrics = Object.entries(weights)
     .filter(([, weight]) => Number.isFinite(weight) && weight > 0)
+    .sort((a, b) => b[1] - a[1]);
+  const weightRows = weightedMetrics.map(([metric, weight]) => {
+    const explanation = resolveMetricExplanation(metric);
+    const weightPct = `${(weight * 100).toFixed(weight >= 0.1 ? 0 : 1)}%`;
+    return `<li><strong>${escapeHtml(explanation.label)}</strong> (${weightPct}) - ${escapeHtml(explanation.rationale)}</li>`;
+  }).join('');
+  const categoryTotals = weightedMetrics.reduce((acc, [metric, weight]) => {
+    const category = resolveMetricExplanation(metric).category;
+    acc[category] = (acc[category] || 0) + weight;
+    return acc;
+  }, {});
+  const categorySummary = Object.entries(categoryTotals)
     .sort((a, b) => b[1] - a[1])
-    .map(([metric, weight]) => `${metric}: ${weight.toFixed(2)}`)
-    .join(', ');
+    .map(([category, weight]) => `${category}: ${(weight * 100).toFixed(0)}%`)
+    .join(' | ');
   const statusBands = scoringModel.bands?.status || {};
   const coverageThreshold = Number.isFinite(scoringModel.coverageThreshold)
     ? `${Math.round(scoringModel.coverageThreshold * 100)}%`
@@ -228,8 +326,14 @@ function buildMethodologyText(scoringModel) {
   const trendPenaltyCap = Number.isFinite(scoringModel.trendPenaltyCap)
     ? String(scoringModel.trendPenaltyCap)
     : null;
-  const excluded = Array.isArray(scoringModel.excludedMetrics) && scoringModel.excludedMetrics.length
-    ? scoringModel.excludedMetrics.join(', ')
+  const excludedMetricKeys = Array.isArray(scoringModel.excludedMetrics) ? scoringModel.excludedMetrics : [];
+  const excluded = excludedMetricKeys.length
+    ? excludedMetricKeys.map((metricKey) => resolveMetricExplanation(metricKey).label).join(', ')
+    : null;
+  const simplificationNote = excludedMetricKeys.some((metricKey) => (
+    metricKey === 'quickRatio' || metricKey === 'payoutRatio' || metricKey === 'assetTurnover'
+  ))
+    ? 'Simplification update: Quick Ratio, Payout Ratio, and Asset Turnover were removed from scoring and kept as reference-only columns.'
     : null;
   const negativeLeverageHandling = scoringModel.negativeLeverageHandling;
   const negativeTargets = Array.isArray(negativeLeverageHandling?.targetMetrics)
@@ -244,19 +348,32 @@ function buildMethodologyText(scoringModel) {
   const negativeLeverageSummary = negativeLeverageHandling
     ? `Negative leverage handling: ${negativeTargets.join(', ')} require support from ${negativeSupportMetrics.join(', ')}; risk floors no/mixed/weak support = ${noSupportFloor}/${mixedSupportFloor}/${weakSupportFloor}`
     : null;
+  const lowWeightMetrics = weightedMetrics
+    .filter(([, weight]) => weight <= 0.03)
+    .map(([metric]) => resolveMetricExplanation(metric).label);
+  const lowWeightNote = lowWeightMetrics.length
+    ? `Low-weight metrics (${lowWeightMetrics.join(', ')}) are tie-breakers and guardrails; they do not drive the score by themselves.`
+    : null;
 
-  return [
-    scoringModel.formula ? `Formula: ${scoringModel.formula}` : null,
-    scoringModel.weightedRisk ? `Weighted risk: ${scoringModel.weightedRisk}` : null,
-    weightedMetrics ? `Metric weights: ${weightedMetrics}` : null,
-    statusBands.green != null && statusBands.amber != null
-      ? `Status bands: Green ≥ ${statusBands.green}, Amber ≥ ${statusBands.amber}, otherwise Red`
-      : null,
-    coverageThreshold ? `Minimum coverage to score: ${coverageThreshold}` : null,
-    trendPenaltyCap ? `Trend penalty cap: ${trendPenaltyCap}` : null,
-    excluded ? `Reference-only metrics (excluded from score): ${excluded}` : null,
-    negativeLeverageSummary
-  ].filter(Boolean).join('. ');
+  return `
+    <p class="methodology-line"><strong>Formula:</strong> ${escapeHtml(scoringModel.formula || 'round(clamp((100 - weightedRisk) - trendPenalty, 0, 100))')}</p>
+    <p class="methodology-line"><strong>Weighted risk:</strong> ${escapeHtml(scoringModel.weightedRisk || 'sum(metricWeight * metricRisk) / sum(availableMetricWeight)')}</p>
+    ${renderStatusLegend(statusBands)}
+    <p class="methodology-line"><strong>Weight concentration:</strong> ${escapeHtml(categorySummary || 'Not available')}</p>
+    ${coverageThreshold ? `<p class="methodology-line"><strong>Minimum coverage to score:</strong> ${escapeHtml(coverageThreshold)}</p>` : ''}
+    ${trendPenaltyCap ? `<p class="methodology-line"><strong>Trend penalty cap:</strong> ${escapeHtml(trendPenaltyCap)}</p>` : ''}
+    ${excluded ? `<p class="methodology-line"><strong>Reference-only metrics (excluded from score):</strong> ${escapeHtml(excluded)}</p>` : ''}
+    ${simplificationNote ? `<p class="methodology-line">${escapeHtml(simplificationNote)}</p>` : ''}
+    ${negativeLeverageSummary ? `<p class="methodology-line"><strong>Negative leverage handling:</strong> ${escapeHtml(negativeLeverageSummary.replace(/^Negative leverage handling:\s*/, ''))}</p>` : ''}
+    ${lowWeightNote ? `<p class="methodology-line">${escapeHtml(lowWeightNote)}</p>` : ''}
+    <p class="methodology-line"><strong>Why leverage still has a large share:</strong> Developers are capital-intensive and refinancing-sensitive, so debt service pressure remains a primary early-warning signal.</p>
+    <ul class="methodology-list">${weightRows}</ul>
+  `;
+}
+
+function toDisplayStatusLabel(rawStatus) {
+  if (!rawStatus) return STATUS_LABEL_MAP['Pending data'];
+  return STATUS_LABEL_MAP[rawStatus] || rawStatus;
 }
 
 function resolveHealthStatus(entry) {
@@ -294,20 +411,21 @@ async function initDevelopersPage() {
     const minimumCoverage = Number.isFinite(ratiosData?.scoringModel?.coverageThreshold)
       ? ratiosData.scoringModel.coverageThreshold
       : 0.5;
-    methodology.textContent = buildMethodologyText(ratiosData?.scoringModel);
+    methodology.innerHTML = buildMethodologyHtml(ratiosData?.scoringModel);
 
     const rows = data.developers.map((dev, index) => {
       const ratioEntry = ratiosMap.get(normalizeTicker(dev.ticker));
       const scoreValue = resolveHealthScore(ratioEntry);
       const scoreCoverage = resolveScoreCoverage(ratioEntry);
       const insufficientCoverage = Number.isFinite(scoreCoverage) && scoreCoverage < minimumCoverage;
-      const status = insufficientCoverage ? 'Pending data' : (resolveHealthStatus(ratioEntry) || 'Pending data');
+      const rawStatus = insufficientCoverage ? 'Pending data' : (resolveHealthStatus(ratioEntry) || 'Pending data');
+      const status = toDisplayStatusLabel(rawStatus);
       const score = insufficientCoverage || scoreValue == null ? 'Pending' : String(scoreValue);
-      const cls = status === 'Green'
+      const cls = rawStatus === 'Green'
         ? 'status-green'
-        : status === 'Red'
+        : rawStatus === 'Red'
           ? 'status-red'
-          : status === 'Pending data'
+          : rawStatus === 'Pending data'
             ? 'status-pending'
             : 'status-amber';
       const currentMarketCap = ratioEntry?.current?.marketCap ?? getCurrentMetric(ratioEntry?.metrics?.marketCap);
@@ -342,7 +460,7 @@ async function initDevelopersPage() {
           ticker: dev.ticker,
           segment: dev.segment,
           score,
-          status,
+          status: rawStatus,
           marketCap: currentMarketCap,
           netDebtToEbitda: currentNetDebtToEbitda,
           debtToEquity: currentDebtToEquity,

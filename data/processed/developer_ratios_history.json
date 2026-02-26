@@ -1,20 +1,20 @@
 {
-  "updatedAt": "2026-02-26T12:42:51.305Z",
+  "updatedAt": "2026-02-26T13:10:12.341107Z",
   "source": "stockanalysis",
   "scoringModel": {
     "formula": "round(clamp((100 - weightedRisk) - trendPenalty, 0, 100))",
     "weightedRisk": "sum(metricWeight * metricRisk) / sum(availableMetricWeight)",
     "weights": {
-      "netDebtToEbitda": 0.26,
-      "debtToEquity": 0.17,
-      "netDebtToEquity": 0.12,
+      "netDebtToEbitda": 0.2,
+      "debtToEquity": 0.15,
+      "netDebtToEquity": 0.1,
       "debtToEbitda": 0,
-      "currentRatio": 0.12,
-      "quickRatio": 0.03,
-      "roic": 0.16,
-      "roe": 0.1,
-      "assetTurnover": 0.02,
-      "payoutRatio": 0.02
+      "currentRatio": 0.2,
+      "quickRatio": 0,
+      "roic": 0.2,
+      "roe": 0.15,
+      "assetTurnover": 0,
+      "payoutRatio": 0
     },
     "coverageThreshold": 0.5,
     "trendPenaltyCap": 8,
@@ -24,7 +24,6 @@
         "netDebtToEquity"
       ],
       "supportMetrics": [
-        "quickRatio",
         "currentRatio",
         "roic",
         "roe"
@@ -46,7 +45,10 @@
       }
     },
     "excludedMetrics": [
-      "debtToEbitda"
+      "debtToEbitda",
+      "quickRatio",
+      "assetTurnover",
+      "payoutRatio"
     ]
   },
   "developers": [
@@ -319,51 +321,46 @@
       "lastFetchedAt": "2026-02-26T12:42:47.321Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 21,
+      "healthScore": 20,
       "healthStatus": "Red",
-      "scoreCoverage": 0.9800000000000001,
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 70.71979267897633,
-        "staticHealthScore": 29.280207321023667,
+        "staticRiskScore": 72.10963118580767,
+        "staticHealthScore": 27.89036881419233,
         "trendPenalty": 8,
-        "finalHealthScore": 21,
-        "scoreCoverage": 0.9800000000000001,
-        "missingMetrics": [
-          "payoutRatio"
-        ],
+        "finalHealthScore": 20,
+        "scoreCoverage": 0.9999999999999999,
+        "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
           "netDebtToEbitda": 89.16666666666666,
           "debtToEquity": 34.11764705882352,
           "netDebtToEquity": 55.714285714285715,
-          "quickRatio": 68.57142857142857,
-          "currentRatio": 48,
+          "currentRatio": 48.0,
           "roic": 97.11111111111111,
-          "roe": 97.10000000000001,
-          "assetTurnover": 28.57142857142856
+          "roe": 97.10000000000001
         },
         "weightedContributors": {
-          "netDebtToEbitda": 23.656462585034006,
-          "debtToEquity": 5.918367346938774,
-          "netDebtToEquity": 6.822157434402332,
-          "quickRatio": 2.0991253644314867,
-          "currentRatio": 5.877551020408163,
-          "roic": 15.854875283446711,
-          "roe": 9.908163265306122,
-          "assetTurnover": 0.583090379008746
+          "netDebtToEbitda": 17.833333333333336,
+          "debtToEquity": 5.117647058823529,
+          "netDebtToEquity": 5.571428571428573,
+          "currentRatio": 9.600000000000003,
+          "roic": 19.422222222222228,
+          "roe": 14.565000000000003
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -387,17 +384,6 @@
             "latestWorsened": true,
             "consecutiveWorsened": true,
             "appliedPenalty": 2.5,
-            "skipped": false
-          },
-          "quickRatio": {
-            "comparedYears": [
-              "FY 2024",
-              "FY 2023",
-              "FY 2022"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 1,
             "skipped": false
           },
           "currentRatio": {
@@ -441,7 +427,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:47.684Z"
+      "lastScoredAt": "2026-02-26T13:10:12.341226Z"
     },
     {
       "ticker": "U14",
@@ -712,52 +698,46 @@
       "lastFetchedAt": "2026-02-26T12:42:47.684Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 74,
-      "healthStatus": "Green",
-      "scoreCoverage": 1,
+      "healthScore": 69,
+      "healthStatus": "Amber",
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 21.314285714285717,
-        "staticHealthScore": 78.68571428571428,
-        "trendPenalty": 4.5,
-        "finalHealthScore": 74,
-        "scoreCoverage": 1,
+        "staticRiskScore": 27.820000000000004,
+        "staticHealthScore": 72.17999999999999,
+        "trendPenalty": 3.5,
+        "finalHealthScore": 69,
+        "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "payoutRatio",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
           "netDebtToEbitda": 0,
           "debtToEquity": 0,
           "netDebtToEquity": 0,
-          "quickRatio": 0,
           "currentRatio": 0,
-          "roic": 77,
-          "roe": 82.8,
-          "payoutRatio": 0,
-          "assetTurnover": 35.71428571428571
+          "roic": 77.0,
+          "roe": 82.8
         },
         "weightedContributors": {
-          "netDebtToEbitda": 0,
-          "debtToEquity": 0,
-          "netDebtToEquity": 0,
-          "quickRatio": 0,
-          "currentRatio": 0,
-          "roic": 12.32,
-          "roe": 8.28,
-          "payoutRatio": 0,
-          "assetTurnover": 0.7142857142857142
+          "netDebtToEbitda": 0.0,
+          "debtToEquity": 0.0,
+          "netDebtToEquity": 0.0,
+          "currentRatio": 0.0,
+          "roic": 15.400000000000002,
+          "roe": 12.420000000000002
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -773,17 +753,6 @@
             "skipped": false
           },
           "debtToEquity": {
-            "comparedYears": [
-              "FY 2024",
-              "FY 2023",
-              "FY 2022"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
-            "skipped": false
-          },
-          "quickRatio": {
             "comparedYears": [
               "FY 2024",
               "FY 2023",
@@ -828,14 +797,14 @@
             "skipped": false
           },
           "payoutRoeInteraction": {
-            "eligible": true,
-            "payoutLatestWorsened": true,
-            "roeLatestWorsened": true,
-            "appliedPenalty": 1
+            "eligible": false,
+            "payoutLatestWorsened": false,
+            "roeLatestWorsened": false,
+            "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:47.843Z"
+      "lastScoredAt": "2026-02-26T13:10:12.341292Z"
     },
     {
       "ticker": "F17",
@@ -1106,52 +1075,46 @@
       "lastFetchedAt": "2026-02-26T12:42:47.843Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 46,
+      "healthScore": 45,
       "healthStatus": "Amber",
-      "scoreCoverage": 1,
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 48.49079365079365,
-        "staticHealthScore": 51.50920634920635,
+        "staticRiskScore": 49.65167133520076,
+        "staticHealthScore": 50.34832866479924,
         "trendPenalty": 5.5,
-        "finalHealthScore": 46,
-        "scoreCoverage": 1,
+        "finalHealthScore": 45,
+        "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "payoutRatio",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
           "netDebtToEbitda": 78.66666666666666,
           "debtToEquity": 2.352941176470584,
           "netDebtToEquity": 22.14285714285714,
-          "quickRatio": 40.00000000000001,
           "currentRatio": 0,
           "roic": 86.55555555555556,
-          "roe": 93.6,
-          "payoutRatio": 0,
-          "assetTurnover": 28.57142857142856
+          "roe": 93.6
         },
         "weightedContributors": {
-          "netDebtToEbitda": 20.453333333333333,
-          "debtToEquity": 0.3999999999999993,
-          "netDebtToEquity": 2.6571428571428566,
-          "quickRatio": 1.2000000000000002,
-          "currentRatio": 0,
-          "roic": 13.84888888888889,
-          "roe": 9.36,
-          "payoutRatio": 0,
-          "assetTurnover": 0.5714285714285712
+          "netDebtToEbitda": 15.733333333333334,
+          "debtToEquity": 0.35294117647058765,
+          "netDebtToEquity": 2.2142857142857144,
+          "currentRatio": 0.0,
+          "roic": 17.311111111111117,
+          "roe": 14.040000000000001
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -1175,17 +1138,6 @@
             "latestWorsened": true,
             "consecutiveWorsened": true,
             "appliedPenalty": 2.5,
-            "skipped": false
-          },
-          "quickRatio": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
             "skipped": false
           },
           "currentRatio": {
@@ -1222,14 +1174,14 @@
             "skipped": false
           },
           "payoutRoeInteraction": {
-            "eligible": true,
-            "payoutLatestWorsened": true,
+            "eligible": false,
+            "payoutLatestWorsened": false,
             "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:48.002Z"
+      "lastScoredAt": "2026-02-26T13:10:12.341352Z"
     },
     {
       "ticker": "TQ5",
@@ -1500,52 +1452,46 @@
       "lastFetchedAt": "2026-02-26T12:42:48.002Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 29,
+      "healthScore": 25,
       "healthStatus": "Red",
-      "scoreCoverage": 1,
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 65.07746031746032,
-        "staticHealthScore": 34.92253968253968,
+        "staticRiskScore": 69.21116713352008,
+        "staticHealthScore": 30.788832866479922,
         "trendPenalty": 5.5,
-        "finalHealthScore": 29,
-        "scoreCoverage": 1,
+        "finalHealthScore": 25,
+        "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "payoutRatio",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
           "netDebtToEbitda": 89.33333333333331,
           "debtToEquity": 18.235294117647065,
           "netDebtToEquity": 40.714285714285715,
-          "quickRatio": 58.57142857142858,
-          "currentRatio": 77,
+          "currentRatio": 77.0,
           "roic": 80.88888888888887,
-          "roe": 86.4,
-          "payoutRatio": 0,
-          "assetTurnover": 64.28571428571429
+          "roe": 86.4
         },
         "weightedContributors": {
-          "netDebtToEbitda": 23.226666666666663,
-          "debtToEquity": 3.1000000000000014,
-          "netDebtToEquity": 4.885714285714285,
-          "quickRatio": 1.7571428571428573,
-          "currentRatio": 9.24,
-          "roic": 12.94222222222222,
-          "roe": 8.64,
-          "payoutRatio": 0,
-          "assetTurnover": 1.2857142857142858
+          "netDebtToEbitda": 17.866666666666667,
+          "debtToEquity": 2.73529411764706,
+          "netDebtToEquity": 4.071428571428573,
+          "currentRatio": 15.400000000000002,
+          "roic": 16.177777777777777,
+          "roe": 12.960000000000003
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -1569,17 +1515,6 @@
             "latestWorsened": true,
             "consecutiveWorsened": true,
             "appliedPenalty": 2.5,
-            "skipped": false
-          },
-          "quickRatio": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
             "skipped": false
           },
           "currentRatio": {
@@ -1616,14 +1551,14 @@
             "skipped": false
           },
           "payoutRoeInteraction": {
-            "eligible": true,
+            "eligible": false,
             "payoutLatestWorsened": false,
             "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:48.164Z"
+      "lastScoredAt": "2026-02-26T13:10:12.341406Z"
     },
     {
       "ticker": "9CI",
@@ -1894,52 +1829,46 @@
       "lastFetchedAt": "2026-02-26T12:42:48.164Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 49,
+      "healthScore": 42,
       "healthStatus": "Amber",
-      "scoreCoverage": 1,
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 44.41238095238095,
-        "staticHealthScore": 55.58761904761905,
-        "trendPenalty": 7,
-        "finalHealthScore": 49,
-        "scoreCoverage": 1,
+        "staticRiskScore": 52.30000000000001,
+        "staticHealthScore": 47.69999999999999,
+        "trendPenalty": 6.0,
+        "finalHealthScore": 42,
+        "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "payoutRatio",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
           "netDebtToEbitda": 33.666666666666664,
           "debtToEquity": 0,
           "netDebtToEquity": 4.9999999999999964,
-          "quickRatio": 0,
           "currentRatio": 57.00000000000001,
           "roic": 93.33333333333333,
-          "roe": 100,
-          "payoutRatio": 100,
-          "assetTurnover": 64.28571428571429
+          "roe": 100
         },
         "weightedContributors": {
-          "netDebtToEbitda": 8.753333333333334,
-          "debtToEquity": 0,
-          "netDebtToEquity": 0.5999999999999995,
-          "quickRatio": 0,
-          "currentRatio": 6.840000000000001,
-          "roic": 14.933333333333334,
-          "roe": 10,
-          "payoutRatio": 2,
-          "assetTurnover": 1.2857142857142858
+          "netDebtToEbitda": 6.733333333333334,
+          "debtToEquity": 0.0,
+          "netDebtToEquity": 0.4999999999999997,
+          "currentRatio": 11.400000000000004,
+          "roic": 18.66666666666667,
+          "roe": 15.000000000000002
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -1963,17 +1892,6 @@
             "latestWorsened": true,
             "consecutiveWorsened": false,
             "appliedPenalty": 1.5,
-            "skipped": false
-          },
-          "quickRatio": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
             "skipped": false
           },
           "currentRatio": {
@@ -2010,14 +1928,14 @@
             "skipped": false
           },
           "payoutRoeInteraction": {
-            "eligible": true,
-            "payoutLatestWorsened": true,
-            "roeLatestWorsened": true,
-            "appliedPenalty": 1
+            "eligible": false,
+            "payoutLatestWorsened": false,
+            "roeLatestWorsened": false,
+            "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:48.322Z"
+      "lastScoredAt": "2026-02-26T13:10:12.341460Z"
     },
     {
       "ticker": "H78",
@@ -2288,51 +2206,46 @@
       "lastFetchedAt": "2026-02-26T12:42:48.323Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 64,
+      "healthScore": 58,
       "healthStatus": "Amber",
-      "scoreCoverage": 0.9800000000000001,
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 30.811467444120503,
-        "staticHealthScore": 69.1885325558795,
-        "trendPenalty": 5,
-        "finalHealthScore": 64,
-        "scoreCoverage": 0.9800000000000001,
-        "missingMetrics": [
-          "payoutRatio"
-        ],
+        "staticRiskScore": 37.13333333333334,
+        "staticHealthScore": 62.86666666666666,
+        "trendPenalty": 5.0,
+        "finalHealthScore": 58,
+        "scoreCoverage": 0.9999999999999999,
+        "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
           "netDebtToEbitda": 0,
           "debtToEquity": 0,
           "netDebtToEquity": 0,
-          "quickRatio": 55.714285714285715,
-          "currentRatio": 26,
+          "currentRatio": 26.0,
           "roic": 84.66666666666667,
-          "roe": 100,
-          "assetTurnover": 92.85714285714288
+          "roe": 100
         },
         "weightedContributors": {
-          "netDebtToEbitda": 0,
-          "debtToEquity": 0,
-          "netDebtToEquity": 0,
-          "quickRatio": 1.705539358600583,
-          "currentRatio": 3.183673469387755,
-          "roic": 13.82312925170068,
-          "roe": 10.204081632653061,
-          "assetTurnover": 1.8950437317784259
+          "netDebtToEbitda": 0.0,
+          "debtToEquity": 0.0,
+          "netDebtToEquity": 0.0,
+          "currentRatio": 5.200000000000001,
+          "roic": 16.933333333333337,
+          "roe": 15.000000000000002
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -2348,17 +2261,6 @@
             "skipped": false
           },
           "debtToEquity": {
-            "comparedYears": [
-              "FY 2024",
-              "FY 2023",
-              "FY 2022"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
-            "skipped": false
-          },
-          "quickRatio": {
             "comparedYears": [
               "FY 2024",
               "FY 2023",
@@ -2410,7 +2312,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:48.559Z"
+      "lastScoredAt": "2026-02-26T13:10:12.341511Z"
     },
     {
       "ticker": "LJ3",
@@ -2681,51 +2583,46 @@
       "lastFetchedAt": "2026-02-26T12:42:48.559Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 47,
-      "healthStatus": "Amber",
-      "scoreCoverage": 0.9800000000000001,
+      "healthScore": 36,
+      "healthStatus": "Red",
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 48.297700032393905,
-        "staticHealthScore": 51.702299967606095,
+        "staticRiskScore": 59.03968253968255,
+        "staticHealthScore": 40.96031746031745,
         "trendPenalty": 4.5,
-        "finalHealthScore": 47,
-        "scoreCoverage": 0.9800000000000001,
-        "missingMetrics": [
-          "payoutRatio"
-        ],
+        "finalHealthScore": 36,
+        "scoreCoverage": 0.9999999999999999,
+        "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
           "netDebtToEbitda": 33.00000000000001,
           "debtToEquity": 0,
           "netDebtToEquity": 9.285714285714286,
-          "quickRatio": 28.571428571428566,
           "currentRatio": 100,
           "roic": 82.55555555555554,
-          "roe": 100,
-          "assetTurnover": 78.57142857142857
+          "roe": 100
         },
         "weightedContributors": {
-          "netDebtToEbitda": 8.755102040816327,
-          "debtToEquity": 0,
-          "netDebtToEquity": 1.1370262390670554,
-          "quickRatio": 0.8746355685131193,
-          "currentRatio": 12.244897959183673,
-          "roic": 13.478458049886619,
-          "roe": 10.204081632653061,
-          "assetTurnover": 1.6034985422740522
+          "netDebtToEbitda": 6.600000000000002,
+          "debtToEquity": 0.0,
+          "netDebtToEquity": 0.9285714285714288,
+          "currentRatio": 20.000000000000004,
+          "roic": 16.511111111111113,
+          "roe": 15.000000000000002
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -2749,17 +2646,6 @@
             "latestWorsened": true,
             "consecutiveWorsened": false,
             "appliedPenalty": 1.5,
-            "skipped": false
-          },
-          "quickRatio": {
-            "comparedYears": [
-              "FY 2024",
-              "FY 2023",
-              "FY 2022"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
             "skipped": false
           },
           "currentRatio": {
@@ -2803,7 +2689,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:48.720Z"
+      "lastScoredAt": "2026-02-26T13:10:12.341562Z"
     },
     {
       "ticker": "W05",
@@ -3074,51 +2960,46 @@
       "lastFetchedAt": "2026-02-26T12:42:48.720Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 53,
+      "healthScore": 48,
       "healthStatus": "Amber",
-      "scoreCoverage": 0.9800000000000001,
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 39.38338192419825,
-        "staticHealthScore": 60.61661807580175,
+        "staticRiskScore": 43.70000000000001,
+        "staticHealthScore": 56.29999999999999,
         "trendPenalty": 8,
-        "finalHealthScore": 53,
-        "scoreCoverage": 0.9800000000000001,
-        "missingMetrics": [
-          "payoutRatio"
-        ],
+        "finalHealthScore": 48,
+        "scoreCoverage": 0.9999999999999999,
+        "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
           "netDebtToEbitda": 43.50000000000001,
           "debtToEquity": 0,
           "netDebtToEquity": 0,
-          "quickRatio": 0,
           "currentRatio": 0,
           "roic": 100,
-          "roe": 100,
-          "assetTurnover": 64.28571428571429
+          "roe": 100
         },
         "weightedContributors": {
-          "netDebtToEbitda": 11.540816326530614,
-          "debtToEquity": 0,
-          "netDebtToEquity": 0,
-          "quickRatio": 0,
-          "currentRatio": 0,
-          "roic": 16.326530612244895,
-          "roe": 10.204081632653061,
-          "assetTurnover": 1.3119533527696792
+          "netDebtToEbitda": 8.700000000000003,
+          "debtToEquity": 0.0,
+          "netDebtToEquity": 0.0,
+          "currentRatio": 0.0,
+          "roic": 20.000000000000004,
+          "roe": 15.000000000000002
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -3142,17 +3023,6 @@
             "latestWorsened": true,
             "consecutiveWorsened": true,
             "appliedPenalty": 2.5,
-            "skipped": false
-          },
-          "quickRatio": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
             "skipped": false
           },
           "currentRatio": {
@@ -3196,7 +3066,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:48.878Z"
+      "lastScoredAt": "2026-02-26T13:10:12.341612Z"
     },
     {
       "ticker": "B61",
@@ -3467,83 +3337,75 @@
       "lastFetchedAt": "2026-02-26T12:42:48.878Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 83,
+      "healthScore": 72,
       "healthStatus": "Green",
-      "scoreCoverage": 1,
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 12.402222222222223,
-        "staticHealthScore": 87.59777777777778,
-        "trendPenalty": 5,
-        "finalHealthScore": 83,
-        "scoreCoverage": 1,
+        "staticRiskScore": 24.42777777777778,
+        "staticHealthScore": 75.57222222222222,
+        "trendPenalty": 4,
+        "finalHealthScore": 72,
+        "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "payoutRatio",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
-          "netDebtToEbitda": 0,
+          "netDebtToEbitda": 25,
           "debtToEquity": 0,
-          "netDebtToEquity": 0,
-          "quickRatio": 0,
+          "netDebtToEquity": 25,
           "currentRatio": 0,
           "roic": 41.888888888888886,
-          "roe": 57.00000000000001,
-          "payoutRatio": 0,
-          "assetTurnover": 0
+          "roe": 57.00000000000001
         },
         "weightedContributors": {
-          "netDebtToEbitda": 0,
-          "debtToEquity": 0,
-          "netDebtToEquity": 0,
-          "quickRatio": 0,
-          "currentRatio": 0,
-          "roic": 6.702222222222222,
-          "roe": 5.700000000000001,
-          "payoutRatio": 0,
-          "assetTurnover": 0
+          "netDebtToEbitda": 5.000000000000001,
+          "debtToEquity": 0.0,
+          "netDebtToEquity": 2.5000000000000004,
+          "currentRatio": 0.0,
+          "roic": 8.37777777777778,
+          "roe": 8.550000000000002
         },
         "metricAdjustments": {
           "netDebtToEbitda": {
             "rule": "negativeLeverageSupportGate",
             "currentValue": -1.44,
             "originalRisk": 0,
-            "adjustedRisk": 0,
-            "supportBand": "strong",
-            "supportHealthScore": 75.27777777777777,
+            "adjustedRisk": 25,
+            "supportBand": "mixed",
+            "supportHealthScore": 67.03703703703704,
             "supportMetricsUsed": [
-              "quickRatio",
               "currentRatio",
               "roic",
               "roe"
             ],
-            "applied": false
+            "applied": true
           },
           "netDebtToEquity": {
             "rule": "negativeLeverageSupportGate",
             "currentValue": -0.1,
             "originalRisk": 0,
-            "adjustedRisk": 0,
-            "supportBand": "strong",
-            "supportHealthScore": 75.27777777777777,
+            "adjustedRisk": 25,
+            "supportBand": "mixed",
+            "supportHealthScore": 67.03703703703704,
             "supportMetricsUsed": [
-              "quickRatio",
               "currentRatio",
               "roic",
               "roe"
             ],
-            "applied": false
+            "applied": true
           }
         },
         "trendBreakdown": {
@@ -3567,17 +3429,6 @@
             "latestWorsened": false,
             "consecutiveWorsened": false,
             "appliedPenalty": 0,
-            "skipped": false
-          },
-          "quickRatio": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 1,
             "skipped": false
           },
           "currentRatio": {
@@ -3614,14 +3465,14 @@
             "skipped": false
           },
           "payoutRoeInteraction": {
-            "eligible": true,
+            "eligible": false,
             "payoutLatestWorsened": false,
             "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:49.031Z"
+      "lastScoredAt": "2026-02-26T13:10:12.341665Z"
     },
     {
       "ticker": "H13",
@@ -3892,52 +3743,46 @@
       "lastFetchedAt": "2026-02-26T12:42:49.032Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 45,
-      "healthStatus": "Amber",
-      "scoreCoverage": 1,
+      "healthScore": 38,
+      "healthStatus": "Red",
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 46.89563492063491,
-        "staticHealthScore": 53.10436507936509,
-        "trendPenalty": 8,
-        "finalHealthScore": 45,
-        "scoreCoverage": 1,
+        "staticRiskScore": 55.82888888888889,
+        "staticHealthScore": 44.17111111111111,
+        "trendPenalty": 6.5,
+        "finalHealthScore": 38,
+        "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "payoutRatio",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
           "netDebtToEbitda": 32.41666666666667,
           "debtToEquity": 0,
-          "netDebtToEquity": 15,
-          "quickRatio": 75.71428571428572,
+          "netDebtToEquity": 15.0,
           "currentRatio": 89.99999999999999,
           "roic": 79.77777777777777,
-          "roe": 92.6,
-          "payoutRatio": 0,
-          "assetTurnover": 78.57142857142857
+          "roe": 92.6
         },
         "weightedContributors": {
-          "netDebtToEbitda": 8.428333333333335,
-          "debtToEquity": 0,
-          "netDebtToEquity": 1.7999999999999998,
-          "quickRatio": 2.271428571428572,
-          "currentRatio": 10.799999999999997,
-          "roic": 12.764444444444443,
-          "roe": 9.26,
-          "payoutRatio": 0,
-          "assetTurnover": 1.5714285714285714
+          "netDebtToEbitda": 6.483333333333335,
+          "debtToEquity": 0.0,
+          "netDebtToEquity": 1.5000000000000002,
+          "currentRatio": 18.0,
+          "roic": 15.955555555555557,
+          "roe": 13.89
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -3961,17 +3806,6 @@
             "latestWorsened": false,
             "consecutiveWorsened": false,
             "appliedPenalty": 0,
-            "skipped": false
-          },
-          "quickRatio": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 1,
             "skipped": false
           },
           "currentRatio": {
@@ -4008,14 +3842,14 @@
             "skipped": false
           },
           "payoutRoeInteraction": {
-            "eligible": true,
-            "payoutLatestWorsened": true,
-            "roeLatestWorsened": true,
-            "appliedPenalty": 1
+            "eligible": false,
+            "payoutLatestWorsened": false,
+            "roeLatestWorsened": false,
+            "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:49.181Z"
+      "lastScoredAt": "2026-02-26T13:10:12.341718Z"
     },
     {
       "ticker": "T24",
@@ -4286,52 +4120,46 @@
       "lastFetchedAt": "2026-02-26T12:42:49.181Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 31,
+      "healthScore": 32,
       "healthStatus": "Red",
-      "scoreCoverage": 1,
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 62.24285714285714,
-        "staticHealthScore": 37.75714285714286,
-        "trendPenalty": 7,
-        "finalHealthScore": 31,
-        "scoreCoverage": 1,
+        "staticRiskScore": 62.268907563025216,
+        "staticHealthScore": 37.731092436974784,
+        "trendPenalty": 6.0,
+        "finalHealthScore": 32,
+        "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "payoutRatio",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
           "netDebtToEbitda": 100,
           "debtToEquity": 19.411764705882344,
           "netDebtToEquity": 43.57142857142857,
-          "quickRatio": 0,
           "currentRatio": 0,
           "roic": 100,
-          "roe": 100,
-          "payoutRatio": 0,
-          "assetTurnover": 85.71428571428572
+          "roe": 100
         },
         "weightedContributors": {
-          "netDebtToEbitda": 26,
-          "debtToEquity": 3.299999999999999,
-          "netDebtToEquity": 5.228571428571428,
-          "quickRatio": 0,
-          "currentRatio": 0,
-          "roic": 16,
-          "roe": 10,
-          "payoutRatio": 0,
-          "assetTurnover": 1.7142857142857144
+          "netDebtToEbitda": 20.000000000000004,
+          "debtToEquity": 2.911764705882352,
+          "netDebtToEquity": 4.357142857142858,
+          "currentRatio": 0.0,
+          "roic": 20.000000000000004,
+          "roe": 15.000000000000002
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -4355,17 +4183,6 @@
             "latestWorsened": true,
             "consecutiveWorsened": false,
             "appliedPenalty": 1.5,
-            "skipped": false
-          },
-          "quickRatio": {
-            "comparedYears": [
-              "FY 2024",
-              "FY 2023",
-              "FY 2022"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
             "skipped": false
           },
           "currentRatio": {
@@ -4402,14 +4219,14 @@
             "skipped": false
           },
           "payoutRoeInteraction": {
-            "eligible": true,
-            "payoutLatestWorsened": true,
-            "roeLatestWorsened": true,
-            "appliedPenalty": 1
+            "eligible": false,
+            "payoutLatestWorsened": false,
+            "roeLatestWorsened": false,
+            "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:49.283Z"
+      "lastScoredAt": "2026-02-26T13:10:12.341769Z"
     },
     {
       "ticker": "O10",
@@ -4680,52 +4497,46 @@
       "lastFetchedAt": "2026-02-26T12:42:49.283Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 47,
+      "healthScore": 41,
       "healthStatus": "Amber",
-      "scoreCoverage": 1,
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 48.01452380952381,
-        "staticHealthScore": 51.98547619047619,
-        "trendPenalty": 5,
-        "finalHealthScore": 47,
-        "scoreCoverage": 1,
+        "staticRiskScore": 56.25500000000001,
+        "staticHealthScore": 43.74499999999999,
+        "trendPenalty": 2.5,
+        "finalHealthScore": 41,
+        "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "payoutRatio",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
           "netDebtToEbitda": 48.41666666666667,
           "debtToEquity": 0,
           "netDebtToEquity": 0,
-          "quickRatio": 45.714285714285715,
-          "currentRatio": 81,
+          "currentRatio": 81.0,
           "roic": 94.33333333333334,
-          "roe": 76.7,
-          "payoutRatio": 0,
-          "assetTurnover": 78.57142857142857
+          "roe": 76.7
         },
         "weightedContributors": {
-          "netDebtToEbitda": 12.588333333333335,
-          "debtToEquity": 0,
-          "netDebtToEquity": 0,
-          "quickRatio": 1.3714285714285714,
-          "currentRatio": 9.719999999999999,
-          "roic": 15.093333333333335,
-          "roe": 7.670000000000001,
-          "payoutRatio": 0,
-          "assetTurnover": 1.5714285714285714
+          "netDebtToEbitda": 9.683333333333337,
+          "debtToEquity": 0.0,
+          "netDebtToEquity": 0.0,
+          "currentRatio": 16.200000000000003,
+          "roic": 18.866666666666674,
+          "roe": 11.505000000000003
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -4749,17 +4560,6 @@
             "latestWorsened": false,
             "consecutiveWorsened": false,
             "appliedPenalty": 0,
-            "skipped": false
-          },
-          "quickRatio": {
-            "comparedYears": [
-              "FY 2024",
-              "FY 2023",
-              "FY 2022"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": true,
-            "appliedPenalty": 1.5,
             "skipped": false
           },
           "currentRatio": {
@@ -4796,14 +4596,14 @@
             "skipped": false
           },
           "payoutRoeInteraction": {
-            "eligible": true,
-            "payoutLatestWorsened": true,
-            "roeLatestWorsened": true,
-            "appliedPenalty": 1
+            "eligible": false,
+            "payoutLatestWorsened": false,
+            "roeLatestWorsened": false,
+            "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:49.494Z"
+      "lastScoredAt": "2026-02-26T13:10:12.341819Z"
     },
     {
       "ticker": "5IC",
@@ -5074,52 +4874,46 @@
       "lastFetchedAt": "2026-02-26T12:42:49.494Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 65,
+      "healthScore": 69,
       "healthStatus": "Amber",
-      "scoreCoverage": 1,
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 33.46666666666667,
-        "staticHealthScore": 66.53333333333333,
+        "staticRiskScore": 29.666666666666668,
+        "staticHealthScore": 70.33333333333333,
         "trendPenalty": 1.5,
-        "finalHealthScore": 65,
-        "scoreCoverage": 1,
+        "finalHealthScore": 69,
+        "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "payoutRatio",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
           "netDebtToEbitda": 7.333333333333332,
           "debtToEquity": 100,
           "netDebtToEquity": 100,
-          "quickRatio": 0,
           "currentRatio": 0,
           "roic": 15.999999999999995,
-          "roe": 0,
-          "payoutRatio": 0,
-          "assetTurnover": 0
+          "roe": 0
         },
         "weightedContributors": {
-          "netDebtToEbitda": 1.9066666666666665,
-          "debtToEquity": 17,
-          "netDebtToEquity": 12,
-          "quickRatio": 0,
-          "currentRatio": 0,
-          "roic": 2.559999999999999,
-          "roe": 0,
-          "payoutRatio": 0,
-          "assetTurnover": 0
+          "netDebtToEbitda": 1.4666666666666668,
+          "debtToEquity": 15.000000000000002,
+          "netDebtToEquity": 10.000000000000002,
+          "currentRatio": 0.0,
+          "roic": 3.1999999999999997,
+          "roe": 0.0
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -5143,17 +4937,6 @@
             "latestWorsened": true,
             "consecutiveWorsened": false,
             "appliedPenalty": 1.5,
-            "skipped": false
-          },
-          "quickRatio": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
             "skipped": false
           },
           "currentRatio": {
@@ -5190,14 +4973,14 @@
             "skipped": false
           },
           "payoutRoeInteraction": {
-            "eligible": true,
+            "eligible": false,
             "payoutLatestWorsened": false,
             "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:49.660Z"
+      "lastScoredAt": "2026-02-26T13:10:12.341867Z"
     },
     {
       "ticker": "5DP",
@@ -5468,51 +5251,46 @@
       "lastFetchedAt": "2026-02-26T12:42:49.660Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 16,
+      "healthScore": 11,
       "healthStatus": "Red",
-      "scoreCoverage": 0.9800000000000001,
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 77.73307418205378,
-        "staticHealthScore": 22.266925817946216,
-        "trendPenalty": 6.5,
-        "finalHealthScore": 16,
-        "scoreCoverage": 0.9800000000000001,
-        "missingMetrics": [
-          "payoutRatio"
-        ],
+        "staticRiskScore": 83.07385620915035,
+        "staticHealthScore": 16.92614379084965,
+        "trendPenalty": 5.5,
+        "finalHealthScore": 11,
+        "scoreCoverage": 0.9999999999999999,
+        "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
           "netDebtToEbitda": 100,
           "debtToEquity": 33.529411764705884,
-          "netDebtToEquity": 60,
-          "quickRatio": 7.1428571428571495,
+          "netDebtToEquity": 60.0,
           "currentRatio": 100,
           "roic": 85.22222222222223,
-          "roe": 100,
-          "assetTurnover": 71.42857142857143
+          "roe": 100
         },
         "weightedContributors": {
-          "netDebtToEbitda": 26.530612244897956,
-          "debtToEquity": 5.816326530612246,
-          "netDebtToEquity": 7.3469387755102025,
-          "quickRatio": 0.21865889212828005,
-          "currentRatio": 12.244897959183673,
-          "roic": 13.913832199546485,
-          "roe": 10.204081632653061,
-          "assetTurnover": 1.4577259475218658
+          "netDebtToEbitda": 20.000000000000004,
+          "debtToEquity": 5.029411764705883,
+          "netDebtToEquity": 6.000000000000001,
+          "currentRatio": 20.000000000000004,
+          "roic": 17.04444444444445,
+          "roe": 15.000000000000002
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -5536,17 +5314,6 @@
             "latestWorsened": true,
             "consecutiveWorsened": false,
             "appliedPenalty": 1.5,
-            "skipped": false
-          },
-          "quickRatio": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 1,
             "skipped": false
           },
           "currentRatio": {
@@ -5590,7 +5357,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:49.823Z"
+      "lastScoredAt": "2026-02-26T13:10:12.341916Z"
     },
     {
       "ticker": "5JK",
@@ -5861,52 +5628,46 @@
       "lastFetchedAt": "2026-02-26T12:42:49.823Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 59,
+      "healthScore": 54,
       "healthStatus": "Amber",
-      "scoreCoverage": 1,
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 38.00857142857143,
-        "staticHealthScore": 61.99142857142857,
+        "staticRiskScore": 43.48235294117648,
+        "staticHealthScore": 56.51764705882352,
         "trendPenalty": 2.5,
-        "finalHealthScore": 59,
-        "scoreCoverage": 1,
+        "finalHealthScore": 54,
+        "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "payoutRatio",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
           "netDebtToEbitda": 27.999999999999996,
           "debtToEquity": 15.882352941176473,
           "netDebtToEquity": 4.9999999999999964,
-          "quickRatio": 0,
           "currentRatio": 0,
           "roic": 100,
-          "roe": 100,
-          "payoutRatio": 0,
-          "assetTurnover": 71.42857142857143
+          "roe": 100
         },
         "weightedContributors": {
-          "netDebtToEbitda": 7.279999999999999,
-          "debtToEquity": 2.7000000000000006,
-          "netDebtToEquity": 0.5999999999999995,
-          "quickRatio": 0,
-          "currentRatio": 0,
-          "roic": 16,
-          "roe": 10,
-          "payoutRatio": 0,
-          "assetTurnover": 1.4285714285714286
+          "netDebtToEbitda": 5.6000000000000005,
+          "debtToEquity": 2.3823529411764715,
+          "netDebtToEquity": 0.4999999999999997,
+          "currentRatio": 0.0,
+          "roic": 20.000000000000004,
+          "roe": 15.000000000000002
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -5930,17 +5691,6 @@
             "latestWorsened": true,
             "consecutiveWorsened": true,
             "appliedPenalty": 2.5,
-            "skipped": false
-          },
-          "quickRatio": {
-            "comparedYears": [
-              "FY 2024",
-              "FY 2023",
-              "FY 2022"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
             "skipped": false
           },
           "currentRatio": {
@@ -5977,14 +5727,14 @@
             "skipped": false
           },
           "payoutRoeInteraction": {
-            "eligible": true,
-            "payoutLatestWorsened": true,
+            "eligible": false,
+            "payoutLatestWorsened": false,
             "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:49.974Z"
+      "lastScoredAt": "2026-02-26T13:10:12.341964Z"
     },
     {
       "ticker": "F1E",
@@ -6255,51 +6005,46 @@
       "lastFetchedAt": "2026-02-26T12:42:49.974Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 54,
+      "healthScore": 46,
       "healthStatus": "Amber",
-      "scoreCoverage": 0.9800000000000001,
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 42.16609977324262,
-        "staticHealthScore": 57.83390022675738,
-        "trendPenalty": 3.5,
-        "finalHealthScore": 54,
-        "scoreCoverage": 0.9800000000000001,
-        "missingMetrics": [
-          "payoutRatio"
-        ],
+        "staticRiskScore": 51.5388888888889,
+        "staticHealthScore": 48.4611111111111,
+        "trendPenalty": 2.5,
+        "finalHealthScore": 46,
+        "scoreCoverage": 0.9999999999999999,
+        "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
           "netDebtToEbitda": 38.916666666666664,
           "debtToEquity": 0,
           "netDebtToEquity": 0,
-          "quickRatio": 0,
           "currentRatio": 44.99999999999999,
           "roic": 98.77777777777779,
-          "roe": 100,
-          "assetTurnover": 0
+          "roe": 100
         },
         "weightedContributors": {
-          "netDebtToEbitda": 10.324829931972786,
-          "debtToEquity": 0,
-          "netDebtToEquity": 0,
-          "quickRatio": 0,
-          "currentRatio": 5.510204081632651,
-          "roic": 16.126984126984127,
-          "roe": 10.204081632653061,
-          "assetTurnover": 0
+          "netDebtToEbitda": 7.783333333333334,
+          "debtToEquity": 0.0,
+          "netDebtToEquity": 0.0,
+          "currentRatio": 9.0,
+          "roic": 19.755555555555564,
+          "roe": 15.000000000000002
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -6323,17 +6068,6 @@
             "latestWorsened": false,
             "consecutiveWorsened": false,
             "appliedPenalty": 0,
-            "skipped": false
-          },
-          "quickRatio": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 1,
             "skipped": false
           },
           "currentRatio": {
@@ -6377,7 +6111,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:50.214Z"
+      "lastScoredAt": "2026-02-26T13:10:12.342012Z"
     },
     {
       "ticker": "ER0",
@@ -6648,63 +6382,56 @@
       "lastFetchedAt": "2026-02-26T12:42:50.214Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 68,
+      "healthScore": 55,
       "healthStatus": "Amber",
-      "scoreCoverage": 1,
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 29.558222222222224,
-        "staticHealthScore": 70.44177777777777,
+        "staticRiskScore": 43.37777777777779,
+        "staticHealthScore": 56.62222222222221,
         "trendPenalty": 2,
-        "finalHealthScore": 68,
-        "scoreCoverage": 1,
+        "finalHealthScore": 55,
+        "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "payoutRatio",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
-          "netDebtToEbitda": 25,
+          "netDebtToEbitda": 55,
           "debtToEquity": 0,
           "netDebtToEquity": 0,
-          "quickRatio": 0,
           "currentRatio": 28.000000000000004,
           "roic": 58.88888888888889,
-          "roe": 100,
-          "payoutRatio": 13.8,
-          "assetTurnover": 0
+          "roe": 100
         },
         "weightedContributors": {
-          "netDebtToEbitda": 6.5,
-          "debtToEquity": 0,
-          "netDebtToEquity": 0,
-          "quickRatio": 0,
-          "currentRatio": 3.3600000000000003,
-          "roic": 9.422222222222222,
-          "roe": 10,
-          "payoutRatio": 0.276,
-          "assetTurnover": 0
+          "netDebtToEbitda": 11.000000000000002,
+          "debtToEquity": 0.0,
+          "netDebtToEquity": 0.0,
+          "currentRatio": 5.600000000000002,
+          "roic": 11.77777777777778,
+          "roe": 15.000000000000002
         },
         "metricAdjustments": {
           "netDebtToEbitda": {
             "rule": "negativeLeverageSupportGate",
             "currentValue": -0.06,
             "originalRisk": 0,
-            "adjustedRisk": 25,
-            "supportBand": "mixed",
-            "supportHealthScore": 53.27777777777778,
+            "adjustedRisk": 55,
+            "supportBand": "weak",
+            "supportHealthScore": 37.7037037037037,
             "supportMetricsUsed": [
-              "quickRatio",
               "currentRatio",
               "roic",
               "roe"
@@ -6725,17 +6452,6 @@
             "skipped": false
           },
           "debtToEquity": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
-            "skipped": false
-          },
-          "quickRatio": {
             "comparedYears": [
               "FY 2025",
               "FY 2024",
@@ -6780,14 +6496,14 @@
             "skipped": false
           },
           "payoutRoeInteraction": {
-            "eligible": true,
-            "payoutLatestWorsened": true,
+            "eligible": false,
+            "payoutLatestWorsened": false,
             "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:50.319Z"
+      "lastScoredAt": "2026-02-26T13:10:12.342061Z"
     },
     {
       "ticker": "BTE",
@@ -7058,63 +6774,56 @@
       "lastFetchedAt": "2026-02-26T12:42:50.319Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 60,
+      "healthScore": 47,
       "healthStatus": "Amber",
-      "scoreCoverage": 1,
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 36.58111111111111,
-        "staticHealthScore": 63.41888888888889,
-        "trendPenalty": 3.5,
-        "finalHealthScore": 60,
-        "scoreCoverage": 1,
+        "staticRiskScore": 50.3038888888889,
+        "staticHealthScore": 49.6961111111111,
+        "trendPenalty": 2.5,
+        "finalHealthScore": 47,
+        "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "payoutRatio",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
-          "netDebtToEbitda": 25,
+          "netDebtToEbitda": 55,
           "debtToEquity": 0,
-          "netDebtToEquity": 25,
-          "quickRatio": 0,
+          "netDebtToEquity": 55,
           "currentRatio": 0,
           "roic": 95.44444444444444,
-          "roe": 98.10000000000001,
-          "payoutRatio": 100,
-          "assetTurnover": 0
+          "roe": 98.10000000000001
         },
         "weightedContributors": {
-          "netDebtToEbitda": 6.5,
-          "debtToEquity": 0,
-          "netDebtToEquity": 3,
-          "quickRatio": 0,
-          "currentRatio": 0,
-          "roic": 15.27111111111111,
-          "roe": 9.810000000000002,
-          "payoutRatio": 2,
-          "assetTurnover": 0
+          "netDebtToEbitda": 11.000000000000002,
+          "debtToEquity": 0.0,
+          "netDebtToEquity": 5.500000000000001,
+          "currentRatio": 0.0,
+          "roic": 19.088888888888892,
+          "roe": 14.715000000000002
         },
         "metricAdjustments": {
           "netDebtToEbitda": {
             "rule": "negativeLeverageSupportGate",
             "currentValue": -5.24,
             "originalRisk": 0,
-            "adjustedRisk": 25,
-            "supportBand": "mixed",
-            "supportHealthScore": 51.61388888888888,
+            "adjustedRisk": 55,
+            "supportBand": "weak",
+            "supportHealthScore": 35.48518518518518,
             "supportMetricsUsed": [
-              "quickRatio",
               "currentRatio",
               "roic",
               "roe"
@@ -7125,11 +6834,10 @@
             "rule": "negativeLeverageSupportGate",
             "currentValue": -0.46,
             "originalRisk": 0,
-            "adjustedRisk": 25,
-            "supportBand": "mixed",
-            "supportHealthScore": 51.61388888888888,
+            "adjustedRisk": 55,
+            "supportBand": "weak",
+            "supportHealthScore": 35.48518518518518,
             "supportMetricsUsed": [
-              "quickRatio",
               "currentRatio",
               "roic",
               "roe"
@@ -7150,17 +6858,6 @@
             "skipped": false
           },
           "debtToEquity": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
-            "skipped": false
-          },
-          "quickRatio": {
             "comparedYears": [
               "FY 2025",
               "FY 2024",
@@ -7205,14 +6902,14 @@
             "skipped": false
           },
           "payoutRoeInteraction": {
-            "eligible": true,
-            "payoutLatestWorsened": true,
-            "roeLatestWorsened": true,
-            "appliedPenalty": 1
+            "eligible": false,
+            "payoutLatestWorsened": false,
+            "roeLatestWorsened": false,
+            "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:50.496Z"
+      "lastScoredAt": "2026-02-26T13:10:12.342112Z"
     },
     {
       "ticker": "5UX",
@@ -7483,51 +7180,46 @@
       "lastFetchedAt": "2026-02-26T12:42:50.496Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 35,
+      "healthScore": 32,
       "healthStatus": "Red",
-      "scoreCoverage": 0.9800000000000001,
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 63.13654033041788,
-        "staticHealthScore": 36.86345966958212,
+        "staticRiskScore": 66.40056022408966,
+        "staticHealthScore": 33.59943977591034,
         "trendPenalty": 1.5,
-        "finalHealthScore": 35,
-        "scoreCoverage": 0.9800000000000001,
-        "missingMetrics": [
-          "payoutRatio"
-        ],
+        "finalHealthScore": 32,
+        "scoreCoverage": 0.9999999999999999,
+        "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
           "netDebtToEbitda": 67.5,
           "debtToEquity": 42.35294117647059,
           "netDebtToEquity": 72.14285714285712,
-          "quickRatio": 0,
-          "currentRatio": 50,
+          "currentRatio": 50.0,
           "roic": 71.66666666666667,
-          "roe": 100,
-          "assetTurnover": 50
+          "roe": 100
         },
         "weightedContributors": {
-          "netDebtToEbitda": 17.908163265306122,
-          "debtToEquity": 7.346938775510203,
-          "netDebtToEquity": 8.833819241982503,
-          "quickRatio": 0,
-          "currentRatio": 6.122448979591836,
-          "roic": 11.700680272108842,
-          "roe": 10.204081632653061,
-          "assetTurnover": 1.020408163265306
+          "netDebtToEbitda": 13.500000000000002,
+          "debtToEquity": 6.352941176470589,
+          "netDebtToEquity": 7.2142857142857135,
+          "currentRatio": 10.000000000000002,
+          "roic": 14.333333333333337,
+          "roe": 15.000000000000002
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -7543,17 +7235,6 @@
             "skipped": false
           },
           "debtToEquity": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
-            "skipped": false
-          },
-          "quickRatio": {
             "comparedYears": [
               "FY 2025",
               "FY 2024",
@@ -7605,7 +7286,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:50.661Z"
+      "lastScoredAt": "2026-02-26T13:10:12.342162Z"
     },
     {
       "ticker": "F9D",
@@ -7876,52 +7557,46 @@
       "lastFetchedAt": "2026-02-26T12:42:50.661Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 87,
+      "healthScore": 84,
       "healthStatus": "Green",
-      "scoreCoverage": 1,
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 6.960000000000001,
-        "staticHealthScore": 93.03999999999999,
-        "trendPenalty": 6,
-        "finalHealthScore": 87,
-        "scoreCoverage": 1,
+        "staticRiskScore": 11.600000000000003,
+        "staticHealthScore": 88.39999999999999,
+        "trendPenalty": 4.5,
+        "finalHealthScore": 84,
+        "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "payoutRatio",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
           "netDebtToEbitda": 0,
           "debtToEquity": 0,
           "netDebtToEquity": 0,
-          "quickRatio": 0,
           "currentRatio": 58.00000000000001,
           "roic": 0,
-          "roe": 0,
-          "payoutRatio": 0,
-          "assetTurnover": 0
+          "roe": 0
         },
         "weightedContributors": {
-          "netDebtToEbitda": 0,
-          "debtToEquity": 0,
-          "netDebtToEquity": 0,
-          "quickRatio": 0,
-          "currentRatio": 6.960000000000001,
-          "roic": 0,
-          "roe": 0,
-          "payoutRatio": 0,
-          "assetTurnover": 0
+          "netDebtToEbitda": 0.0,
+          "debtToEquity": 0.0,
+          "netDebtToEquity": 0.0,
+          "currentRatio": 11.600000000000003,
+          "roic": 0.0,
+          "roe": 0.0
         },
         "metricAdjustments": {
           "netDebtToEbitda": {
@@ -7930,9 +7605,8 @@
             "originalRisk": 0,
             "adjustedRisk": 0,
             "supportBand": "strong",
-            "supportHealthScore": 85.5,
+            "supportHealthScore": 80.66666666666667,
             "supportMetricsUsed": [
-              "quickRatio",
               "currentRatio",
               "roic",
               "roe"
@@ -7945,9 +7619,8 @@
             "originalRisk": 0,
             "adjustedRisk": 0,
             "supportBand": "strong",
-            "supportHealthScore": 85.5,
+            "supportHealthScore": 80.66666666666667,
             "supportMetricsUsed": [
-              "quickRatio",
               "currentRatio",
               "roic",
               "roe"
@@ -7976,17 +7649,6 @@
             "latestWorsened": false,
             "consecutiveWorsened": false,
             "appliedPenalty": 0,
-            "skipped": false
-          },
-          "quickRatio": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": true,
-            "appliedPenalty": 1.5,
             "skipped": false
           },
           "currentRatio": {
@@ -8023,14 +7685,14 @@
             "skipped": false
           },
           "payoutRoeInteraction": {
-            "eligible": true,
+            "eligible": false,
             "payoutLatestWorsened": false,
             "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:50.796Z"
+      "lastScoredAt": "2026-02-26T13:10:12.342212Z"
     },
     {
       "ticker": "OU8",
@@ -8301,52 +7963,46 @@
       "lastFetchedAt": "2026-02-26T12:42:50.796Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 84,
+      "healthScore": 78,
       "healthStatus": "Green",
-      "scoreCoverage": 1,
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 14.757142857142856,
-        "staticHealthScore": 85.24285714285715,
+        "staticRiskScore": 21.071428571428577,
+        "staticHealthScore": 78.92857142857142,
         "trendPenalty": 1,
-        "finalHealthScore": 84,
-        "scoreCoverage": 1,
+        "finalHealthScore": 78,
+        "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "payoutRatio",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
           "netDebtToEbitda": 0,
           "debtToEquity": 0,
           "netDebtToEquity": 10.714285714285717,
-          "quickRatio": 44.28571428571429,
           "currentRatio": 100,
           "roic": 0,
-          "roe": 0,
-          "payoutRatio": 0,
-          "assetTurnover": 7.14285714285713
+          "roe": 0
         },
         "weightedContributors": {
-          "netDebtToEbitda": 0,
-          "debtToEquity": 0,
-          "netDebtToEquity": 1.285714285714286,
-          "quickRatio": 1.3285714285714287,
-          "currentRatio": 12,
-          "roic": 0,
-          "roe": 0,
-          "payoutRatio": 0,
-          "assetTurnover": 0.1428571428571426
+          "netDebtToEbitda": 0.0,
+          "debtToEquity": 0.0,
+          "netDebtToEquity": 1.071428571428572,
+          "currentRatio": 20.000000000000004,
+          "roic": 0.0,
+          "roe": 0.0
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -8362,17 +8018,6 @@
             "skipped": false
           },
           "debtToEquity": {
-            "comparedYears": [
-              "FY 2024",
-              "FY 2023",
-              "FY 2022"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
-            "skipped": false
-          },
-          "quickRatio": {
             "comparedYears": [
               "FY 2024",
               "FY 2023",
@@ -8417,14 +8062,14 @@
             "skipped": false
           },
           "payoutRoeInteraction": {
-            "eligible": true,
+            "eligible": false,
             "payoutLatestWorsened": false,
             "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:50.948Z"
+      "lastScoredAt": "2026-02-26T13:10:12.342259Z"
     },
     {
       "ticker": "C33",
@@ -8695,63 +8340,56 @@
       "lastFetchedAt": "2026-02-26T12:42:50.948Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 57,
+      "healthScore": 43,
       "healthStatus": "Amber",
-      "scoreCoverage": 1,
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 35.71857142857143,
-        "staticHealthScore": 64.28142857142856,
-        "trendPenalty": 7,
-        "finalHealthScore": 57,
-        "scoreCoverage": 1,
+        "staticRiskScore": 49.68500000000001,
+        "staticHealthScore": 50.31499999999999,
+        "trendPenalty": 7.0,
+        "finalHealthScore": 43,
+        "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "payoutRatio",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
-          "netDebtToEbitda": 25,
+          "netDebtToEbitda": 55,
           "debtToEquity": 0,
-          "netDebtToEquity": 25,
-          "quickRatio": 0,
+          "netDebtToEquity": 55,
           "currentRatio": 0,
           "roic": 100,
-          "roe": 87.89999999999999,
-          "payoutRatio": 0,
-          "assetTurnover": 71.42857142857143
+          "roe": 87.89999999999999
         },
         "weightedContributors": {
-          "netDebtToEbitda": 6.5,
-          "debtToEquity": 0,
-          "netDebtToEquity": 3,
-          "quickRatio": 0,
-          "currentRatio": 0,
-          "roic": 16,
-          "roe": 8.79,
-          "payoutRatio": 0,
-          "assetTurnover": 1.4285714285714286
+          "netDebtToEbitda": 11.000000000000002,
+          "debtToEquity": 0.0,
+          "netDebtToEquity": 5.500000000000001,
+          "currentRatio": 0.0,
+          "roic": 20.000000000000004,
+          "roe": 13.185
         },
         "metricAdjustments": {
           "netDebtToEbitda": {
             "rule": "negativeLeverageSupportGate",
             "currentValue": -8.18,
             "originalRisk": 0,
-            "adjustedRisk": 25,
-            "supportBand": "mixed",
-            "supportHealthScore": 53.025000000000006,
+            "adjustedRisk": 55,
+            "supportBand": "weak",
+            "supportHealthScore": 37.36666666666667,
             "supportMetricsUsed": [
-              "quickRatio",
               "currentRatio",
               "roic",
               "roe"
@@ -8762,11 +8400,10 @@
             "rule": "negativeLeverageSupportGate",
             "currentValue": -0.04,
             "originalRisk": 0,
-            "adjustedRisk": 25,
-            "supportBand": "mixed",
-            "supportHealthScore": 53.025000000000006,
+            "adjustedRisk": 55,
+            "supportBand": "weak",
+            "supportHealthScore": 37.36666666666667,
             "supportMetricsUsed": [
-              "quickRatio",
               "currentRatio",
               "roic",
               "roe"
@@ -8795,17 +8432,6 @@
             "latestWorsened": true,
             "consecutiveWorsened": true,
             "appliedPenalty": 2.5,
-            "skipped": false
-          },
-          "quickRatio": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
             "skipped": false
           },
           "currentRatio": {
@@ -8842,14 +8468,14 @@
             "skipped": false
           },
           "payoutRoeInteraction": {
-            "eligible": true,
+            "eligible": false,
             "payoutLatestWorsened": false,
             "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:51.157Z"
+      "lastScoredAt": "2026-02-26T13:10:12.342307Z"
     },
     {
       "ticker": "S9B",
@@ -9106,51 +8732,46 @@
       "lastFetchedAt": "2026-02-26T12:42:51.157Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 91,
+      "healthScore": 90,
       "healthStatus": "Green",
-      "scoreCoverage": 0.9800000000000001,
+      "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 7.466472303206998,
-        "staticHealthScore": 92.533527696793,
+        "staticRiskScore": 8.190000000000001,
+        "staticHealthScore": 91.81,
         "trendPenalty": 2,
-        "finalHealthScore": 91,
-        "scoreCoverage": 0.9800000000000001,
-        "missingMetrics": [
-          "payoutRatio"
-        ],
+        "finalHealthScore": 90,
+        "scoreCoverage": 0.9999999999999999,
+        "missingMetrics": [],
         "excludedMetrics": [
-          "debtToEbitda"
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
         ],
         "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
-          "quickRatio",
           "currentRatio",
           "roic",
-          "roe",
-          "assetTurnover"
+          "roe"
         ],
         "riskByMetric": {
           "netDebtToEbitda": 0,
           "debtToEquity": 0,
           "netDebtToEquity": 0,
-          "quickRatio": 0,
           "currentRatio": 0,
           "roic": 0,
-          "roe": 54.6,
-          "assetTurnover": 92.85714285714288
+          "roe": 54.6
         },
         "weightedContributors": {
-          "netDebtToEbitda": 0,
-          "debtToEquity": 0,
-          "netDebtToEquity": 0,
-          "quickRatio": 0,
-          "currentRatio": 0,
-          "roic": 0,
-          "roe": 5.571428571428572,
-          "assetTurnover": 1.8950437317784259
+          "netDebtToEbitda": 0.0,
+          "debtToEquity": 0.0,
+          "netDebtToEquity": 0.0,
+          "currentRatio": 0.0,
+          "roic": 0.0,
+          "roe": 8.190000000000001
         },
         "metricAdjustments": {
           "netDebtToEbitda": {
@@ -9159,9 +8780,8 @@
             "originalRisk": 0,
             "adjustedRisk": 0,
             "supportBand": "strong",
-            "supportHealthScore": 86.35,
+            "supportHealthScore": 81.8,
             "supportMetricsUsed": [
-              "quickRatio",
               "currentRatio",
               "roic",
               "roe"
@@ -9174,9 +8794,8 @@
             "originalRisk": 0,
             "adjustedRisk": 0,
             "supportBand": "strong",
-            "supportHealthScore": 86.35,
+            "supportHealthScore": 81.8,
             "supportMetricsUsed": [
-              "quickRatio",
               "currentRatio",
               "roic",
               "roe"
@@ -9197,17 +8816,6 @@
             "skipped": false
           },
           "debtToEquity": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
-            "skipped": false
-          },
-          "quickRatio": {
             "comparedYears": [
               "FY 2025",
               "FY 2024",
@@ -9259,7 +8867,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:42:51.305Z"
+      "lastScoredAt": "2026-02-26T13:10:12.342355Z"
     }
   ]
 }

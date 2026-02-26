@@ -47,7 +47,6 @@ test('one missing metric renormalizes and still computes', () => {
     debtToEquity: { Current: 1.2 },
     netDebtToEquity: { Current: 0.9 },
     quickRatio: { Current: 0.7 },
-    currentRatio: { Current: 1.5 },
     roic: { Current: 6 },
     roe: { Current: 8 },
     assetTurnover: { Current: 0.08 }
@@ -57,7 +56,7 @@ test('one missing metric renormalizes and still computes', () => {
   assert.notEqual(result.healthScore, null);
   assert.ok(result.scoreCoverage < 1);
   assert.ok(result.scoreCoverage >= 0.5);
-  assert.ok(result.healthScoreComponents.missingMetrics.includes('payoutRatio'));
+  assert.ok(result.healthScoreComponents.missingMetrics.includes('currentRatio'));
 });
 
 test('coverage below threshold returns Pending data', () => {
@@ -173,7 +172,7 @@ test('missing payout current value does not trigger payout/roe interaction in fi
   });
 
   const result = computeHealthScore(record);
-  assert.ok(result.healthScoreComponents.missingMetrics.includes('payoutRatio'));
+  assert.ok(result.healthScoreComponents.excludedMetrics.includes('payoutRatio'));
   assert.equal(result.healthScoreComponents.trendBreakdown.payoutRoeInteraction.eligible, false);
   assert.equal(result.healthScoreComponents.trendBreakdown.payoutRoeInteraction.appliedPenalty, 0);
 });
@@ -234,12 +233,32 @@ test('partial metric sets can still compute when positive-weight coverage is suf
   const record = buildRecord({
     netDebtToEbitda: { Current: 9 },
     debtToEquity: { Current: 1.4 },
-    netDebtToEquity: { Current: 1.1 }
+    netDebtToEquity: { Current: 1.1 },
+    currentRatio: { Current: 1.4 }
   });
 
   const result = computeHealthScore(record);
   assert.notEqual(result.healthScore, null);
   assert.ok(result.scoreCoverage >= 0.5);
+});
+
+test('simplified model excludes quick ratio, payout ratio, and asset turnover', () => {
+  const record = buildRecord({
+    netDebtToEbitda: { Current: 9 },
+    debtToEquity: { Current: 1.4 },
+    netDebtToEquity: { Current: 1.1 },
+    quickRatio: { Current: 0.8 },
+    currentRatio: { Current: 1.5 },
+    roic: { Current: 7 },
+    roe: { Current: 9 },
+    payoutRatio: { Current: 90 },
+    assetTurnover: { Current: 0.08 }
+  });
+
+  const result = computeHealthScore(record);
+  assert.ok(result.healthScoreComponents.excludedMetrics.includes('quickRatio'));
+  assert.ok(result.healthScoreComponents.excludedMetrics.includes('payoutRatio'));
+  assert.ok(result.healthScoreComponents.excludedMetrics.includes('assetTurnover'));
 });
 
 test('high leverage mixed profile no longer trivially collapses to 0', () => {
@@ -308,5 +327,5 @@ test("'-' parsed as null from fixture does not crash score and keeps computing",
 
   assert.equal(parsed.metrics.payoutRatio.values.Current, null);
   assert.ok(result.healthScore === null || Number.isFinite(result.healthScore));
-  assert.ok(result.healthScoreComponents.missingMetrics.includes('payoutRatio'));
+  assert.ok(result.healthScoreComponents.excludedMetrics.includes('payoutRatio'));
 });
