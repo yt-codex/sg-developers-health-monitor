@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-26T12:31:10.662Z",
+  "generatedAt": "2026-02-26T12:42:51.308Z",
   "totalDevelopers": 23,
   "coverageDistribution": {
     "gte0_8": 23,
@@ -11,13 +11,13 @@
     "p10": 29.4,
     "p25": 45.5,
     "median": 54,
-    "p75": 71.5,
+    "p75": 66.5,
     "p90": 83.8,
     "max": 91
   },
   "statusCounts": {
-    "Green": 6,
-    "Amber": 12,
+    "Green": 5,
+    "Amber": 13,
     "Red": 5,
     "Pending data": 0
   },
@@ -375,31 +375,6 @@
       ]
     },
     {
-      "ticker": "ER0",
-      "name": "KSH Holdings Ltd",
-      "segment": "mixed",
-      "healthScore": 75,
-      "healthStatus": "Green",
-      "scoreCoverage": 1,
-      "topRiskContributors": [
-        {
-          "metric": "roe",
-          "weightedRiskContribution": 10,
-          "riskScore": 100
-        },
-        {
-          "metric": "roic",
-          "weightedRiskContribution": 9.422,
-          "riskScore": 58.88888888888889
-        },
-        {
-          "metric": "currentRatio",
-          "weightedRiskContribution": 3.36,
-          "riskScore": 28.000000000000004
-        }
-      ]
-    },
-    {
       "ticker": "U14",
       "name": "UOL Group Ltd",
       "segment": "mixed",
@@ -425,52 +400,27 @@
       ]
     },
     {
-      "ticker": "BTE",
-      "name": "Lian Beng Group Ltd",
+      "ticker": "ER0",
+      "name": "KSH Holdings Ltd",
       "segment": "mixed",
-      "healthScore": 69,
+      "healthScore": 68,
       "healthStatus": "Amber",
       "scoreCoverage": 1,
       "topRiskContributors": [
         {
-          "metric": "roic",
-          "weightedRiskContribution": 15.271,
-          "riskScore": 95.44444444444444
-        },
-        {
           "metric": "roe",
-          "weightedRiskContribution": 9.81,
-          "riskScore": 98.10000000000001
-        },
-        {
-          "metric": "payoutRatio",
-          "weightedRiskContribution": 2,
-          "riskScore": 100
-        }
-      ]
-    },
-    {
-      "ticker": "C33",
-      "name": "Chuan Hup Holdings Ltd",
-      "segment": "mixed",
-      "healthScore": 67,
-      "healthStatus": "Amber",
-      "scoreCoverage": 1,
-      "topRiskContributors": [
-        {
-          "metric": "roic",
-          "weightedRiskContribution": 16,
+          "weightedRiskContribution": 10,
           "riskScore": 100
         },
         {
-          "metric": "roe",
-          "weightedRiskContribution": 8.79,
-          "riskScore": 87.89999999999999
+          "metric": "roic",
+          "weightedRiskContribution": 9.422,
+          "riskScore": 58.88888888888889
         },
         {
-          "metric": "assetTurnover",
-          "weightedRiskContribution": 1.429,
-          "riskScore": 71.42857142857143
+          "metric": "netDebtToEbitda",
+          "weightedRiskContribution": 6.5,
+          "riskScore": 25
         }
       ]
     },
@@ -521,6 +471,56 @@
           "metric": "currentRatio",
           "weightedRiskContribution": 3.184,
           "riskScore": 26
+        }
+      ]
+    },
+    {
+      "ticker": "BTE",
+      "name": "Lian Beng Group Ltd",
+      "segment": "mixed",
+      "healthScore": 60,
+      "healthStatus": "Amber",
+      "scoreCoverage": 1,
+      "topRiskContributors": [
+        {
+          "metric": "roic",
+          "weightedRiskContribution": 15.271,
+          "riskScore": 95.44444444444444
+        },
+        {
+          "metric": "roe",
+          "weightedRiskContribution": 9.81,
+          "riskScore": 98.10000000000001
+        },
+        {
+          "metric": "netDebtToEbitda",
+          "weightedRiskContribution": 6.5,
+          "riskScore": 25
+        }
+      ]
+    },
+    {
+      "ticker": "5JK",
+      "name": "Hiap Hoe Ltd",
+      "segment": "mixed",
+      "healthScore": 59,
+      "healthStatus": "Amber",
+      "scoreCoverage": 1,
+      "topRiskContributors": [
+        {
+          "metric": "roic",
+          "weightedRiskContribution": 16,
+          "riskScore": 100
+        },
+        {
+          "metric": "roe",
+          "weightedRiskContribution": 10,
+          "riskScore": 100
+        },
+        {
+          "metric": "netDebtToEbitda",
+          "weightedRiskContribution": 7.28,
+          "riskScore": 27.999999999999996
         }
       ]
     }

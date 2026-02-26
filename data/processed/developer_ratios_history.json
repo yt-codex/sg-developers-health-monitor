@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-02-26T12:31:10.660Z",
+  "updatedAt": "2026-02-26T12:42:51.305Z",
   "source": "stockanalysis",
   "scoringModel": {
     "formula": "round(clamp((100 - weightedRisk) - trendPenalty, 0, 100))",
@@ -18,6 +18,27 @@
     },
     "coverageThreshold": 0.5,
     "trendPenaltyCap": 8,
+    "negativeLeverageHandling": {
+      "targetMetrics": [
+        "netDebtToEbitda",
+        "netDebtToEquity"
+      ],
+      "supportMetrics": [
+        "quickRatio",
+        "currentRatio",
+        "roic",
+        "roe"
+      ],
+      "supportBands": {
+        "strongMinHealthScore": 70,
+        "mixedMinHealthScore": 40
+      },
+      "riskFloors": {
+        "noSupport": 50,
+        "mixedSupport": 25,
+        "weakSupport": 55
+      }
+    },
     "bands": {
       "status": {
         "green": 70,
@@ -295,7 +316,7 @@
         "payoutRatio": null,
         "assetTurnover": 0.14
       },
-      "lastFetchedAt": "2026-02-26T12:31:06.297Z",
+      "lastFetchedAt": "2026-02-26T12:42:47.321Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 21,
@@ -344,6 +365,7 @@
           "roe": 9.908163265306122,
           "assetTurnover": 0.583090379008746
         },
+        "metricAdjustments": {},
         "trendBreakdown": {
           "netDebtToEbitda": {
             "comparedYears": [
@@ -419,7 +441,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:06.598Z"
+      "lastScoredAt": "2026-02-26T12:42:47.684Z"
     },
     {
       "ticker": "U14",
@@ -687,7 +709,7 @@
         "payoutRatio": 25.35,
         "assetTurnover": 0.13
       },
-      "lastFetchedAt": "2026-02-26T12:31:06.598Z",
+      "lastFetchedAt": "2026-02-26T12:42:47.684Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 74,
@@ -737,6 +759,7 @@
           "payoutRatio": 0,
           "assetTurnover": 0.7142857142857142
         },
+        "metricAdjustments": {},
         "trendBreakdown": {
           "netDebtToEbitda": {
             "comparedYears": [
@@ -812,7 +835,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:06.777Z"
+      "lastScoredAt": "2026-02-26T12:42:47.843Z"
     },
     {
       "ticker": "F17",
@@ -1080,7 +1103,7 @@
         "payoutRatio": 66.12,
         "assetTurnover": 0.14
       },
-      "lastFetchedAt": "2026-02-26T12:31:06.778Z",
+      "lastFetchedAt": "2026-02-26T12:42:47.843Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 46,
@@ -1130,6 +1153,7 @@
           "payoutRatio": 0,
           "assetTurnover": 0.5714285714285712
         },
+        "metricAdjustments": {},
         "trendBreakdown": {
           "netDebtToEbitda": {
             "comparedYears": [
@@ -1205,7 +1229,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:06.966Z"
+      "lastScoredAt": "2026-02-26T12:42:48.002Z"
     },
     {
       "ticker": "TQ5",
@@ -1473,7 +1497,7 @@
         "payoutRatio": 72.68,
         "assetTurnover": 0.09
       },
-      "lastFetchedAt": "2026-02-26T12:31:06.966Z",
+      "lastFetchedAt": "2026-02-26T12:42:48.002Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 29,
@@ -1523,6 +1547,7 @@
           "payoutRatio": 0,
           "assetTurnover": 1.2857142857142858
         },
+        "metricAdjustments": {},
         "trendBreakdown": {
           "netDebtToEbitda": {
             "comparedYears": [
@@ -1598,7 +1623,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:07.099Z"
+      "lastScoredAt": "2026-02-26T12:42:48.164Z"
     },
     {
       "ticker": "9CI",
@@ -1866,7 +1891,7 @@
         "payoutRatio": 413.1,
         "assetTurnover": 0.09
       },
-      "lastFetchedAt": "2026-02-26T12:31:07.100Z",
+      "lastFetchedAt": "2026-02-26T12:42:48.164Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 49,
@@ -1916,6 +1941,7 @@
           "payoutRatio": 2,
           "assetTurnover": 1.2857142857142858
         },
+        "metricAdjustments": {},
         "trendBreakdown": {
           "netDebtToEbitda": {
             "comparedYears": [
@@ -1991,7 +2017,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:07.263Z"
+      "lastScoredAt": "2026-02-26T12:42:48.322Z"
     },
     {
       "ticker": "H78",
@@ -2259,7 +2285,7 @@
         "payoutRatio": null,
         "assetTurnover": 0.05
       },
-      "lastFetchedAt": "2026-02-26T12:31:07.263Z",
+      "lastFetchedAt": "2026-02-26T12:42:48.323Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 64,
@@ -2308,6 +2334,7 @@
           "roe": 10.204081632653061,
           "assetTurnover": 1.8950437317784259
         },
+        "metricAdjustments": {},
         "trendBreakdown": {
           "netDebtToEbitda": {
             "comparedYears": [
@@ -2383,7 +2410,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:07.598Z"
+      "lastScoredAt": "2026-02-26T12:42:48.559Z"
     },
     {
       "ticker": "LJ3",
@@ -2651,7 +2678,7 @@
         "payoutRatio": null,
         "assetTurnover": 0.07
       },
-      "lastFetchedAt": "2026-02-26T12:31:07.598Z",
+      "lastFetchedAt": "2026-02-26T12:42:48.559Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 47,
@@ -2700,6 +2727,7 @@
           "roe": 10.204081632653061,
           "assetTurnover": 1.6034985422740522
         },
+        "metricAdjustments": {},
         "trendBreakdown": {
           "netDebtToEbitda": {
             "comparedYears": [
@@ -2775,7 +2803,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:07.779Z"
+      "lastScoredAt": "2026-02-26T12:42:48.720Z"
     },
     {
       "ticker": "W05",
@@ -3043,7 +3071,7 @@
         "payoutRatio": null,
         "assetTurnover": 0.09
       },
-      "lastFetchedAt": "2026-02-26T12:31:07.779Z",
+      "lastFetchedAt": "2026-02-26T12:42:48.720Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 53,
@@ -3092,6 +3120,7 @@
           "roe": 10.204081632653061,
           "assetTurnover": 1.3119533527696792
         },
+        "metricAdjustments": {},
         "trendBreakdown": {
           "netDebtToEbitda": {
             "comparedYears": [
@@ -3167,7 +3196,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:07.911Z"
+      "lastScoredAt": "2026-02-26T12:42:48.878Z"
     },
     {
       "ticker": "B61",
@@ -3435,7 +3464,7 @@
         "payoutRatio": 10.51,
         "assetTurnover": 0.21
       },
-      "lastFetchedAt": "2026-02-26T12:31:07.911Z",
+      "lastFetchedAt": "2026-02-26T12:42:48.878Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 83,
@@ -3484,6 +3513,38 @@
           "roe": 5.700000000000001,
           "payoutRatio": 0,
           "assetTurnover": 0
+        },
+        "metricAdjustments": {
+          "netDebtToEbitda": {
+            "rule": "negativeLeverageSupportGate",
+            "currentValue": -1.44,
+            "originalRisk": 0,
+            "adjustedRisk": 0,
+            "supportBand": "strong",
+            "supportHealthScore": 75.27777777777777,
+            "supportMetricsUsed": [
+              "quickRatio",
+              "currentRatio",
+              "roic",
+              "roe"
+            ],
+            "applied": false
+          },
+          "netDebtToEquity": {
+            "rule": "negativeLeverageSupportGate",
+            "currentValue": -0.1,
+            "originalRisk": 0,
+            "adjustedRisk": 0,
+            "supportBand": "strong",
+            "supportHealthScore": 75.27777777777777,
+            "supportMetricsUsed": [
+              "quickRatio",
+              "currentRatio",
+              "roic",
+              "roe"
+            ],
+            "applied": false
+          }
         },
         "trendBreakdown": {
           "netDebtToEbitda": {
@@ -3560,7 +3621,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:08.089Z"
+      "lastScoredAt": "2026-02-26T12:42:49.031Z"
     },
     {
       "ticker": "H13",
@@ -3828,7 +3889,7 @@
         "payoutRatio": 26.51,
         "assetTurnover": 0.07
       },
-      "lastFetchedAt": "2026-02-26T12:31:08.089Z",
+      "lastFetchedAt": "2026-02-26T12:42:49.032Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 45,
@@ -3878,6 +3939,7 @@
           "payoutRatio": 0,
           "assetTurnover": 1.5714285714285714
         },
+        "metricAdjustments": {},
         "trendBreakdown": {
           "netDebtToEbitda": {
             "comparedYears": [
@@ -3953,7 +4015,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:08.269Z"
+      "lastScoredAt": "2026-02-26T12:42:49.181Z"
     },
     {
       "ticker": "T24",
@@ -4221,7 +4283,7 @@
         "payoutRatio": 31.72,
         "assetTurnover": 0.06
       },
-      "lastFetchedAt": "2026-02-26T12:31:08.269Z",
+      "lastFetchedAt": "2026-02-26T12:42:49.181Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 31,
@@ -4271,6 +4333,7 @@
           "payoutRatio": 0,
           "assetTurnover": 1.7142857142857144
         },
+        "metricAdjustments": {},
         "trendBreakdown": {
           "netDebtToEbitda": {
             "comparedYears": [
@@ -4346,7 +4409,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:08.456Z"
+      "lastScoredAt": "2026-02-26T12:42:49.283Z"
     },
     {
       "ticker": "O10",
@@ -4614,7 +4677,7 @@
         "payoutRatio": 30.11,
         "assetTurnover": 0.07
       },
-      "lastFetchedAt": "2026-02-26T12:31:08.456Z",
+      "lastFetchedAt": "2026-02-26T12:42:49.283Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 47,
@@ -4664,6 +4727,7 @@
           "payoutRatio": 0,
           "assetTurnover": 1.5714285714285714
         },
+        "metricAdjustments": {},
         "trendBreakdown": {
           "netDebtToEbitda": {
             "comparedYears": [
@@ -4739,7 +4803,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:08.661Z"
+      "lastScoredAt": "2026-02-26T12:42:49.494Z"
     },
     {
       "ticker": "5IC",
@@ -5007,7 +5071,7 @@
         "payoutRatio": 2.82,
         "assetTurnover": 0.67
       },
-      "lastFetchedAt": "2026-02-26T12:31:08.661Z",
+      "lastFetchedAt": "2026-02-26T12:42:49.494Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 65,
@@ -5057,6 +5121,7 @@
           "payoutRatio": 0,
           "assetTurnover": 0
         },
+        "metricAdjustments": {},
         "trendBreakdown": {
           "netDebtToEbitda": {
             "comparedYears": [
@@ -5132,7 +5197,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:08.832Z"
+      "lastScoredAt": "2026-02-26T12:42:49.660Z"
     },
     {
       "ticker": "5DP",
@@ -5400,7 +5465,7 @@
         "payoutRatio": null,
         "assetTurnover": 0.08
       },
-      "lastFetchedAt": "2026-02-26T12:31:08.832Z",
+      "lastFetchedAt": "2026-02-26T12:42:49.660Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 16,
@@ -5449,6 +5514,7 @@
           "roe": 10.204081632653061,
           "assetTurnover": 1.4577259475218658
         },
+        "metricAdjustments": {},
         "trendBreakdown": {
           "netDebtToEbitda": {
             "comparedYears": [
@@ -5524,7 +5590,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:09.040Z"
+      "lastScoredAt": "2026-02-26T12:42:49.823Z"
     },
     {
       "ticker": "5JK",
@@ -5792,7 +5858,7 @@
         "payoutRatio": 32.16,
         "assetTurnover": 0.08
       },
-      "lastFetchedAt": "2026-02-26T12:31:09.040Z",
+      "lastFetchedAt": "2026-02-26T12:42:49.823Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 59,
@@ -5842,6 +5908,7 @@
           "payoutRatio": 0,
           "assetTurnover": 1.4285714285714286
         },
+        "metricAdjustments": {},
         "trendBreakdown": {
           "netDebtToEbitda": {
             "comparedYears": [
@@ -5917,7 +5984,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:09.234Z"
+      "lastScoredAt": "2026-02-26T12:42:49.974Z"
     },
     {
       "ticker": "F1E",
@@ -6185,7 +6252,7 @@
         "payoutRatio": null,
         "assetTurnover": 0.25
       },
-      "lastFetchedAt": "2026-02-26T12:31:09.234Z",
+      "lastFetchedAt": "2026-02-26T12:42:49.974Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 54,
@@ -6234,6 +6301,7 @@
           "roe": 10.204081632653061,
           "assetTurnover": 0
         },
+        "metricAdjustments": {},
         "trendBreakdown": {
           "netDebtToEbitda": {
             "comparedYears": [
@@ -6309,7 +6377,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:09.432Z"
+      "lastScoredAt": "2026-02-26T12:42:50.214Z"
     },
     {
       "ticker": "ER0",
@@ -6577,18 +6645,18 @@
         "payoutRatio": 120.7,
         "assetTurnover": 0.4
       },
-      "lastFetchedAt": "2026-02-26T12:31:09.432Z",
+      "lastFetchedAt": "2026-02-26T12:42:50.214Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 75,
-      "healthStatus": "Green",
+      "healthScore": 68,
+      "healthStatus": "Amber",
       "scoreCoverage": 1,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 23.058222222222224,
-        "staticHealthScore": 76.94177777777777,
+        "staticRiskScore": 29.558222222222224,
+        "staticHealthScore": 70.44177777777777,
         "trendPenalty": 2,
-        "finalHealthScore": 75,
+        "finalHealthScore": 68,
         "scoreCoverage": 1,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -6606,7 +6674,7 @@
           "assetTurnover"
         ],
         "riskByMetric": {
-          "netDebtToEbitda": 0,
+          "netDebtToEbitda": 25,
           "debtToEquity": 0,
           "netDebtToEquity": 0,
           "quickRatio": 0,
@@ -6617,7 +6685,7 @@
           "assetTurnover": 0
         },
         "weightedContributors": {
-          "netDebtToEbitda": 0,
+          "netDebtToEbitda": 6.5,
           "debtToEquity": 0,
           "netDebtToEquity": 0,
           "quickRatio": 0,
@@ -6626,6 +6694,23 @@
           "roe": 10,
           "payoutRatio": 0.276,
           "assetTurnover": 0
+        },
+        "metricAdjustments": {
+          "netDebtToEbitda": {
+            "rule": "negativeLeverageSupportGate",
+            "currentValue": -0.06,
+            "originalRisk": 0,
+            "adjustedRisk": 25,
+            "supportBand": "mixed",
+            "supportHealthScore": 53.27777777777778,
+            "supportMetricsUsed": [
+              "quickRatio",
+              "currentRatio",
+              "roic",
+              "roe"
+            ],
+            "applied": true
+          }
         },
         "trendBreakdown": {
           "netDebtToEbitda": {
@@ -6702,7 +6787,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:09.618Z"
+      "lastScoredAt": "2026-02-26T12:42:50.319Z"
     },
     {
       "ticker": "BTE",
@@ -6970,18 +7055,18 @@
         "payoutRatio": 358.2,
         "assetTurnover": 0.2
       },
-      "lastFetchedAt": "2026-02-26T12:31:09.618Z",
+      "lastFetchedAt": "2026-02-26T12:42:50.319Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 69,
+      "healthScore": 60,
       "healthStatus": "Amber",
       "scoreCoverage": 1,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 27.081111111111113,
-        "staticHealthScore": 72.91888888888889,
+        "staticRiskScore": 36.58111111111111,
+        "staticHealthScore": 63.41888888888889,
         "trendPenalty": 3.5,
-        "finalHealthScore": 69,
+        "finalHealthScore": 60,
         "scoreCoverage": 1,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -6999,9 +7084,9 @@
           "assetTurnover"
         ],
         "riskByMetric": {
-          "netDebtToEbitda": 0,
+          "netDebtToEbitda": 25,
           "debtToEquity": 0,
-          "netDebtToEquity": 0,
+          "netDebtToEquity": 25,
           "quickRatio": 0,
           "currentRatio": 0,
           "roic": 95.44444444444444,
@@ -7010,15 +7095,47 @@
           "assetTurnover": 0
         },
         "weightedContributors": {
-          "netDebtToEbitda": 0,
+          "netDebtToEbitda": 6.5,
           "debtToEquity": 0,
-          "netDebtToEquity": 0,
+          "netDebtToEquity": 3,
           "quickRatio": 0,
           "currentRatio": 0,
           "roic": 15.27111111111111,
           "roe": 9.810000000000002,
           "payoutRatio": 2,
           "assetTurnover": 0
+        },
+        "metricAdjustments": {
+          "netDebtToEbitda": {
+            "rule": "negativeLeverageSupportGate",
+            "currentValue": -5.24,
+            "originalRisk": 0,
+            "adjustedRisk": 25,
+            "supportBand": "mixed",
+            "supportHealthScore": 51.61388888888888,
+            "supportMetricsUsed": [
+              "quickRatio",
+              "currentRatio",
+              "roic",
+              "roe"
+            ],
+            "applied": true
+          },
+          "netDebtToEquity": {
+            "rule": "negativeLeverageSupportGate",
+            "currentValue": -0.46,
+            "originalRisk": 0,
+            "adjustedRisk": 25,
+            "supportBand": "mixed",
+            "supportHealthScore": 51.61388888888888,
+            "supportMetricsUsed": [
+              "quickRatio",
+              "currentRatio",
+              "roic",
+              "roe"
+            ],
+            "applied": true
+          }
         },
         "trendBreakdown": {
           "netDebtToEbitda": {
@@ -7095,7 +7212,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:09.788Z"
+      "lastScoredAt": "2026-02-26T12:42:50.496Z"
     },
     {
       "ticker": "5UX",
@@ -7363,7 +7480,7 @@
         "payoutRatio": null,
         "assetTurnover": 0.11
       },
-      "lastFetchedAt": "2026-02-26T12:31:09.789Z",
+      "lastFetchedAt": "2026-02-26T12:42:50.496Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 35,
@@ -7412,6 +7529,7 @@
           "roe": 10.204081632653061,
           "assetTurnover": 1.020408163265306
         },
+        "metricAdjustments": {},
         "trendBreakdown": {
           "netDebtToEbitda": {
             "comparedYears": [
@@ -7487,7 +7605,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:09.970Z"
+      "lastScoredAt": "2026-02-26T12:42:50.661Z"
     },
     {
       "ticker": "F9D",
@@ -7755,7 +7873,7 @@
         "payoutRatio": 19.02,
         "assetTurnover": 0.48
       },
-      "lastFetchedAt": "2026-02-26T12:31:09.971Z",
+      "lastFetchedAt": "2026-02-26T12:42:50.661Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 87,
@@ -7804,6 +7922,38 @@
           "roe": 0,
           "payoutRatio": 0,
           "assetTurnover": 0
+        },
+        "metricAdjustments": {
+          "netDebtToEbitda": {
+            "rule": "negativeLeverageSupportGate",
+            "currentValue": -2.84,
+            "originalRisk": 0,
+            "adjustedRisk": 0,
+            "supportBand": "strong",
+            "supportHealthScore": 85.5,
+            "supportMetricsUsed": [
+              "quickRatio",
+              "currentRatio",
+              "roic",
+              "roe"
+            ],
+            "applied": false
+          },
+          "netDebtToEquity": {
+            "rule": "negativeLeverageSupportGate",
+            "currentValue": -0.44,
+            "originalRisk": 0,
+            "adjustedRisk": 0,
+            "supportBand": "strong",
+            "supportHealthScore": 85.5,
+            "supportMetricsUsed": [
+              "quickRatio",
+              "currentRatio",
+              "roic",
+              "roe"
+            ],
+            "applied": false
+          }
         },
         "trendBreakdown": {
           "netDebtToEbitda": {
@@ -7880,7 +8030,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:10.141Z"
+      "lastScoredAt": "2026-02-26T12:42:50.796Z"
     },
     {
       "ticker": "OU8",
@@ -8148,7 +8298,7 @@
         "payoutRatio": 9.79,
         "assetTurnover": 0.17
       },
-      "lastFetchedAt": "2026-02-26T12:31:10.141Z",
+      "lastFetchedAt": "2026-02-26T12:42:50.796Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 84,
@@ -8198,6 +8348,7 @@
           "payoutRatio": 0,
           "assetTurnover": 0.1428571428571426
         },
+        "metricAdjustments": {},
         "trendBreakdown": {
           "netDebtToEbitda": {
             "comparedYears": [
@@ -8273,7 +8424,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:10.326Z"
+      "lastScoredAt": "2026-02-26T12:42:50.948Z"
     },
     {
       "ticker": "C33",
@@ -8541,18 +8692,18 @@
         "payoutRatio": 63.27,
         "assetTurnover": 0.08
       },
-      "lastFetchedAt": "2026-02-26T12:31:10.326Z",
+      "lastFetchedAt": "2026-02-26T12:42:50.948Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 67,
+      "healthScore": 57,
       "healthStatus": "Amber",
       "scoreCoverage": 1,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 26.218571428571426,
-        "staticHealthScore": 73.78142857142858,
+        "staticRiskScore": 35.71857142857143,
+        "staticHealthScore": 64.28142857142856,
         "trendPenalty": 7,
-        "finalHealthScore": 67,
+        "finalHealthScore": 57,
         "scoreCoverage": 1,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -8570,9 +8721,9 @@
           "assetTurnover"
         ],
         "riskByMetric": {
-          "netDebtToEbitda": 0,
+          "netDebtToEbitda": 25,
           "debtToEquity": 0,
-          "netDebtToEquity": 0,
+          "netDebtToEquity": 25,
           "quickRatio": 0,
           "currentRatio": 0,
           "roic": 100,
@@ -8581,15 +8732,47 @@
           "assetTurnover": 71.42857142857143
         },
         "weightedContributors": {
-          "netDebtToEbitda": 0,
+          "netDebtToEbitda": 6.5,
           "debtToEquity": 0,
-          "netDebtToEquity": 0,
+          "netDebtToEquity": 3,
           "quickRatio": 0,
           "currentRatio": 0,
           "roic": 16,
           "roe": 8.79,
           "payoutRatio": 0,
           "assetTurnover": 1.4285714285714286
+        },
+        "metricAdjustments": {
+          "netDebtToEbitda": {
+            "rule": "negativeLeverageSupportGate",
+            "currentValue": -8.18,
+            "originalRisk": 0,
+            "adjustedRisk": 25,
+            "supportBand": "mixed",
+            "supportHealthScore": 53.025000000000006,
+            "supportMetricsUsed": [
+              "quickRatio",
+              "currentRatio",
+              "roic",
+              "roe"
+            ],
+            "applied": true
+          },
+          "netDebtToEquity": {
+            "rule": "negativeLeverageSupportGate",
+            "currentValue": -0.04,
+            "originalRisk": 0,
+            "adjustedRisk": 25,
+            "supportBand": "mixed",
+            "supportHealthScore": 53.025000000000006,
+            "supportMetricsUsed": [
+              "quickRatio",
+              "currentRatio",
+              "roic",
+              "roe"
+            ],
+            "applied": true
+          }
         },
         "trendBreakdown": {
           "netDebtToEbitda": {
@@ -8666,7 +8849,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:10.495Z"
+      "lastScoredAt": "2026-02-26T12:42:51.157Z"
     },
     {
       "ticker": "S9B",
@@ -8920,7 +9103,7 @@
         "payoutRatio": null,
         "assetTurnover": 0.05
       },
-      "lastFetchedAt": "2026-02-26T12:31:10.496Z",
+      "lastFetchedAt": "2026-02-26T12:42:51.157Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 91,
@@ -8968,6 +9151,38 @@
           "roic": 0,
           "roe": 5.571428571428572,
           "assetTurnover": 1.8950437317784259
+        },
+        "metricAdjustments": {
+          "netDebtToEbitda": {
+            "rule": "negativeLeverageSupportGate",
+            "currentValue": -1.56,
+            "originalRisk": 0,
+            "adjustedRisk": 0,
+            "supportBand": "strong",
+            "supportHealthScore": 86.35,
+            "supportMetricsUsed": [
+              "quickRatio",
+              "currentRatio",
+              "roic",
+              "roe"
+            ],
+            "applied": false
+          },
+          "netDebtToEquity": {
+            "rule": "negativeLeverageSupportGate",
+            "currentValue": -0.17,
+            "originalRisk": 0,
+            "adjustedRisk": 0,
+            "supportBand": "strong",
+            "supportHealthScore": 86.35,
+            "supportMetricsUsed": [
+              "quickRatio",
+              "currentRatio",
+              "roic",
+              "roe"
+            ],
+            "applied": false
+          }
         },
         "trendBreakdown": {
           "netDebtToEbitda": {
@@ -9044,7 +9259,7 @@
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:31:10.660Z"
+      "lastScoredAt": "2026-02-26T12:42:51.305Z"
     }
   ]
 }
