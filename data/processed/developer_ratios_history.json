@@ -1,6 +1,33 @@
 {
-  "updatedAt": "2026-02-26T12:08:40.758Z",
+  "updatedAt": "2026-02-26T12:31:10.660Z",
   "source": "stockanalysis",
+  "scoringModel": {
+    "formula": "round(clamp((100 - weightedRisk) - trendPenalty, 0, 100))",
+    "weightedRisk": "sum(metricWeight * metricRisk) / sum(availableMetricWeight)",
+    "weights": {
+      "netDebtToEbitda": 0.26,
+      "debtToEquity": 0.17,
+      "netDebtToEquity": 0.12,
+      "debtToEbitda": 0,
+      "currentRatio": 0.12,
+      "quickRatio": 0.03,
+      "roic": 0.16,
+      "roe": 0.1,
+      "assetTurnover": 0.02,
+      "payoutRatio": 0.02
+    },
+    "coverageThreshold": 0.5,
+    "trendPenaltyCap": 8,
+    "bands": {
+      "status": {
+        "green": 70,
+        "amber": 40
+      }
+    },
+    "excludedMetrics": [
+      "debtToEbitda"
+    ]
+  },
   "developers": [
     {
       "ticker": "C09",
@@ -268,7 +295,7 @@
         "payoutRatio": null,
         "assetTurnover": 0.14
       },
-      "lastFetchedAt": "2026-02-26T12:08:38.442Z",
+      "lastFetchedAt": "2026-02-26T12:31:06.297Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 21,
@@ -326,7 +353,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 2
+            "appliedPenalty": 2,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -336,7 +364,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 2.5
+            "appliedPenalty": 2.5,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -346,7 +375,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1
+            "appliedPenalty": 1,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -356,7 +386,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 1.5
+            "appliedPenalty": 1.5,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -366,7 +397,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1.5
+            "appliedPenalty": 1.5,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -376,16 +408,18 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 1.5
+            "appliedPenalty": 1.5,
+            "skipped": false
           },
           "payoutRoeInteraction": {
-            "payoutLatestWorsened": true,
-            "roeLatestWorsened": true,
-            "appliedPenalty": 1
+            "eligible": false,
+            "payoutLatestWorsened": false,
+            "roeLatestWorsened": false,
+            "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:38.694Z"
+      "lastScoredAt": "2026-02-26T12:31:06.598Z"
     },
     {
       "ticker": "U14",
@@ -653,7 +687,7 @@
         "payoutRatio": 25.35,
         "assetTurnover": 0.13
       },
-      "lastFetchedAt": "2026-02-26T12:08:38.695Z",
+      "lastFetchedAt": "2026-02-26T12:31:06.598Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 74,
@@ -712,7 +746,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -722,7 +757,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -732,7 +768,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -742,7 +779,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -752,7 +790,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 2.5
+            "appliedPenalty": 2.5,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -762,16 +801,18 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1
+            "appliedPenalty": 1,
+            "skipped": false
           },
           "payoutRoeInteraction": {
+            "eligible": true,
             "payoutLatestWorsened": true,
             "roeLatestWorsened": true,
             "appliedPenalty": 1
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:38.803Z"
+      "lastScoredAt": "2026-02-26T12:31:06.777Z"
     },
     {
       "ticker": "F17",
@@ -1039,7 +1080,7 @@
         "payoutRatio": 66.12,
         "assetTurnover": 0.14
       },
-      "lastFetchedAt": "2026-02-26T12:08:38.803Z",
+      "lastFetchedAt": "2026-02-26T12:31:06.778Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 46,
@@ -1098,7 +1139,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 3
+            "appliedPenalty": 3,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -1108,7 +1150,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 2.5
+            "appliedPenalty": 2.5,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -1118,7 +1161,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -1128,7 +1172,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -1138,7 +1183,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -1148,16 +1194,18 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "payoutRoeInteraction": {
+            "eligible": true,
             "payoutLatestWorsened": true,
             "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:38.907Z"
+      "lastScoredAt": "2026-02-26T12:31:06.966Z"
     },
     {
       "ticker": "TQ5",
@@ -1425,7 +1473,7 @@
         "payoutRatio": 72.68,
         "assetTurnover": 0.09
       },
-      "lastFetchedAt": "2026-02-26T12:08:38.907Z",
+      "lastFetchedAt": "2026-02-26T12:31:06.966Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 29,
@@ -1484,7 +1532,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 3
+            "appliedPenalty": 3,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -1494,7 +1543,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 2.5
+            "appliedPenalty": 2.5,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -1504,7 +1554,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -1514,7 +1565,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -1524,7 +1576,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -1534,16 +1587,18 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "payoutRoeInteraction": {
+            "eligible": true,
             "payoutLatestWorsened": false,
             "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:38.996Z"
+      "lastScoredAt": "2026-02-26T12:31:07.099Z"
     },
     {
       "ticker": "9CI",
@@ -1811,7 +1866,7 @@
         "payoutRatio": 413.1,
         "assetTurnover": 0.09
       },
-      "lastFetchedAt": "2026-02-26T12:08:38.997Z",
+      "lastFetchedAt": "2026-02-26T12:31:07.100Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 49,
@@ -1870,7 +1925,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 2
+            "appliedPenalty": 2,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -1880,7 +1936,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1.5
+            "appliedPenalty": 1.5,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -1890,7 +1947,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -1900,7 +1958,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -1910,7 +1969,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1.5
+            "appliedPenalty": 1.5,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -1920,16 +1980,18 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1
+            "appliedPenalty": 1,
+            "skipped": false
           },
           "payoutRoeInteraction": {
+            "eligible": true,
             "payoutLatestWorsened": true,
             "roeLatestWorsened": true,
             "appliedPenalty": 1
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:39.078Z"
+      "lastScoredAt": "2026-02-26T12:31:07.263Z"
     },
     {
       "ticker": "H78",
@@ -2197,7 +2259,7 @@
         "payoutRatio": null,
         "assetTurnover": 0.05
       },
-      "lastFetchedAt": "2026-02-26T12:08:39.078Z",
+      "lastFetchedAt": "2026-02-26T12:31:07.263Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 64,
@@ -2255,7 +2317,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 2
+            "appliedPenalty": 2,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -2265,7 +2328,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -2275,7 +2339,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -2285,7 +2350,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -2295,7 +2361,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1.5
+            "appliedPenalty": 1.5,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -2305,16 +2372,18 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 1.5
+            "appliedPenalty": 1.5,
+            "skipped": false
           },
           "payoutRoeInteraction": {
+            "eligible": false,
             "payoutLatestWorsened": false,
-            "roeLatestWorsened": true,
+            "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:39.182Z"
+      "lastScoredAt": "2026-02-26T12:31:07.598Z"
     },
     {
       "ticker": "LJ3",
@@ -2582,18 +2651,18 @@
         "payoutRatio": null,
         "assetTurnover": 0.07
       },
-      "lastFetchedAt": "2026-02-26T12:08:39.183Z",
+      "lastFetchedAt": "2026-02-26T12:31:07.598Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 46,
+      "healthScore": 47,
       "healthStatus": "Amber",
       "scoreCoverage": 0.9800000000000001,
       "scoreNote": null,
       "healthScoreComponents": {
         "staticRiskScore": 48.297700032393905,
         "staticHealthScore": 51.702299967606095,
-        "trendPenalty": 5.5,
-        "finalHealthScore": 46,
+        "trendPenalty": 4.5,
+        "finalHealthScore": 47,
         "scoreCoverage": 0.9800000000000001,
         "missingMetrics": [
           "payoutRatio"
@@ -2640,7 +2709,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -2650,7 +2720,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1.5
+            "appliedPenalty": 1.5,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -2660,7 +2731,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -2670,7 +2742,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -2680,7 +2753,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1.5
+            "appliedPenalty": 1.5,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -2690,16 +2764,18 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 1.5
+            "appliedPenalty": 1.5,
+            "skipped": false
           },
           "payoutRoeInteraction": {
-            "payoutLatestWorsened": true,
-            "roeLatestWorsened": true,
-            "appliedPenalty": 1
+            "eligible": false,
+            "payoutLatestWorsened": false,
+            "roeLatestWorsened": false,
+            "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:39.287Z"
+      "lastScoredAt": "2026-02-26T12:31:07.779Z"
     },
     {
       "ticker": "W05",
@@ -2967,7 +3043,7 @@
         "payoutRatio": null,
         "assetTurnover": 0.09
       },
-      "lastFetchedAt": "2026-02-26T12:08:39.288Z",
+      "lastFetchedAt": "2026-02-26T12:31:07.779Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 53,
@@ -3025,7 +3101,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 3
+            "appliedPenalty": 3,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -3035,7 +3112,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 2.5
+            "appliedPenalty": 2.5,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -3045,7 +3123,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -3055,7 +3134,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -3065,7 +3145,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 2.5
+            "appliedPenalty": 2.5,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -3075,16 +3156,18 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "payoutRoeInteraction": {
-            "payoutLatestWorsened": true,
+            "eligible": false,
+            "payoutLatestWorsened": false,
             "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:39.369Z"
+      "lastScoredAt": "2026-02-26T12:31:07.911Z"
     },
     {
       "ticker": "B61",
@@ -3352,7 +3435,7 @@
         "payoutRatio": 10.51,
         "assetTurnover": 0.21
       },
-      "lastFetchedAt": "2026-02-26T12:08:39.369Z",
+      "lastFetchedAt": "2026-02-26T12:31:07.911Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 83,
@@ -3411,7 +3494,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 3
+            "appliedPenalty": 3,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -3421,7 +3505,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -3431,7 +3516,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1
+            "appliedPenalty": 1,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -3441,7 +3527,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1
+            "appliedPenalty": 1,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -3451,7 +3538,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -3461,16 +3549,18 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "payoutRoeInteraction": {
+            "eligible": true,
             "payoutLatestWorsened": false,
             "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:39.443Z"
+      "lastScoredAt": "2026-02-26T12:31:08.089Z"
     },
     {
       "ticker": "H13",
@@ -3738,7 +3828,7 @@
         "payoutRatio": 26.51,
         "assetTurnover": 0.07
       },
-      "lastFetchedAt": "2026-02-26T12:08:39.443Z",
+      "lastFetchedAt": "2026-02-26T12:31:08.089Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 45,
@@ -3797,7 +3887,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 2
+            "appliedPenalty": 2,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -3807,7 +3898,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -3817,7 +3909,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1
+            "appliedPenalty": 1,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -3827,7 +3920,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1
+            "appliedPenalty": 1,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -3837,7 +3931,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 2.5
+            "appliedPenalty": 2.5,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -3847,16 +3942,18 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1
+            "appliedPenalty": 1,
+            "skipped": false
           },
           "payoutRoeInteraction": {
+            "eligible": true,
             "payoutLatestWorsened": true,
             "roeLatestWorsened": true,
             "appliedPenalty": 1
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:39.565Z"
+      "lastScoredAt": "2026-02-26T12:31:08.269Z"
     },
     {
       "ticker": "T24",
@@ -4124,7 +4221,7 @@
         "payoutRatio": 31.72,
         "assetTurnover": 0.06
       },
-      "lastFetchedAt": "2026-02-26T12:08:39.566Z",
+      "lastFetchedAt": "2026-02-26T12:31:08.269Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 31,
@@ -4183,7 +4280,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 2
+            "appliedPenalty": 2,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -4193,7 +4291,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1.5
+            "appliedPenalty": 1.5,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -4203,7 +4302,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -4213,7 +4313,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -4223,7 +4324,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1.5
+            "appliedPenalty": 1.5,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -4233,16 +4335,18 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1
+            "appliedPenalty": 1,
+            "skipped": false
           },
           "payoutRoeInteraction": {
+            "eligible": true,
             "payoutLatestWorsened": true,
             "roeLatestWorsened": true,
             "appliedPenalty": 1
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:39.649Z"
+      "lastScoredAt": "2026-02-26T12:31:08.456Z"
     },
     {
       "ticker": "O10",
@@ -4510,7 +4614,7 @@
         "payoutRatio": 30.11,
         "assetTurnover": 0.07
       },
-      "lastFetchedAt": "2026-02-26T12:08:39.649Z",
+      "lastFetchedAt": "2026-02-26T12:31:08.456Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 47,
@@ -4569,7 +4673,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -4579,7 +4684,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -4589,7 +4695,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 1.5
+            "appliedPenalty": 1.5,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -4599,7 +4706,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 1.5
+            "appliedPenalty": 1.5,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -4609,7 +4717,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -4619,16 +4728,18 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1
+            "appliedPenalty": 1,
+            "skipped": false
           },
           "payoutRoeInteraction": {
+            "eligible": true,
             "payoutLatestWorsened": true,
             "roeLatestWorsened": true,
             "appliedPenalty": 1
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:39.778Z"
+      "lastScoredAt": "2026-02-26T12:31:08.661Z"
     },
     {
       "ticker": "5IC",
@@ -4896,7 +5007,7 @@
         "payoutRatio": 2.82,
         "assetTurnover": 0.67
       },
-      "lastFetchedAt": "2026-02-26T12:08:39.779Z",
+      "lastFetchedAt": "2026-02-26T12:31:08.661Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 65,
@@ -4955,7 +5066,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -4965,7 +5077,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1.5
+            "appliedPenalty": 1.5,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -4975,7 +5088,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -4985,7 +5099,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -4995,7 +5110,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -5005,16 +5121,18 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "payoutRoeInteraction": {
+            "eligible": true,
             "payoutLatestWorsened": false,
             "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:39.921Z"
+      "lastScoredAt": "2026-02-26T12:31:08.832Z"
     },
     {
       "ticker": "5DP",
@@ -5282,7 +5400,7 @@
         "payoutRatio": null,
         "assetTurnover": 0.08
       },
-      "lastFetchedAt": "2026-02-26T12:08:39.921Z",
+      "lastFetchedAt": "2026-02-26T12:31:08.832Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 16,
@@ -5340,7 +5458,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 2
+            "appliedPenalty": 2,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -5350,7 +5469,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1.5
+            "appliedPenalty": 1.5,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -5360,7 +5480,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1
+            "appliedPenalty": 1,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -5370,7 +5491,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1
+            "appliedPenalty": 1,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -5380,7 +5502,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -5390,16 +5513,18 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1
+            "appliedPenalty": 1,
+            "skipped": false
           },
           "payoutRoeInteraction": {
+            "eligible": false,
             "payoutLatestWorsened": false,
-            "roeLatestWorsened": true,
+            "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:40.003Z"
+      "lastScoredAt": "2026-02-26T12:31:09.040Z"
     },
     {
       "ticker": "5JK",
@@ -5667,7 +5792,7 @@
         "payoutRatio": 32.16,
         "assetTurnover": 0.08
       },
-      "lastFetchedAt": "2026-02-26T12:08:40.003Z",
+      "lastFetchedAt": "2026-02-26T12:31:09.040Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 59,
@@ -5726,7 +5851,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -5736,7 +5862,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 2.5
+            "appliedPenalty": 2.5,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -5746,7 +5873,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -5756,7 +5884,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -5766,7 +5895,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -5776,16 +5906,18 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "payoutRoeInteraction": {
+            "eligible": true,
             "payoutLatestWorsened": true,
             "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:40.078Z"
+      "lastScoredAt": "2026-02-26T12:31:09.234Z"
     },
     {
       "ticker": "F1E",
@@ -6053,7 +6185,7 @@
         "payoutRatio": null,
         "assetTurnover": 0.25
       },
-      "lastFetchedAt": "2026-02-26T12:08:40.078Z",
+      "lastFetchedAt": "2026-02-26T12:31:09.234Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 54,
@@ -6111,7 +6243,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -6121,7 +6254,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -6131,7 +6265,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1
+            "appliedPenalty": 1,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -6141,7 +6276,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1
+            "appliedPenalty": 1,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -6151,7 +6287,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1.5
+            "appliedPenalty": 1.5,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -6161,16 +6298,18 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "payoutRoeInteraction": {
-            "payoutLatestWorsened": true,
+            "eligible": false,
+            "payoutLatestWorsened": false,
             "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:40.157Z"
+      "lastScoredAt": "2026-02-26T12:31:09.432Z"
     },
     {
       "ticker": "ER0",
@@ -6438,7 +6577,7 @@
         "payoutRatio": 120.7,
         "assetTurnover": 0.4
       },
-      "lastFetchedAt": "2026-02-26T12:08:40.157Z",
+      "lastFetchedAt": "2026-02-26T12:31:09.432Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 75,
@@ -6497,7 +6636,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 2
+            "appliedPenalty": 2,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -6507,7 +6647,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -6517,7 +6658,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -6527,7 +6669,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -6537,7 +6680,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -6547,16 +6691,18 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "payoutRoeInteraction": {
+            "eligible": true,
             "payoutLatestWorsened": true,
             "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:40.234Z"
+      "lastScoredAt": "2026-02-26T12:31:09.618Z"
     },
     {
       "ticker": "BTE",
@@ -6824,7 +6970,7 @@
         "payoutRatio": 358.2,
         "assetTurnover": 0.2
       },
-      "lastFetchedAt": "2026-02-26T12:08:40.234Z",
+      "lastFetchedAt": "2026-02-26T12:31:09.618Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 69,
@@ -6883,7 +7029,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -6893,7 +7040,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -6903,7 +7051,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -6913,7 +7062,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -6923,7 +7073,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1.5
+            "appliedPenalty": 1.5,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -6933,16 +7084,18 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1
+            "appliedPenalty": 1,
+            "skipped": false
           },
           "payoutRoeInteraction": {
+            "eligible": true,
             "payoutLatestWorsened": true,
             "roeLatestWorsened": true,
             "appliedPenalty": 1
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:40.312Z"
+      "lastScoredAt": "2026-02-26T12:31:09.788Z"
     },
     {
       "ticker": "5UX",
@@ -7210,7 +7363,7 @@
         "payoutRatio": null,
         "assetTurnover": 0.11
       },
-      "lastFetchedAt": "2026-02-26T12:08:40.313Z",
+      "lastFetchedAt": "2026-02-26T12:31:09.789Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 35,
@@ -7268,7 +7421,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -7278,7 +7432,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -7288,7 +7443,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -7298,7 +7454,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -7308,7 +7465,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1.5
+            "appliedPenalty": 1.5,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -7318,16 +7476,18 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "payoutRoeInteraction": {
-            "payoutLatestWorsened": true,
+            "eligible": false,
+            "payoutLatestWorsened": false,
             "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:40.399Z"
+      "lastScoredAt": "2026-02-26T12:31:09.970Z"
     },
     {
       "ticker": "F9D",
@@ -7595,7 +7755,7 @@
         "payoutRatio": 19.02,
         "assetTurnover": 0.48
       },
-      "lastFetchedAt": "2026-02-26T12:08:40.399Z",
+      "lastFetchedAt": "2026-02-26T12:31:09.971Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 87,
@@ -7654,7 +7814,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 3
+            "appliedPenalty": 3,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -7664,7 +7825,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -7674,7 +7836,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 1.5
+            "appliedPenalty": 1.5,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -7684,7 +7847,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 1.5
+            "appliedPenalty": 1.5,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -7694,7 +7858,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -7704,16 +7869,18 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "payoutRoeInteraction": {
+            "eligible": true,
             "payoutLatestWorsened": false,
             "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:40.491Z"
+      "lastScoredAt": "2026-02-26T12:31:10.141Z"
     },
     {
       "ticker": "OU8",
@@ -7751,7 +7918,7 @@
           "label": "Market Capitalization",
           "unit": "millions SGD",
           "values": {
-            "Current": 1312,
+            "Current": 1337,
             "FY 2024": 807,
             "FY 2023": 341,
             "FY 2022": 282,
@@ -7759,7 +7926,7 @@
             "FY 2020": 294
           },
           "rawValues": {
-            "Current": "1,312",
+            "Current": "1,337",
             "FY 2024": "807",
             "FY 2023": "341",
             "FY 2022": "282",
@@ -7969,7 +8136,7 @@
         }
       },
       "current": {
-        "marketCap": 1312,
+        "marketCap": 1337,
         "netDebtToEbitda": 2.76,
         "debtToEquity": 0.64,
         "netDebtToEquity": 0.55,
@@ -7981,7 +8148,7 @@
         "payoutRatio": 9.79,
         "assetTurnover": 0.17
       },
-      "lastFetchedAt": "2026-02-26T12:08:40.491Z",
+      "lastFetchedAt": "2026-02-26T12:31:10.141Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 84,
@@ -8040,7 +8207,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -8050,7 +8218,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -8060,7 +8229,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -8070,7 +8240,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1
+            "appliedPenalty": 1,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -8080,7 +8251,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -8090,16 +8262,18 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "payoutRoeInteraction": {
+            "eligible": true,
             "payoutLatestWorsened": false,
             "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:40.577Z"
+      "lastScoredAt": "2026-02-26T12:31:10.326Z"
     },
     {
       "ticker": "C33",
@@ -8367,7 +8541,7 @@
         "payoutRatio": 63.27,
         "assetTurnover": 0.08
       },
-      "lastFetchedAt": "2026-02-26T12:08:40.577Z",
+      "lastFetchedAt": "2026-02-26T12:31:10.326Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 67,
@@ -8426,7 +8600,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 3
+            "appliedPenalty": 3,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -8436,7 +8611,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": true,
-            "appliedPenalty": 2.5
+            "appliedPenalty": 2.5,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -8446,7 +8622,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -8456,7 +8633,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -8466,7 +8644,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 1.5
+            "appliedPenalty": 1.5,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -8476,16 +8655,18 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "payoutRoeInteraction": {
+            "eligible": true,
             "payoutLatestWorsened": false,
             "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:40.670Z"
+      "lastScoredAt": "2026-02-26T12:31:10.495Z"
     },
     {
       "ticker": "S9B",
@@ -8739,7 +8920,7 @@
         "payoutRatio": null,
         "assetTurnover": 0.05
       },
-      "lastFetchedAt": "2026-02-26T12:08:40.670Z",
+      "lastFetchedAt": "2026-02-26T12:31:10.496Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 91,
@@ -8797,7 +8978,8 @@
             ],
             "latestWorsened": true,
             "consecutiveWorsened": false,
-            "appliedPenalty": 2
+            "appliedPenalty": 2,
+            "skipped": false
           },
           "debtToEquity": {
             "comparedYears": [
@@ -8807,7 +8989,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "quickRatio": {
             "comparedYears": [
@@ -8817,7 +9000,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "currentRatio": {
             "comparedYears": [
@@ -8827,7 +9011,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roic": {
             "comparedYears": [
@@ -8837,7 +9022,8 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "roe": {
             "comparedYears": [
@@ -8847,16 +9033,18 @@
             ],
             "latestWorsened": false,
             "consecutiveWorsened": false,
-            "appliedPenalty": 0
+            "appliedPenalty": 0,
+            "skipped": false
           },
           "payoutRoeInteraction": {
+            "eligible": false,
             "payoutLatestWorsened": false,
             "roeLatestWorsened": false,
             "appliedPenalty": 0
           }
         }
       },
-      "lastScoredAt": "2026-02-26T12:08:40.758Z"
+      "lastScoredAt": "2026-02-26T12:31:10.660Z"
     }
   ]
 }
