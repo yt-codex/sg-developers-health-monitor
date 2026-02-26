@@ -1,23 +1,95 @@
 {
-  "updatedAt": "2026-02-26T13:11:28.673Z",
+  "updatedAt": "2026-02-26T14:00:48.885321Z",
   "source": "stockanalysis",
   "scoringModel": {
-    "formula": "round(clamp((100 - weightedRisk) - trendPenalty, 0, 100))",
-    "weightedRisk": "sum(metricWeight * metricRisk) / sum(availableMetricWeight)",
-    "weights": {
-      "netDebtToEbitda": 0.2,
-      "debtToEquity": 0.15,
-      "netDebtToEquity": 0.1,
-      "debtToEbitda": 0,
-      "currentRatio": 0.2,
-      "quickRatio": 0,
-      "roic": 0.2,
-      "roe": 0.15,
-      "assetTurnover": 0,
-      "payoutRatio": 0
+    "formula": "round(clamp((100 - weightedPillarRisk) - trendPenalty, 0, 100))",
+    "weightedRisk": "sum(pillarWeight * pillarRisk) / sum(availablePillarWeight)",
+    "pillarWeights": {
+      "leverage": 0.35,
+      "liquidity": 0.3,
+      "resilience": 0.35
+    },
+    "pillars": {
+      "leverage": {
+        "metrics": [
+          "netDebtToEbitda",
+          "debtToEquity",
+          "netDebtToEquity"
+        ],
+        "aggregation": "median"
+      },
+      "liquidity": {
+        "metrics": [
+          "currentRatio"
+        ],
+        "aggregation": "single"
+      },
+      "resilience": {
+        "metrics": [
+          "roic",
+          "roe"
+        ],
+        "aggregation": "average"
+      }
     },
     "coverageThreshold": 0.5,
-    "trendPenaltyCap": 8,
+    "trendPenalty": {
+      "cap": 4,
+      "multiplier": 0.4,
+      "minWorseningMetrics": 2
+    },
+    "metricThresholds": {
+      "debtToEquity": {
+        "direction": "higherWorse",
+        "good": 0.8,
+        "bad": 2.5
+      },
+      "netDebtToEquity": {
+        "direction": "higherWorse",
+        "good": 0.4,
+        "bad": 1.8
+      },
+      "netDebtToEbitda": {
+        "direction": "higherWorse",
+        "good": 6,
+        "bad": 18
+      },
+      "debtToEbitda": {
+        "direction": "higherWorse",
+        "good": 8,
+        "bad": 22
+      },
+      "quickRatio": {
+        "direction": "lowerWorse",
+        "good": 1.0,
+        "bad": 0.3
+      },
+      "currentRatio": {
+        "direction": "lowerWorse",
+        "good": 2.0,
+        "bad": 1.0
+      },
+      "roic": {
+        "direction": "lowerWorse",
+        "good": 5,
+        "bad": 1
+      },
+      "roe": {
+        "direction": "lowerWorse",
+        "good": 10,
+        "bad": 0
+      },
+      "assetTurnover": {
+        "direction": "lowerWorse",
+        "good": 0.18,
+        "bad": 0.04
+      },
+      "payoutRatio": {
+        "direction": "higherWorse",
+        "good": 100,
+        "bad": 250
+      }
+    },
     "negativeLeverageHandling": {
       "targetMetrics": [
         "netDebtToEbitda",
@@ -28,6 +100,7 @@
         "roic",
         "roe"
       ],
+      "netCashLeverageSoftener": 0.7,
       "supportBands": {
         "strongMinHealthScore": 70,
         "mixedMinHealthScore": 40
@@ -40,15 +113,15 @@
     },
     "bands": {
       "status": {
-        "green": 70,
+        "green": 65,
         "amber": 40
       }
     },
     "excludedMetrics": [
       "debtToEbitda",
       "quickRatio",
-      "assetTurnover",
-      "payoutRatio"
+      "payoutRatio",
+      "assetTurnover"
     ]
   },
   "developers": [
@@ -321,15 +394,15 @@
       "lastFetchedAt": "2026-02-26T13:11:25.550Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 20,
+      "healthScore": 33,
       "healthStatus": "Red",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 72.10963118580767,
-        "staticHealthScore": 27.89036881419233,
-        "trendPenalty": 8,
-        "finalHealthScore": 20,
+        "staticRiskScore": 63.755,
+        "staticHealthScore": 36.245,
+        "trendPenalty": 3.6,
+        "finalHealthScore": 33,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -350,17 +423,48 @@
           "netDebtToEbitda": 89.16666666666666,
           "debtToEquity": 34.11764705882352,
           "netDebtToEquity": 55.714285714285715,
-          "currentRatio": 48,
-          "roic": 97.11111111111111,
-          "roe": 97.10000000000001
+          "currentRatio": 48.0,
+          "roic": 93.5,
+          "roe": 77.10000000000001
         },
         "weightedContributors": {
-          "netDebtToEbitda": 17.833333333333336,
-          "debtToEquity": 5.117647058823529,
-          "netDebtToEquity": 5.571428571428573,
-          "currentRatio": 9.600000000000003,
-          "roic": 19.422222222222228,
-          "roe": 14.565000000000003
+          "leverage": 19.500000000000004,
+          "liquidity": 14.4,
+          "resilience": 29.855000000000004
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 55.714285714285715,
+            "weightedRiskContribution": 19.500000000000004
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 48.0,
+            "weightedRiskContribution": 14.4
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 85.30000000000001,
+            "weightedRiskContribution": 29.855000000000004
+          }
+        },
+        "pillarRisks": {
+          "leverage": 55.714285714285715,
+          "liquidity": 48.0,
+          "resilience": 85.30000000000001
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -418,16 +522,12 @@
             "consecutiveWorsened": true,
             "appliedPenalty": 1.5,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 9.0,
+        "worseningMetricCount": 5
       },
-      "lastScoredAt": "2026-02-26T13:11:25.851Z"
+      "lastScoredAt": "2026-02-26T14:00:48.884124Z"
     },
     {
       "ticker": "U14",
@@ -698,15 +798,15 @@
       "lastFetchedAt": "2026-02-26T13:11:25.852Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 69,
-      "healthStatus": "Amber",
+      "healthScore": 79,
+      "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 27.820000000000004,
-        "staticHealthScore": 72.17999999999999,
-        "trendPenalty": 3.5,
-        "finalHealthScore": 69,
+        "staticRiskScore": 19.433750000000003,
+        "staticHealthScore": 80.56625,
+        "trendPenalty": 1.4000000000000001,
+        "finalHealthScore": 79,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -728,16 +828,47 @@
           "debtToEquity": 0,
           "netDebtToEquity": 0,
           "currentRatio": 0,
-          "roic": 77,
-          "roe": 82.8
+          "roic": 48.25000000000001,
+          "roe": 62.79999999999999
         },
         "weightedContributors": {
-          "netDebtToEbitda": 0,
-          "debtToEquity": 0,
-          "netDebtToEquity": 0,
-          "currentRatio": 0,
-          "roic": 15.400000000000002,
-          "roe": 12.420000000000002
+          "leverage": 0.0,
+          "liquidity": 0.0,
+          "resilience": 19.433750000000003
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0.0
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0.0
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 55.525,
+            "weightedRiskContribution": 19.433750000000003
+          }
+        },
+        "pillarRisks": {
+          "leverage": 0,
+          "liquidity": 0,
+          "resilience": 55.525
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -795,16 +926,12 @@
             "consecutiveWorsened": false,
             "appliedPenalty": 1,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 3.5,
+        "worseningMetricCount": 2
       },
-      "lastScoredAt": "2026-02-26T13:11:25.956Z"
+      "lastScoredAt": "2026-02-26T14:00:48.884206Z"
     },
     {
       "ticker": "F17",
@@ -1075,15 +1202,15 @@
       "lastFetchedAt": "2026-02-26T13:11:25.956Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 45,
-      "healthStatus": "Amber",
+      "healthScore": 65,
+      "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 49.65167133520076,
-        "staticHealthScore": 50.34832866479924,
-        "trendPenalty": 5.5,
-        "finalHealthScore": 45,
+        "staticRiskScore": 32.83625,
+        "staticHealthScore": 67.16375,
+        "trendPenalty": 2.2,
+        "finalHealthScore": 65,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -1105,16 +1232,47 @@
           "debtToEquity": 2.352941176470584,
           "netDebtToEquity": 22.14285714285714,
           "currentRatio": 0,
-          "roic": 86.55555555555556,
-          "roe": 93.6
+          "roic": 69.75,
+          "roe": 73.6
         },
         "weightedContributors": {
-          "netDebtToEbitda": 15.733333333333334,
-          "debtToEquity": 0.35294117647058765,
-          "netDebtToEquity": 2.2142857142857144,
-          "currentRatio": 0,
-          "roic": 17.311111111111117,
-          "roe": 14.040000000000001
+          "leverage": 7.749999999999999,
+          "liquidity": 0.0,
+          "resilience": 25.08625
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 22.14285714285714,
+            "weightedRiskContribution": 7.749999999999999
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0.0
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 71.675,
+            "weightedRiskContribution": 25.08625
+          }
+        },
+        "pillarRisks": {
+          "leverage": 22.14285714285714,
+          "liquidity": 0,
+          "resilience": 71.675
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -1172,16 +1330,12 @@
             "consecutiveWorsened": false,
             "appliedPenalty": 0,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 5.5,
+        "worseningMetricCount": 2
       },
-      "lastScoredAt": "2026-02-26T13:11:26.076Z"
+      "lastScoredAt": "2026-02-26T14:00:48.884271Z"
     },
     {
       "ticker": "TQ5",
@@ -1452,15 +1606,15 @@
       "lastFetchedAt": "2026-02-26T13:11:26.076Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 25,
+      "healthScore": 39,
       "healthStatus": "Red",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 69.21116713352008,
-        "staticHealthScore": 30.788832866479922,
-        "trendPenalty": 5.5,
-        "finalHealthScore": 25,
+        "staticRiskScore": 58.945,
+        "staticHealthScore": 41.055,
+        "trendPenalty": 2.2,
+        "finalHealthScore": 39,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -1481,17 +1635,48 @@
           "netDebtToEbitda": 89.33333333333331,
           "debtToEquity": 18.235294117647065,
           "netDebtToEquity": 40.714285714285715,
-          "currentRatio": 77,
-          "roic": 80.88888888888887,
-          "roe": 86.4
+          "currentRatio": 77.0,
+          "roic": 56.99999999999999,
+          "roe": 66.4
         },
         "weightedContributors": {
-          "netDebtToEbitda": 17.866666666666667,
-          "debtToEquity": 2.73529411764706,
-          "netDebtToEquity": 4.071428571428573,
-          "currentRatio": 15.400000000000002,
-          "roic": 16.177777777777777,
-          "roe": 12.960000000000003
+          "leverage": 14.250000000000002,
+          "liquidity": 23.1,
+          "resilience": 21.595000000000002
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 40.714285714285715,
+            "weightedRiskContribution": 14.250000000000002
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 77.0,
+            "weightedRiskContribution": 23.1
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 61.7,
+            "weightedRiskContribution": 21.595000000000002
+          }
+        },
+        "pillarRisks": {
+          "leverage": 40.714285714285715,
+          "liquidity": 77.0,
+          "resilience": 61.7
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -1549,16 +1734,12 @@
             "consecutiveWorsened": false,
             "appliedPenalty": 0,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 5.5,
+        "worseningMetricCount": 2
       },
-      "lastScoredAt": "2026-02-26T13:11:26.271Z"
+      "lastScoredAt": "2026-02-26T14:00:48.884325Z"
     },
     {
       "ticker": "9CI",
@@ -1829,15 +2010,15 @@
       "lastFetchedAt": "2026-02-26T13:11:26.271Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 42,
+      "healthScore": 49,
       "healthStatus": "Amber",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 52.30000000000001,
-        "staticHealthScore": 47.69999999999999,
-        "trendPenalty": 6,
-        "finalHealthScore": 42,
+        "staticRiskScore": 49.09,
+        "staticHealthScore": 50.91,
+        "trendPenalty": 2.4000000000000004,
+        "finalHealthScore": 49,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -1859,16 +2040,47 @@
           "debtToEquity": 0,
           "netDebtToEquity": 4.9999999999999964,
           "currentRatio": 57.00000000000001,
-          "roic": 93.33333333333333,
-          "roe": 100
+          "roic": 85.0,
+          "roe": 87.79999999999998
         },
         "weightedContributors": {
-          "netDebtToEbitda": 6.733333333333334,
-          "debtToEquity": 0,
-          "netDebtToEquity": 0.4999999999999997,
-          "currentRatio": 11.400000000000004,
-          "roic": 18.66666666666667,
-          "roe": 15.000000000000002
+          "leverage": 1.749999999999999,
+          "liquidity": 17.100000000000005,
+          "resilience": 30.24
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 4.9999999999999964,
+            "weightedRiskContribution": 1.749999999999999
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 57.00000000000001,
+            "weightedRiskContribution": 17.100000000000005
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 86.39999999999999,
+            "weightedRiskContribution": 30.24
+          }
+        },
+        "pillarRisks": {
+          "leverage": 4.9999999999999964,
+          "liquidity": 57.00000000000001,
+          "resilience": 86.39999999999999
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -1926,16 +2138,12 @@
             "consecutiveWorsened": false,
             "appliedPenalty": 1,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 6.0,
+        "worseningMetricCount": 4
       },
-      "lastScoredAt": "2026-02-26T13:11:26.388Z"
+      "lastScoredAt": "2026-02-26T14:00:48.884379Z"
     },
     {
       "ticker": "H78",
@@ -2206,15 +2414,15 @@
       "lastFetchedAt": "2026-02-26T13:11:26.389Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 58,
+      "healthScore": 61,
       "healthStatus": "Amber",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 37.13333333333334,
-        "staticHealthScore": 62.86666666666666,
-        "trendPenalty": 5,
-        "finalHealthScore": 58,
+        "staticRiskScore": 36.7625,
+        "staticHealthScore": 63.2375,
+        "trendPenalty": 2.0,
+        "finalHealthScore": 61,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -2235,17 +2443,48 @@
           "netDebtToEbitda": 0,
           "debtToEquity": 0,
           "netDebtToEquity": 0,
-          "currentRatio": 26,
-          "roic": 84.66666666666667,
+          "currentRatio": 26.0,
+          "roic": 65.5,
           "roe": 100
         },
         "weightedContributors": {
-          "netDebtToEbitda": 0,
-          "debtToEquity": 0,
-          "netDebtToEquity": 0,
-          "currentRatio": 5.200000000000001,
-          "roic": 16.933333333333337,
-          "roe": 15.000000000000002
+          "leverage": 0.0,
+          "liquidity": 7.800000000000001,
+          "resilience": 28.962500000000002
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0.0
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 26.0,
+            "weightedRiskContribution": 7.800000000000001
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 82.75,
+            "weightedRiskContribution": 28.962500000000002
+          }
+        },
+        "pillarRisks": {
+          "leverage": 0,
+          "liquidity": 26.0,
+          "resilience": 82.75
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -2303,16 +2542,12 @@
             "consecutiveWorsened": true,
             "appliedPenalty": 1.5,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 5.0,
+        "worseningMetricCount": 3
       },
-      "lastScoredAt": "2026-02-26T13:11:26.477Z"
+      "lastScoredAt": "2026-02-26T14:00:48.884434Z"
     },
     {
       "ticker": "LJ3",
@@ -2583,15 +2818,15 @@
       "lastFetchedAt": "2026-02-26T13:11:26.478Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 36,
+      "healthScore": 37,
       "healthStatus": "Red",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 59.03968253968255,
-        "staticHealthScore": 40.96031746031745,
-        "trendPenalty": 4.5,
-        "finalHealthScore": 36,
+        "staticRiskScore": 61.38125,
+        "staticHealthScore": 38.61875,
+        "trendPenalty": 1.8,
+        "finalHealthScore": 37,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -2613,16 +2848,47 @@
           "debtToEquity": 0,
           "netDebtToEquity": 9.285714285714286,
           "currentRatio": 100,
-          "roic": 82.55555555555554,
+          "roic": 60.75000000000001,
           "roe": 100
         },
         "weightedContributors": {
-          "netDebtToEbitda": 6.600000000000002,
-          "debtToEquity": 0,
-          "netDebtToEquity": 0.9285714285714288,
-          "currentRatio": 20.000000000000004,
-          "roic": 16.511111111111113,
-          "roe": 15.000000000000002
+          "leverage": 3.2500000000000004,
+          "liquidity": 30.000000000000004,
+          "resilience": 28.13125
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 9.285714285714286,
+            "weightedRiskContribution": 3.2500000000000004
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 100,
+            "weightedRiskContribution": 30.000000000000004
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 80.375,
+            "weightedRiskContribution": 28.13125
+          }
+        },
+        "pillarRisks": {
+          "leverage": 9.285714285714286,
+          "liquidity": 100,
+          "resilience": 80.375
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -2680,16 +2946,12 @@
             "consecutiveWorsened": true,
             "appliedPenalty": 1.5,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 4.5,
+        "worseningMetricCount": 3
       },
-      "lastScoredAt": "2026-02-26T13:11:26.685Z"
+      "lastScoredAt": "2026-02-26T14:00:48.884487Z"
     },
     {
       "ticker": "W05",
@@ -2960,15 +3222,15 @@
       "lastFetchedAt": "2026-02-26T13:11:26.685Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 48,
+      "healthScore": 62,
       "healthStatus": "Amber",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 43.70000000000001,
-        "staticHealthScore": 56.29999999999999,
-        "trendPenalty": 8,
-        "finalHealthScore": 48,
+        "staticRiskScore": 35.00000000000001,
+        "staticHealthScore": 65.0,
+        "trendPenalty": 3.2,
+        "finalHealthScore": 62,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -2994,12 +3256,43 @@
           "roe": 100
         },
         "weightedContributors": {
-          "netDebtToEbitda": 8.700000000000003,
-          "debtToEquity": 0,
-          "netDebtToEquity": 0,
-          "currentRatio": 0,
-          "roic": 20.000000000000004,
-          "roe": 15.000000000000002
+          "leverage": 0.0,
+          "liquidity": 0.0,
+          "resilience": 35.00000000000001
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0.0
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0.0
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 100.0,
+            "weightedRiskContribution": 35.00000000000001
+          }
+        },
+        "pillarRisks": {
+          "leverage": 0,
+          "liquidity": 0,
+          "resilience": 100.0
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -3057,16 +3350,12 @@
             "consecutiveWorsened": false,
             "appliedPenalty": 0,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 8.0,
+        "worseningMetricCount": 3
       },
-      "lastScoredAt": "2026-02-26T13:11:26.814Z"
+      "lastScoredAt": "2026-02-26T14:00:48.884539Z"
     },
     {
       "ticker": "B61",
@@ -3337,15 +3626,15 @@
       "lastFetchedAt": "2026-02-26T13:11:26.814Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 72,
+      "healthScore": 92,
       "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 24.42777777777778,
-        "staticHealthScore": 75.57222222222222,
-        "trendPenalty": 4,
-        "finalHealthScore": 72,
+        "staticRiskScore": 6.4750000000000005,
+        "staticHealthScore": 93.525,
+        "trendPenalty": 1.6,
+        "finalHealthScore": 92,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -3363,49 +3652,80 @@
           "roe"
         ],
         "riskByMetric": {
-          "netDebtToEbitda": 25,
+          "netDebtToEbitda": 0,
           "debtToEquity": 0,
-          "netDebtToEquity": 25,
+          "netDebtToEquity": 0,
           "currentRatio": 0,
-          "roic": 41.888888888888886,
-          "roe": 57.00000000000001
+          "roic": 0,
+          "roe": 37.0
         },
         "weightedContributors": {
-          "netDebtToEbitda": 5.000000000000001,
-          "debtToEquity": 0,
-          "netDebtToEquity": 2.5000000000000004,
-          "currentRatio": 0,
-          "roic": 8.37777777777778,
-          "roe": 8.550000000000002
+          "leverage": 0.0,
+          "liquidity": 0.0,
+          "resilience": 6.4750000000000005
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 0.0,
+            "weightedRiskContribution": 0.0
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0.0
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 18.5,
+            "weightedRiskContribution": 6.4750000000000005
+          }
+        },
+        "pillarRisks": {
+          "leverage": 0.0,
+          "liquidity": 0,
+          "resilience": 18.5
         },
         "metricAdjustments": {
           "netDebtToEbitda": {
             "rule": "negativeLeverageSupportGate",
             "currentValue": -1.44,
             "originalRisk": 0,
-            "adjustedRisk": 25,
-            "supportBand": "mixed",
-            "supportHealthScore": 67.03703703703704,
+            "adjustedRisk": 0,
+            "supportBand": "strong",
+            "supportHealthScore": 87.66666666666667,
             "supportMetricsUsed": [
               "currentRatio",
               "roic",
               "roe"
             ],
-            "applied": true
+            "applied": false
           },
           "netDebtToEquity": {
             "rule": "negativeLeverageSupportGate",
             "currentValue": -0.1,
             "originalRisk": 0,
-            "adjustedRisk": 25,
-            "supportBand": "mixed",
-            "supportHealthScore": 67.03703703703704,
+            "adjustedRisk": 0,
+            "supportBand": "strong",
+            "supportHealthScore": 87.66666666666667,
             "supportMetricsUsed": [
               "currentRatio",
               "roic",
               "roe"
             ],
-            "applied": true
+            "applied": false
           }
         },
         "trendBreakdown": {
@@ -3463,16 +3783,12 @@
             "consecutiveWorsened": false,
             "appliedPenalty": 0,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 4,
+        "worseningMetricCount": 2
       },
-      "lastScoredAt": "2026-02-26T13:11:26.902Z"
+      "lastScoredAt": "2026-02-26T14:00:48.884596Z"
     },
     {
       "ticker": "H13",
@@ -3743,15 +4059,15 @@
       "lastFetchedAt": "2026-02-26T13:11:26.902Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 38,
-      "healthStatus": "Red",
+      "healthScore": 43,
+      "healthStatus": "Amber",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 55.82888888888889,
-        "staticHealthScore": 44.17111111111111,
-        "trendPenalty": 6.5,
-        "finalHealthScore": 38,
+        "staticRiskScore": 54.4925,
+        "staticHealthScore": 45.5075,
+        "trendPenalty": 2.6,
+        "finalHealthScore": 43,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -3771,18 +4087,49 @@
         "riskByMetric": {
           "netDebtToEbitda": 32.41666666666667,
           "debtToEquity": 0,
-          "netDebtToEquity": 15,
+          "netDebtToEquity": 15.0,
           "currentRatio": 89.99999999999999,
-          "roic": 79.77777777777777,
-          "roe": 92.6
+          "roic": 54.50000000000001,
+          "roe": 72.6
         },
         "weightedContributors": {
-          "netDebtToEbitda": 6.483333333333335,
-          "debtToEquity": 0,
-          "netDebtToEquity": 1.5000000000000002,
-          "currentRatio": 18,
-          "roic": 15.955555555555557,
-          "roe": 13.89
+          "leverage": 5.250000000000001,
+          "liquidity": 27.0,
+          "resilience": 22.2425
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 15.0,
+            "weightedRiskContribution": 5.250000000000001
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 89.99999999999999,
+            "weightedRiskContribution": 27.0
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 63.55,
+            "weightedRiskContribution": 22.2425
+          }
+        },
+        "pillarRisks": {
+          "leverage": 15.0,
+          "liquidity": 89.99999999999999,
+          "resilience": 63.55
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -3840,16 +4187,12 @@
             "consecutiveWorsened": false,
             "appliedPenalty": 1,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 6.5,
+        "worseningMetricCount": 4
       },
-      "lastScoredAt": "2026-02-26T13:11:26.984Z"
+      "lastScoredAt": "2026-02-26T14:00:48.884650Z"
     },
     {
       "ticker": "T24",
@@ -4120,15 +4463,15 @@
       "lastFetchedAt": "2026-02-26T13:11:26.984Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 32,
-      "healthStatus": "Red",
+      "healthScore": 51,
+      "healthStatus": "Amber",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 62.268907563025216,
-        "staticHealthScore": 37.731092436974784,
-        "trendPenalty": 6,
-        "finalHealthScore": 32,
+        "staticRiskScore": 47.0475,
+        "staticHealthScore": 52.9525,
+        "trendPenalty": 2.4000000000000004,
+        "finalHealthScore": 51,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -4151,15 +4494,46 @@
           "netDebtToEquity": 43.57142857142857,
           "currentRatio": 0,
           "roic": 100,
-          "roe": 100
+          "roe": 81.69999999999999
         },
         "weightedContributors": {
-          "netDebtToEbitda": 20.000000000000004,
-          "debtToEquity": 2.911764705882352,
-          "netDebtToEquity": 4.357142857142858,
-          "currentRatio": 0,
-          "roic": 20.000000000000004,
-          "roe": 15.000000000000002
+          "leverage": 15.25,
+          "liquidity": 0.0,
+          "resilience": 31.7975
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 43.57142857142857,
+            "weightedRiskContribution": 15.25
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0.0
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 90.85,
+            "weightedRiskContribution": 31.7975
+          }
+        },
+        "pillarRisks": {
+          "leverage": 43.57142857142857,
+          "liquidity": 0,
+          "resilience": 90.85
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -4217,16 +4591,12 @@
             "consecutiveWorsened": false,
             "appliedPenalty": 1,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 6.0,
+        "worseningMetricCount": 4
       },
-      "lastScoredAt": "2026-02-26T13:11:27.085Z"
+      "lastScoredAt": "2026-02-26T14:00:48.884700Z"
     },
     {
       "ticker": "O10",
@@ -4497,15 +4867,15 @@
       "lastFetchedAt": "2026-02-26T13:11:27.086Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 41,
+      "healthScore": 50,
       "healthStatus": "Amber",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 56.25500000000001,
-        "staticHealthScore": 43.74499999999999,
-        "trendPenalty": 2.5,
-        "finalHealthScore": 41,
+        "staticRiskScore": 49.49125,
+        "staticHealthScore": 50.50875,
+        "trendPenalty": 1.0,
+        "finalHealthScore": 50,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -4526,17 +4896,48 @@
           "netDebtToEbitda": 48.41666666666667,
           "debtToEquity": 0,
           "netDebtToEquity": 0,
-          "currentRatio": 81,
-          "roic": 94.33333333333334,
-          "roe": 76.7
+          "currentRatio": 81.0,
+          "roic": 87.25,
+          "roe": 56.699999999999996
         },
         "weightedContributors": {
-          "netDebtToEbitda": 9.683333333333337,
-          "debtToEquity": 0,
-          "netDebtToEquity": 0,
-          "currentRatio": 16.200000000000003,
-          "roic": 18.866666666666674,
-          "roe": 11.505000000000003
+          "leverage": 0.0,
+          "liquidity": 24.300000000000004,
+          "resilience": 25.19125
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0.0
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 81.0,
+            "weightedRiskContribution": 24.300000000000004
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 71.975,
+            "weightedRiskContribution": 25.19125
+          }
+        },
+        "pillarRisks": {
+          "leverage": 0,
+          "liquidity": 81.0,
+          "resilience": 71.975
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -4594,16 +4995,12 @@
             "consecutiveWorsened": false,
             "appliedPenalty": 1,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 2.5,
+        "worseningMetricCount": 2
       },
-      "lastScoredAt": "2026-02-26T13:11:27.173Z"
+      "lastScoredAt": "2026-02-26T14:00:48.884751Z"
     },
     {
       "ticker": "5IC",
@@ -4874,15 +5271,15 @@
       "lastFetchedAt": "2026-02-26T13:11:27.173Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 69,
-      "healthStatus": "Amber",
+      "healthScore": 65,
+      "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 29.666666666666668,
-        "staticHealthScore": 70.33333333333333,
-        "trendPenalty": 1.5,
-        "finalHealthScore": 69,
+        "staticRiskScore": 35.00000000000001,
+        "staticHealthScore": 65.0,
+        "trendPenalty": 0,
+        "finalHealthScore": 65,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -4904,16 +5301,47 @@
           "debtToEquity": 100,
           "netDebtToEquity": 100,
           "currentRatio": 0,
-          "roic": 15.999999999999995,
+          "roic": 0,
           "roe": 0
         },
         "weightedContributors": {
-          "netDebtToEbitda": 1.4666666666666668,
-          "debtToEquity": 15.000000000000002,
-          "netDebtToEquity": 10.000000000000002,
-          "currentRatio": 0,
-          "roic": 3.1999999999999997,
-          "roe": 0
+          "leverage": 35.00000000000001,
+          "liquidity": 0.0,
+          "resilience": 0.0
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 100,
+            "weightedRiskContribution": 35.00000000000001
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0.0
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 0.0,
+            "weightedRiskContribution": 0.0
+          }
+        },
+        "pillarRisks": {
+          "leverage": 100,
+          "liquidity": 0,
+          "resilience": 0.0
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -4971,16 +5399,12 @@
             "consecutiveWorsened": false,
             "appliedPenalty": 0,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 1.5,
+        "worseningMetricCount": 1
       },
-      "lastScoredAt": "2026-02-26T13:11:27.289Z"
+      "lastScoredAt": "2026-02-26T14:00:48.884802Z"
     },
     {
       "ticker": "5DP",
@@ -5251,15 +5675,15 @@
       "lastFetchedAt": "2026-02-26T13:11:27.289Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 11,
+      "healthScore": 18,
       "healthStatus": "Red",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 83.07385620915035,
-        "staticHealthScore": 16.92614379084965,
-        "trendPenalty": 5.5,
-        "finalHealthScore": 11,
+        "staticRiskScore": 80.18125000000002,
+        "staticHealthScore": 19.81874999999998,
+        "trendPenalty": 2.2,
+        "finalHealthScore": 18,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -5279,18 +5703,49 @@
         "riskByMetric": {
           "netDebtToEbitda": 100,
           "debtToEquity": 33.529411764705884,
-          "netDebtToEquity": 60,
+          "netDebtToEquity": 60.0,
           "currentRatio": 100,
-          "roic": 85.22222222222223,
+          "roic": 66.75,
           "roe": 100
         },
         "weightedContributors": {
-          "netDebtToEbitda": 20.000000000000004,
-          "debtToEquity": 5.029411764705883,
-          "netDebtToEquity": 6.000000000000001,
-          "currentRatio": 20.000000000000004,
-          "roic": 17.04444444444445,
-          "roe": 15.000000000000002
+          "leverage": 21.000000000000004,
+          "liquidity": 30.000000000000004,
+          "resilience": 29.181250000000002
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 60.0,
+            "weightedRiskContribution": 21.000000000000004
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 100,
+            "weightedRiskContribution": 30.000000000000004
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 83.375,
+            "weightedRiskContribution": 29.181250000000002
+          }
+        },
+        "pillarRisks": {
+          "leverage": 60.0,
+          "liquidity": 100,
+          "resilience": 83.375
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -5348,16 +5803,12 @@
             "consecutiveWorsened": false,
             "appliedPenalty": 1,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 5.5,
+        "worseningMetricCount": 4
       },
-      "lastScoredAt": "2026-02-26T13:11:27.413Z"
+      "lastScoredAt": "2026-02-26T14:00:48.884854Z"
     },
     {
       "ticker": "5JK",
@@ -5628,15 +6079,15 @@
       "lastFetchedAt": "2026-02-26T13:11:27.413Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 54,
+      "healthScore": 62,
       "healthStatus": "Amber",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 43.48235294117648,
-        "staticHealthScore": 56.51764705882352,
-        "trendPenalty": 2.5,
-        "finalHealthScore": 54,
+        "staticRiskScore": 37.89882352941178,
+        "staticHealthScore": 62.10117647058822,
+        "trendPenalty": 0,
+        "finalHealthScore": 62,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -5659,15 +6110,46 @@
           "netDebtToEquity": 4.9999999999999964,
           "currentRatio": 0,
           "roic": 100,
-          "roe": 100
+          "roe": 84.80000000000001
         },
         "weightedContributors": {
-          "netDebtToEbitda": 5.6000000000000005,
-          "debtToEquity": 2.3823529411764715,
-          "netDebtToEquity": 0.4999999999999997,
-          "currentRatio": 0,
-          "roic": 20.000000000000004,
-          "roe": 15.000000000000002
+          "leverage": 5.558823529411766,
+          "liquidity": 0.0,
+          "resilience": 32.34000000000001
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 15.882352941176473,
+            "weightedRiskContribution": 5.558823529411766
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0.0
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 92.4,
+            "weightedRiskContribution": 32.34000000000001
+          }
+        },
+        "pillarRisks": {
+          "leverage": 15.882352941176473,
+          "liquidity": 0,
+          "resilience": 92.4
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -5725,16 +6207,12 @@
             "consecutiveWorsened": false,
             "appliedPenalty": 0,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 2.5,
+        "worseningMetricCount": 1
       },
-      "lastScoredAt": "2026-02-26T13:11:27.514Z"
+      "lastScoredAt": "2026-02-26T14:00:48.884904Z"
     },
     {
       "ticker": "F1E",
@@ -6005,15 +6483,15 @@
       "lastFetchedAt": "2026-02-26T13:11:27.514Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 46,
+      "healthScore": 51,
       "healthStatus": "Amber",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 51.5388888888889,
-        "staticHealthScore": 48.4611111111111,
-        "trendPenalty": 2.5,
-        "finalHealthScore": 46,
+        "staticRiskScore": 48.018750000000004,
+        "staticHealthScore": 51.981249999999996,
+        "trendPenalty": 1.0,
+        "finalHealthScore": 51,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -6035,16 +6513,47 @@
           "debtToEquity": 0,
           "netDebtToEquity": 0,
           "currentRatio": 44.99999999999999,
-          "roic": 98.77777777777779,
+          "roic": 97.24999999999999,
           "roe": 100
         },
         "weightedContributors": {
-          "netDebtToEbitda": 7.783333333333334,
-          "debtToEquity": 0,
-          "netDebtToEquity": 0,
-          "currentRatio": 9,
-          "roic": 19.755555555555564,
-          "roe": 15.000000000000002
+          "leverage": 0.0,
+          "liquidity": 13.5,
+          "resilience": 34.518750000000004
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0.0
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 44.99999999999999,
+            "weightedRiskContribution": 13.5
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 98.625,
+            "weightedRiskContribution": 34.518750000000004
+          }
+        },
+        "pillarRisks": {
+          "leverage": 0,
+          "liquidity": 44.99999999999999,
+          "resilience": 98.625
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -6102,16 +6611,12 @@
             "consecutiveWorsened": false,
             "appliedPenalty": 0,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 2.5,
+        "worseningMetricCount": 2
       },
-      "lastScoredAt": "2026-02-26T13:11:27.646Z"
+      "lastScoredAt": "2026-02-26T14:00:48.884955Z"
     },
     {
       "ticker": "ER0",
@@ -6382,15 +6887,15 @@
       "lastFetchedAt": "2026-02-26T13:11:27.647Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 55,
-      "healthStatus": "Amber",
+      "healthScore": 75,
+      "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 43.37777777777779,
-        "staticHealthScore": 56.62222222222221,
-        "trendPenalty": 2,
-        "finalHealthScore": 55,
+        "staticRiskScore": 25.287500000000005,
+        "staticHealthScore": 74.71249999999999,
+        "trendPenalty": 0,
+        "finalHealthScore": 75,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -6408,29 +6913,60 @@
           "roe"
         ],
         "riskByMetric": {
-          "netDebtToEbitda": 55,
+          "netDebtToEbitda": 25,
           "debtToEquity": 0,
           "netDebtToEquity": 0,
           "currentRatio": 28.000000000000004,
-          "roic": 58.88888888888889,
-          "roe": 100
+          "roic": 7.499999999999996,
+          "roe": 89.0
         },
         "weightedContributors": {
-          "netDebtToEbitda": 11.000000000000002,
-          "debtToEquity": 0,
-          "netDebtToEquity": 0,
-          "currentRatio": 5.600000000000002,
-          "roic": 11.77777777777778,
-          "roe": 15.000000000000002
+          "leverage": 0.0,
+          "liquidity": 8.400000000000002,
+          "resilience": 16.887500000000003
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0.0
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 28.000000000000004,
+            "weightedRiskContribution": 8.400000000000002
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 48.25,
+            "weightedRiskContribution": 16.887500000000003
+          }
+        },
+        "pillarRisks": {
+          "leverage": 0,
+          "liquidity": 28.000000000000004,
+          "resilience": 48.25
         },
         "metricAdjustments": {
           "netDebtToEbitda": {
             "rule": "negativeLeverageSupportGate",
             "currentValue": -0.06,
             "originalRisk": 0,
-            "adjustedRisk": 55,
-            "supportBand": "weak",
-            "supportHealthScore": 37.7037037037037,
+            "adjustedRisk": 25,
+            "supportBand": "mixed",
+            "supportHealthScore": 58.5,
             "supportMetricsUsed": [
               "currentRatio",
               "roic",
@@ -6494,16 +7030,12 @@
             "consecutiveWorsened": false,
             "appliedPenalty": 0,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 2,
+        "worseningMetricCount": 1
       },
-      "lastScoredAt": "2026-02-26T13:11:27.988Z"
+      "lastScoredAt": "2026-02-26T14:00:48.885006Z"
     },
     {
       "ticker": "BTE",
@@ -6774,15 +7306,15 @@
       "lastFetchedAt": "2026-02-26T13:11:27.988Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 47,
+      "healthScore": 64,
       "healthStatus": "Amber",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 50.3038888888889,
-        "staticHealthScore": 49.6961111111111,
-        "trendPenalty": 2.5,
-        "finalHealthScore": 47,
+        "staticRiskScore": 35.49875000000001,
+        "staticHealthScore": 64.50125,
+        "trendPenalty": 1.0,
+        "finalHealthScore": 64,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -6800,29 +7332,60 @@
           "roe"
         ],
         "riskByMetric": {
-          "netDebtToEbitda": 55,
+          "netDebtToEbitda": 25,
           "debtToEquity": 0,
-          "netDebtToEquity": 55,
+          "netDebtToEquity": 25,
           "currentRatio": 0,
-          "roic": 95.44444444444444,
-          "roe": 98.10000000000001
+          "roic": 89.75,
+          "roe": 78.10000000000001
         },
         "weightedContributors": {
-          "netDebtToEbitda": 11.000000000000002,
-          "debtToEquity": 0,
-          "netDebtToEquity": 5.500000000000001,
-          "currentRatio": 0,
-          "roic": 19.088888888888892,
-          "roe": 14.715000000000002
+          "leverage": 6.125000000000001,
+          "liquidity": 0.0,
+          "resilience": 29.373750000000005
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 17.5,
+            "weightedRiskContribution": 6.125000000000001
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0.0
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 83.92500000000001,
+            "weightedRiskContribution": 29.373750000000005
+          }
+        },
+        "pillarRisks": {
+          "leverage": 17.5,
+          "liquidity": 0,
+          "resilience": 83.92500000000001
         },
         "metricAdjustments": {
           "netDebtToEbitda": {
             "rule": "negativeLeverageSupportGate",
             "currentValue": -5.24,
             "originalRisk": 0,
-            "adjustedRisk": 55,
-            "supportBand": "weak",
-            "supportHealthScore": 35.48518518518518,
+            "adjustedRisk": 25,
+            "supportBand": "mixed",
+            "supportHealthScore": 44.04999999999999,
             "supportMetricsUsed": [
               "currentRatio",
               "roic",
@@ -6834,9 +7397,9 @@
             "rule": "negativeLeverageSupportGate",
             "currentValue": -0.46,
             "originalRisk": 0,
-            "adjustedRisk": 55,
-            "supportBand": "weak",
-            "supportHealthScore": 35.48518518518518,
+            "adjustedRisk": 25,
+            "supportBand": "mixed",
+            "supportHealthScore": 44.04999999999999,
             "supportMetricsUsed": [
               "currentRatio",
               "roic",
@@ -6900,16 +7463,12 @@
             "consecutiveWorsened": false,
             "appliedPenalty": 1,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 2.5,
+        "worseningMetricCount": 2
       },
-      "lastScoredAt": "2026-02-26T13:11:28.079Z"
+      "lastScoredAt": "2026-02-26T14:00:48.885059Z"
     },
     {
       "ticker": "5UX",
@@ -7180,15 +7739,15 @@
       "lastFetchedAt": "2026-02-26T13:11:28.079Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 32,
+      "healthScore": 38,
       "healthStatus": "Red",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 66.40056022408966,
-        "staticHealthScore": 33.59943977591034,
-        "trendPenalty": 1.5,
-        "finalHealthScore": 32,
+        "staticRiskScore": 62.46875000000001,
+        "staticHealthScore": 37.53124999999999,
+        "trendPenalty": 0,
+        "finalHealthScore": 38,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -7209,17 +7768,48 @@
           "netDebtToEbitda": 67.5,
           "debtToEquity": 42.35294117647059,
           "netDebtToEquity": 72.14285714285712,
-          "currentRatio": 50,
-          "roic": 71.66666666666667,
+          "currentRatio": 50.0,
+          "roic": 36.25000000000001,
           "roe": 100
         },
         "weightedContributors": {
-          "netDebtToEbitda": 13.500000000000002,
-          "debtToEquity": 6.352941176470589,
-          "netDebtToEquity": 7.2142857142857135,
-          "currentRatio": 10.000000000000002,
-          "roic": 14.333333333333337,
-          "roe": 15.000000000000002
+          "leverage": 23.625000000000004,
+          "liquidity": 15.000000000000002,
+          "resilience": 23.843750000000004
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 67.5,
+            "weightedRiskContribution": 23.625000000000004
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 50.0,
+            "weightedRiskContribution": 15.000000000000002
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 68.125,
+            "weightedRiskContribution": 23.843750000000004
+          }
+        },
+        "pillarRisks": {
+          "leverage": 67.5,
+          "liquidity": 50.0,
+          "resilience": 68.125
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -7277,16 +7867,12 @@
             "consecutiveWorsened": false,
             "appliedPenalty": 0,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 1.5,
+        "worseningMetricCount": 1
       },
-      "lastScoredAt": "2026-02-26T13:11:28.193Z"
+      "lastScoredAt": "2026-02-26T14:00:48.885112Z"
     },
     {
       "ticker": "F9D",
@@ -7557,15 +8143,15 @@
       "lastFetchedAt": "2026-02-26T13:11:28.193Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 84,
+      "healthScore": 81,
       "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 11.600000000000003,
-        "staticHealthScore": 88.39999999999999,
-        "trendPenalty": 4.5,
-        "finalHealthScore": 84,
+        "staticRiskScore": 17.400000000000006,
+        "staticHealthScore": 82.6,
+        "trendPenalty": 1.8,
+        "finalHealthScore": 81,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -7591,12 +8177,43 @@
           "roe": 0
         },
         "weightedContributors": {
-          "netDebtToEbitda": 0,
-          "debtToEquity": 0,
-          "netDebtToEquity": 0,
-          "currentRatio": 11.600000000000003,
-          "roic": 0,
-          "roe": 0
+          "leverage": 0.0,
+          "liquidity": 17.400000000000006,
+          "resilience": 0.0
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 0.0,
+            "weightedRiskContribution": 0.0
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 58.00000000000001,
+            "weightedRiskContribution": 17.400000000000006
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 0.0,
+            "weightedRiskContribution": 0.0
+          }
+        },
+        "pillarRisks": {
+          "leverage": 0.0,
+          "liquidity": 58.00000000000001,
+          "resilience": 0.0
         },
         "metricAdjustments": {
           "netDebtToEbitda": {
@@ -7683,16 +8300,12 @@
             "consecutiveWorsened": false,
             "appliedPenalty": 0,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 4.5,
+        "worseningMetricCount": 2
       },
-      "lastScoredAt": "2026-02-26T13:11:28.309Z"
+      "lastScoredAt": "2026-02-26T14:00:48.885164Z"
     },
     {
       "ticker": "OU8",
@@ -7963,15 +8576,15 @@
       "lastFetchedAt": "2026-02-26T13:11:28.309Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 78,
+      "healthScore": 70,
       "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 21.071428571428577,
-        "staticHealthScore": 78.92857142857142,
-        "trendPenalty": 1,
-        "finalHealthScore": 78,
+        "staticRiskScore": 30.000000000000004,
+        "staticHealthScore": 70.0,
+        "trendPenalty": 0,
+        "finalHealthScore": 70,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -7997,12 +8610,43 @@
           "roe": 0
         },
         "weightedContributors": {
-          "netDebtToEbitda": 0,
-          "debtToEquity": 0,
-          "netDebtToEquity": 1.071428571428572,
-          "currentRatio": 20.000000000000004,
-          "roic": 0,
-          "roe": 0
+          "leverage": 0.0,
+          "liquidity": 30.000000000000004,
+          "resilience": 0.0
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0.0
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 100,
+            "weightedRiskContribution": 30.000000000000004
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 0.0,
+            "weightedRiskContribution": 0.0
+          }
+        },
+        "pillarRisks": {
+          "leverage": 0,
+          "liquidity": 100,
+          "resilience": 0.0
         },
         "metricAdjustments": {},
         "trendBreakdown": {
@@ -8060,16 +8704,12 @@
             "consecutiveWorsened": false,
             "appliedPenalty": 0,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 1,
+        "worseningMetricCount": 1
       },
-      "lastScoredAt": "2026-02-26T13:11:28.414Z"
+      "lastScoredAt": "2026-02-26T14:00:48.885212Z"
     },
     {
       "ticker": "C33",
@@ -8340,15 +8980,15 @@
       "lastFetchedAt": "2026-02-26T13:11:28.414Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 43,
+      "healthScore": 62,
       "healthStatus": "Amber",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 49.68500000000001,
-        "staticHealthScore": 50.31499999999999,
-        "trendPenalty": 7,
-        "finalHealthScore": 43,
+        "staticRiskScore": 35.50750000000001,
+        "staticHealthScore": 64.49249999999999,
+        "trendPenalty": 2.8000000000000003,
+        "finalHealthScore": 62,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -8366,29 +9006,60 @@
           "roe"
         ],
         "riskByMetric": {
-          "netDebtToEbitda": 55,
+          "netDebtToEbitda": 25,
           "debtToEquity": 0,
-          "netDebtToEquity": 55,
+          "netDebtToEquity": 25,
           "currentRatio": 0,
           "roic": 100,
-          "roe": 87.89999999999999
+          "roe": 67.9
         },
         "weightedContributors": {
-          "netDebtToEbitda": 11.000000000000002,
-          "debtToEquity": 0,
-          "netDebtToEquity": 5.500000000000001,
-          "currentRatio": 0,
-          "roic": 20.000000000000004,
-          "roe": 13.185
+          "leverage": 6.125000000000001,
+          "liquidity": 0.0,
+          "resilience": 29.382500000000004
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 17.5,
+            "weightedRiskContribution": 6.125000000000001
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0.0
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 83.95,
+            "weightedRiskContribution": 29.382500000000004
+          }
+        },
+        "pillarRisks": {
+          "leverage": 17.5,
+          "liquidity": 0,
+          "resilience": 83.95
         },
         "metricAdjustments": {
           "netDebtToEbitda": {
             "rule": "negativeLeverageSupportGate",
             "currentValue": -8.18,
             "originalRisk": 0,
-            "adjustedRisk": 55,
-            "supportBand": "weak",
-            "supportHealthScore": 37.36666666666667,
+            "adjustedRisk": 25,
+            "supportBand": "mixed",
+            "supportHealthScore": 44.03333333333333,
             "supportMetricsUsed": [
               "currentRatio",
               "roic",
@@ -8400,9 +9071,9 @@
             "rule": "negativeLeverageSupportGate",
             "currentValue": -0.04,
             "originalRisk": 0,
-            "adjustedRisk": 55,
-            "supportBand": "weak",
-            "supportHealthScore": 37.36666666666667,
+            "adjustedRisk": 25,
+            "supportBand": "mixed",
+            "supportHealthScore": 44.03333333333333,
             "supportMetricsUsed": [
               "currentRatio",
               "roic",
@@ -8466,16 +9137,12 @@
             "consecutiveWorsened": false,
             "appliedPenalty": 0,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 7.0,
+        "worseningMetricCount": 3
       },
-      "lastScoredAt": "2026-02-26T13:11:28.509Z"
+      "lastScoredAt": "2026-02-26T14:00:48.885262Z"
     },
     {
       "ticker": "S9B",
@@ -8732,15 +9399,15 @@
       "lastFetchedAt": "2026-02-26T13:11:28.509Z",
       "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": 90,
+      "healthScore": 94,
       "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": 8.190000000000001,
-        "staticHealthScore": 91.81,
-        "trendPenalty": 2,
-        "finalHealthScore": 90,
+        "staticRiskScore": 6.055,
+        "staticHealthScore": 93.945,
+        "trendPenalty": 0,
+        "finalHealthScore": 94,
         "scoreCoverage": 0.9999999999999999,
         "missingMetrics": [],
         "excludedMetrics": [
@@ -8763,15 +9430,46 @@
           "netDebtToEquity": 0,
           "currentRatio": 0,
           "roic": 0,
-          "roe": 54.6
+          "roe": 34.599999999999994
         },
         "weightedContributors": {
-          "netDebtToEbitda": 0,
-          "debtToEquity": 0,
-          "netDebtToEquity": 0,
-          "currentRatio": 0,
-          "roic": 0,
-          "roe": 8.190000000000001
+          "leverage": 0.0,
+          "liquidity": 0.0,
+          "resilience": 6.055
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 0.0,
+            "weightedRiskContribution": 0.0
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0.0
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 17.299999999999997,
+            "weightedRiskContribution": 6.055
+          }
+        },
+        "pillarRisks": {
+          "leverage": 0.0,
+          "liquidity": 0,
+          "resilience": 17.299999999999997
         },
         "metricAdjustments": {
           "netDebtToEbitda": {
@@ -8780,7 +9478,7 @@
             "originalRisk": 0,
             "adjustedRisk": 0,
             "supportBand": "strong",
-            "supportHealthScore": 81.8,
+            "supportHealthScore": 88.46666666666665,
             "supportMetricsUsed": [
               "currentRatio",
               "roic",
@@ -8794,7 +9492,7 @@
             "originalRisk": 0,
             "adjustedRisk": 0,
             "supportBand": "strong",
-            "supportHealthScore": 81.8,
+            "supportHealthScore": 88.46666666666665,
             "supportMetricsUsed": [
               "currentRatio",
               "roic",
@@ -8858,16 +9556,12 @@
             "consecutiveWorsened": false,
             "appliedPenalty": 0,
             "skipped": false
-          },
-          "payoutRoeInteraction": {
-            "eligible": false,
-            "payoutLatestWorsened": false,
-            "roeLatestWorsened": false,
-            "appliedPenalty": 0
           }
-        }
+        },
+        "rawTrendPenalty": 2,
+        "worseningMetricCount": 1
       },
-      "lastScoredAt": "2026-02-26T13:11:28.673Z"
+      "lastScoredAt": "2026-02-26T14:00:48.885316Z"
     }
   ]
 }

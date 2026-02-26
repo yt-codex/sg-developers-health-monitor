@@ -14,25 +14,47 @@ const SCORE_METRICS = [
 ];
 
 const BASE_WEIGHTS = {
-  netDebtToEbitda: 0.20,
-  debtToEquity: 0.15,
-  netDebtToEquity: 0.10,
+  netDebtToEbitda: 0,
+  debtToEquity: 0,
+  netDebtToEquity: 0,
   debtToEbitda: 0,
-  currentRatio: 0.20,
+  currentRatio: 0,
   quickRatio: 0,
-  roic: 0.20,
-  roe: 0.15,
+  roic: 0,
+  roe: 0,
   assetTurnover: 0,
   payoutRatio: 0
 };
 
+const POLICY_PILLAR_WEIGHTS = {
+  leverage: 0.35,
+  liquidity: 0.30,
+  resilience: 0.35
+};
+
+const POLICY_PILLAR_METRICS = {
+  leverage: ['netDebtToEbitda', 'debtToEquity', 'netDebtToEquity'],
+  liquidity: ['currentRatio'],
+  resilience: ['roic', 'roe']
+};
+
+const POLICY_PILLAR_AGGREGATION = {
+  leverage: 'median',
+  liquidity: 'single',
+  resilience: 'average'
+};
+
+const POLICY_NEGATIVE_NET_CASH_SOFTEN = 0.7;
+
 const STATUS_BANDS = {
-  green: 70,
+  green: 65,
   amber: 40
 };
 
 const SCORE_COVERAGE_MIN = 0.5;
-const TREND_PENALTY_CAP = 8;
+const TREND_PENALTY_CAP = 4;
+const TREND_PENALTY_MULTIPLIER = 0.4;
+const TREND_MIN_WORSENING_METRICS = 2;
 
 const RISK_THRESHOLDS = {
   debtToEquity: { direction: 'higherWorse', good: 0.8, bad: 2.5 },
@@ -41,8 +63,8 @@ const RISK_THRESHOLDS = {
   debtToEbitda: { direction: 'higherWorse', good: 8, bad: 22 },
   quickRatio: { direction: 'lowerWorse', good: 1.0, bad: 0.3 },
   currentRatio: { direction: 'lowerWorse', good: 2.0, bad: 1.0 },
-  roic: { direction: 'lowerWorse', good: 10, bad: 1 },
-  roe: { direction: 'lowerWorse', good: 12, bad: 2 },
+  roic: { direction: 'lowerWorse', good: 5, bad: 1 },
+  roe: { direction: 'lowerWorse', good: 10, bad: 0 },
   assetTurnover: { direction: 'lowerWorse', good: 0.18, bad: 0.04 },
   payoutRatio: { direction: 'higherWorse', good: 100, bad: 250 }
 };
@@ -139,6 +161,55 @@ function average(values = []) {
   return sum / values.length;
 }
 
+function median(values = []) {
+  if (!values.length) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 1
+    ? sorted[mid]
+    : (sorted[mid - 1] + sorted[mid]) / 2;
+}
+
+function getEnabledScoreMetrics() {
+  const enabled = new Set();
+  Object.values(POLICY_PILLAR_METRICS).forEach((metricKeys) => {
+    metricKeys.forEach((metricKey) => enabled.add(metricKey));
+  });
+  return enabled;
+}
+
+function computePillarRisks(metrics = {}, riskByMetric = {}) {
+  const leverageRisks = POLICY_PILLAR_METRICS.leverage
+    .map((metricKey) => riskByMetric[metricKey])
+    .filter(Number.isFinite);
+  let leverageRisk = median(leverageRisks);
+
+  const currentNetDebtToEbitda = getCurrentValue(metrics.netDebtToEbitda);
+  const currentNetDebtToEquity = getCurrentValue(metrics.netDebtToEquity);
+  const hasNetCashSignals = Number.isFinite(currentNetDebtToEbitda)
+    && Number.isFinite(currentNetDebtToEquity)
+    && currentNetDebtToEbitda < 0
+    && currentNetDebtToEquity < 0;
+  if (Number.isFinite(leverageRisk) && hasNetCashSignals) {
+    leverageRisk *= POLICY_NEGATIVE_NET_CASH_SOFTEN;
+  }
+
+  const liquidityRisk = Number.isFinite(riskByMetric.currentRatio)
+    ? riskByMetric.currentRatio
+    : null;
+  const resilienceRisk = average(
+    POLICY_PILLAR_METRICS.resilience
+      .map((metricKey) => riskByMetric[metricKey])
+      .filter(Number.isFinite)
+  );
+
+  return {
+    leverage: leverageRisk,
+    liquidity: liquidityRisk,
+    resilience: resilienceRisk
+  };
+}
+
 function computeSupportHealthScore(metrics = {}, riskByMetric = {}) {
   const supportMetricsUsed = [];
   const supportHealthValues = [];
@@ -210,7 +281,8 @@ function computeTrendPenalty(metrics = {}, options = {}) {
     ? new Set(options.includedMetrics)
     : null;
   const trendBreakdown = {};
-  let trendPenalty = 0;
+  let rawTrendPenalty = 0;
+  let worseningMetricCount = 0;
 
   for (const rule of TREND_RULES) {
     if (!isMetricIncluded(rule.key, includedMetricsSet)) {
@@ -234,30 +306,20 @@ function computeTrendPenalty(metrics = {}, options = {}) {
         appliedPenalty,
         skipped: false
       };
-      trendPenalty += appliedPenalty;
+      rawTrendPenalty += appliedPenalty;
+      if (trend.latestWorsened) worseningMetricCount += 1;
   }
 
-  const payoutAndRoeEligible = isMetricIncluded('payoutRatio', includedMetricsSet)
-    && isMetricIncluded('roe', includedMetricsSet);
-  const payoutTrend = payoutAndRoeEligible
-    ? evaluateTrendForMetric(extractFySeries(metrics.payoutRatio), 'higherWorse')
-    : { latestWorsened: false, consecutiveWorsened: false };
-  const roeTrend = payoutAndRoeEligible
-    ? evaluateTrendForMetric(extractFySeries(metrics.roe), 'lowerWorse')
-    : { latestWorsened: false, consecutiveWorsened: false };
-  const interactionPenalty = payoutAndRoeEligible && payoutTrend.latestWorsened && roeTrend.latestWorsened ? 1 : 0;
+  const trendPenalty = worseningMetricCount >= TREND_MIN_WORSENING_METRICS
+    ? Math.min(TREND_PENALTY_CAP, rawTrendPenalty * TREND_PENALTY_MULTIPLIER)
+    : 0;
 
-  trendBreakdown.payoutRoeInteraction = {
-    eligible: payoutAndRoeEligible,
-    payoutLatestWorsened: payoutTrend.latestWorsened,
-    roeLatestWorsened: roeTrend.latestWorsened,
-    appliedPenalty: interactionPenalty
+  return {
+    trendPenalty,
+    trendBreakdown,
+    rawTrendPenalty,
+    worseningMetricCount
   };
-
-  trendPenalty += interactionPenalty;
-  trendPenalty = Math.min(TREND_PENALTY_CAP, trendPenalty);
-
-  return { trendPenalty, trendBreakdown };
 }
 
 function statusFromScore(score) {
@@ -271,30 +333,66 @@ function computeHealthScore(record = {}) {
   const metrics = record.metrics || {};
   const riskByMetric = {};
   const weightedContributors = {};
+  const pillarContributors = {};
   const usedMetrics = [];
   const missingMetrics = [];
   const excludedMetrics = [];
   let metricAdjustments = {};
-
-  let availableWeight = 0;
+  const enabledMetrics = getEnabledScoreMetrics();
 
   for (const metricKey of SCORE_METRICS) {
-    const metricWeight = BASE_WEIGHTS[metricKey] || 0;
-    if (metricWeight <= 0) {
+    if (!enabledMetrics.has(metricKey)) {
       excludedMetrics.push(metricKey);
       continue;
     }
 
     const currentValue = getCurrentValue(metrics[metricKey]);
     const risk = riskForMetric(metricKey, currentValue);
-    if (risk == null) {
+    if (!Number.isFinite(risk)) {
       missingMetrics.push(metricKey);
       continue;
     }
 
     usedMetrics.push(metricKey);
     riskByMetric[metricKey] = risk;
-    availableWeight += metricWeight;
+  }
+
+  if (!usedMetrics.length) {
+    return {
+      healthScore: null,
+      healthStatus: 'Pending data',
+      scoreCoverage: 0,
+      scoreNote: 'Insufficient ratio coverage',
+      healthScoreComponents: {
+        staticRiskScore: null,
+        staticHealthScore: null,
+        trendPenalty: null,
+        finalHealthScore: null,
+        scoreCoverage: 0,
+        missingMetrics,
+        excludedMetrics,
+        usedMetrics,
+        riskByMetric,
+        weightedContributors,
+        pillarContributors,
+        pillarRisks: {},
+        metricAdjustments: {},
+        trendBreakdown: {}
+      },
+      lastScoredAt: nowIso()
+    };
+  }
+
+  metricAdjustments = adjustNegativeLeverageRisks(metrics, riskByMetric, usedMetrics);
+  const pillarRisks = computePillarRisks(metrics, riskByMetric);
+
+  let availableWeight = 0;
+  let weightedRiskSum = 0;
+  for (const [pillar, weight] of Object.entries(POLICY_PILLAR_WEIGHTS)) {
+    const pillarRisk = pillarRisks[pillar];
+    if (!Number.isFinite(pillarRisk)) continue;
+    availableWeight += weight;
+    weightedRiskSum += pillarRisk * weight;
   }
 
   if (availableWeight === 0) {
@@ -314,31 +412,37 @@ function computeHealthScore(record = {}) {
         usedMetrics,
         riskByMetric,
         weightedContributors,
-        metricAdjustments: {},
+        pillarContributors,
+        pillarRisks,
+        metricAdjustments,
         trendBreakdown: {}
       },
       lastScoredAt: nowIso()
     };
   }
 
-  metricAdjustments = adjustNegativeLeverageRisks(metrics, riskByMetric, usedMetrics);
-
-  const weightedRiskSum = usedMetrics.reduce((sum, metricKey) => {
-    const metricWeight = BASE_WEIGHTS[metricKey] || 0;
-    const metricRisk = riskByMetric[metricKey];
-    if (!Number.isFinite(metricRisk)) return sum;
-    return sum + (metricRisk * metricWeight);
-  }, 0);
-
   const staticRiskScore = weightedRiskSum / availableWeight;
   const staticHealthScore = 100 - staticRiskScore;
 
-  for (const metricKey of usedMetrics) {
-    const metricWeight = BASE_WEIGHTS[metricKey] || 0;
-    weightedContributors[metricKey] = (metricWeight * riskByMetric[metricKey]) / availableWeight;
+  for (const [pillar, weight] of Object.entries(POLICY_PILLAR_WEIGHTS)) {
+    const pillarRisk = pillarRisks[pillar];
+    if (!Number.isFinite(pillarRisk)) continue;
+    const weightedRiskContribution = (weight * pillarRisk) / availableWeight;
+    weightedContributors[pillar] = weightedRiskContribution;
+    pillarContributors[pillar] = {
+      metricKeys: POLICY_PILLAR_METRICS[pillar] || [],
+      aggregation: POLICY_PILLAR_AGGREGATION[pillar] || 'average',
+      pillarRiskScore: pillarRisk,
+      weightedRiskContribution
+    };
   }
 
-  const { trendPenalty, trendBreakdown } = computeTrendPenalty(metrics, { includedMetrics: usedMetrics });
+  const {
+    trendPenalty,
+    trendBreakdown,
+    rawTrendPenalty,
+    worseningMetricCount
+  } = computeTrendPenalty(metrics, { includedMetrics: usedMetrics });
   const provisionalFinal = clamp(staticHealthScore - trendPenalty, 0, 100);
   const roundedFinal = Math.round(provisionalFinal);
 
@@ -359,8 +463,12 @@ function computeHealthScore(record = {}) {
         usedMetrics,
         riskByMetric,
         weightedContributors,
+        pillarContributors,
+        pillarRisks,
         metricAdjustments,
-        trendBreakdown
+        trendBreakdown,
+        rawTrendPenalty,
+        worseningMetricCount
       },
       lastScoredAt: nowIso()
     };
@@ -382,8 +490,12 @@ function computeHealthScore(record = {}) {
       usedMetrics,
       riskByMetric,
       weightedContributors,
+      pillarContributors,
+      pillarRisks,
       metricAdjustments,
-      trendBreakdown
+      trendBreakdown,
+      rawTrendPenalty,
+      worseningMetricCount
     },
     lastScoredAt: nowIso()
   };
@@ -391,9 +503,15 @@ function computeHealthScore(record = {}) {
 
 module.exports = {
   BASE_WEIGHTS,
+  POLICY_PILLAR_WEIGHTS,
+  POLICY_PILLAR_METRICS,
+  POLICY_PILLAR_AGGREGATION,
+  POLICY_NEGATIVE_NET_CASH_SOFTEN,
   SCORE_COVERAGE_MIN,
   STATUS_BANDS,
   TREND_PENALTY_CAP,
+  TREND_PENALTY_MULTIPLIER,
+  TREND_MIN_WORSENING_METRICS,
   TREND_RULES,
   NEGATIVE_LEVERAGE_SUPPORT,
   RISK_THRESHOLDS,

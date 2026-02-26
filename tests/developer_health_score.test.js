@@ -7,8 +7,12 @@ const { parseRatiosTable } = require('../scripts/lib/developer_ratios');
 const {
   BASE_WEIGHTS,
   NEGATIVE_LEVERAGE_SUPPORT,
+  POLICY_PILLAR_WEIGHTS,
   SCORE_COVERAGE_MIN,
   STATUS_BANDS,
+  TREND_MIN_WORSENING_METRICS,
+  TREND_PENALTY_CAP,
+  TREND_PENALTY_MULTIPLIER,
   computeHealthScore,
   computeTrendPenalty,
   riskForMetric,
@@ -36,26 +40,29 @@ function buildRecord(metricValues = {}) {
   };
 }
 
-test('weights sum to 1.00', () => {
+test('legacy metric weights are zero in pillar model', () => {
   const totalWeight = Object.values(BASE_WEIGHTS).reduce((sum, value) => sum + value, 0);
+  assert.equal(Number(totalWeight.toFixed(2)), 0);
+});
+
+test('pillar weights sum to 1.00', () => {
+  const totalWeight = Object.values(POLICY_PILLAR_WEIGHTS).reduce((sum, value) => sum + value, 0);
   assert.equal(Number(totalWeight.toFixed(2)), 1.0);
 });
 
-test('one missing metric renormalizes and still computes', () => {
+test('missing one key metric still computes when pillar coverage >= threshold', () => {
   const record = buildRecord({
     netDebtToEbitda: { Current: 8 },
     debtToEquity: { Current: 1.2 },
     netDebtToEquity: { Current: 0.9 },
-    quickRatio: { Current: 0.7 },
     roic: { Current: 6 },
-    roe: { Current: 8 },
-    assetTurnover: { Current: 0.08 }
+    roe: { Current: 8 }
   });
 
   const result = computeHealthScore(record);
   assert.notEqual(result.healthScore, null);
   assert.ok(result.scoreCoverage < 1);
-  assert.ok(result.scoreCoverage >= 0.5);
+  assert.ok(result.scoreCoverage >= SCORE_COVERAGE_MIN);
   assert.ok(result.healthScoreComponents.missingMetrics.includes('currentRatio'));
 });
 
@@ -72,19 +79,37 @@ test('coverage below threshold returns Pending data', () => {
   assert.ok(result.scoreCoverage < SCORE_COVERAGE_MIN);
 });
 
-test('trend penalty is capped at 8', () => {
+test('trend penalty is scaled and capped', () => {
   const metrics = {
     netDebtToEbitda: metric({ 'FY 2025': 20, 'FY 2024': 12, 'FY 2023': 6 }),
     debtToEquity: metric({ 'FY 2025': 2.8, 'FY 2024': 1.8, 'FY 2023': 0.9 }),
-    quickRatio: metric({ 'FY 2025': 0.5, 'FY 2024': 0.7, 'FY 2023': 1.0 }),
     currentRatio: metric({ 'FY 2025': 1.0, 'FY 2024': 1.3, 'FY 2023': 1.8 }),
     roic: metric({ 'FY 2025': 2, 'FY 2024': 5, 'FY 2023': 8 }),
-    roe: metric({ 'FY 2025': 1, 'FY 2024': 4, 'FY 2023': 9 }),
-    payoutRatio: metric({ 'FY 2025': 260, 'FY 2024': 180, 'FY 2023': 90 })
+    roe: metric({ 'FY 2025': 1, 'FY 2024': 4, 'FY 2023': 9 })
   };
 
   const trend = computeTrendPenalty(metrics);
-  assert.equal(trend.trendPenalty, 8);
+  const expectedRaw = 3 + 2.5 + 1.5 + 2.5 + 1.5;
+  assert.equal(Number(trend.rawTrendPenalty.toFixed(2)), Number(expectedRaw.toFixed(2)));
+  assert.equal(trend.worseningMetricCount, 5);
+  assert.equal(
+    Number(trend.trendPenalty.toFixed(2)),
+    Number(Math.min(TREND_PENALTY_CAP, expectedRaw * TREND_PENALTY_MULTIPLIER).toFixed(2))
+  );
+});
+
+test('trend penalty is zero when fewer than minimum metrics worsen', () => {
+  const metrics = {
+    netDebtToEbitda: metric({ 'FY 2025': 8, 'FY 2024': 8, 'FY 2023': 7 }),
+    debtToEquity: metric({ 'FY 2025': 1.1, 'FY 2024': 1.1, 'FY 2023': 1.0 }),
+    currentRatio: metric({ 'FY 2025': 1.8, 'FY 2024': 1.8, 'FY 2023': 1.9 }),
+    roic: metric({ 'FY 2025': 5.5, 'FY 2024': 5.5, 'FY 2023': 6.0 }),
+    roe: metric({ 'FY 2025': 8, 'FY 2024': 8, 'FY 2023': 9 })
+  };
+
+  const trend = computeTrendPenalty(metrics);
+  assert.ok(trend.worseningMetricCount < TREND_MIN_WORSENING_METRICS);
+  assert.equal(trend.trendPenalty, 0);
 });
 
 test('debtToEbitda is excluded from score even when present', () => {
@@ -92,12 +117,9 @@ test('debtToEbitda is excluded from score even when present', () => {
     netDebtToEbitda: { Current: 8 },
     debtToEquity: { Current: 1.2 },
     netDebtToEquity: { Current: 0.9 },
-    quickRatio: { Current: 0.7 },
     currentRatio: { Current: 1.5 },
     roic: { Current: 6 },
-    roe: { Current: 8 },
-    payoutRatio: { Current: 90 },
-    assetTurnover: { Current: 0.08 }
+    roe: { Current: 8 }
   });
 
   const withDebtToEbitda = buildRecord({
@@ -105,12 +127,9 @@ test('debtToEbitda is excluded from score even when present', () => {
     debtToEquity: { Current: 1.2 },
     netDebtToEquity: { Current: 0.9 },
     debtToEbitda: { Current: 999 },
-    quickRatio: { Current: 0.7 },
     currentRatio: { Current: 1.5 },
     roic: { Current: 6 },
-    roe: { Current: 8 },
-    payoutRatio: { Current: 90 },
-    assetTurnover: { Current: 0.08 }
+    roe: { Current: 8 }
   });
 
   const without = computeHealthScore(base);
@@ -122,19 +141,7 @@ test('debtToEbitda is excluded from score even when present', () => {
   assert.equal(withMetric.healthScoreComponents.riskByMetric.debtToEbitda, undefined);
 });
 
-test('zero-weight metrics do not affect availableWeight or coverage', () => {
-  const onlyZeroWeight = buildRecord({
-    debtToEbitda: { Current: 10 }
-  });
-
-  const result = computeHealthScore(onlyZeroWeight);
-  assert.equal(result.scoreCoverage, 0);
-  assert.equal(result.healthScore, null);
-  assert.ok(result.healthScoreComponents.excludedMetrics.includes('debtToEbitda'));
-  assert.equal(result.healthScoreComponents.usedMetrics.length, 0);
-});
-
-test('trend penalty excludes debtToEbitda', () => {
+test('trend rules ignore debtToEbitda', () => {
   const trend = computeTrendPenalty({
     debtToEbitda: metric({ 'FY 2025': 40, 'FY 2024': 20, 'FY 2023': 5 })
   });
@@ -143,50 +150,14 @@ test('trend penalty excludes debtToEbitda', () => {
   assert.equal(trend.trendBreakdown.debtToEbitda, undefined);
 });
 
-test('payout/roe interaction penalty requires both metrics in included coverage set', () => {
-  const metrics = {
-    payoutRatio: metric({ 'FY 2025': 260, 'FY 2024': 180, 'FY 2023': 90 }),
-    roe: metric({ 'FY 2025': 1, 'FY 2024': 4, 'FY 2023': 9 })
-  };
-
-  const eligible = computeTrendPenalty(metrics, { includedMetrics: ['payoutRatio', 'roe'] });
-  const missingPayout = computeTrendPenalty(metrics, { includedMetrics: ['roe'] });
-
-  assert.equal(eligible.trendBreakdown.payoutRoeInteraction.eligible, true);
-  assert.equal(eligible.trendBreakdown.payoutRoeInteraction.appliedPenalty, 1);
-  assert.equal(missingPayout.trendBreakdown.payoutRoeInteraction.eligible, false);
-  assert.equal(missingPayout.trendBreakdown.payoutRoeInteraction.appliedPenalty, 0);
-});
-
-test('missing payout current value does not trigger payout/roe interaction in final score', () => {
-  const record = buildRecord({
-    netDebtToEbitda: { Current: 8 },
-    debtToEquity: { Current: 1.2 },
-    netDebtToEquity: { Current: 0.9 },
-    quickRatio: { Current: 0.7 },
-    currentRatio: { Current: 1.5 },
-    roic: { Current: 6, 'FY 2025': 6, 'FY 2024': 7 },
-    roe: { Current: 8, 'FY 2025': 8, 'FY 2024': 9 },
-    payoutRatio: { 'FY 2025': 260, 'FY 2024': 180, 'FY 2023': 90 },
-    assetTurnover: { Current: 0.08 }
-  });
-
-  const result = computeHealthScore(record);
-  assert.ok(result.healthScoreComponents.excludedMetrics.includes('payoutRatio'));
-  assert.equal(result.healthScoreComponents.trendBreakdown.payoutRoeInteraction.eligible, false);
-  assert.equal(result.healthScoreComponents.trendBreakdown.payoutRoeInteraction.appliedPenalty, 0);
-});
-
 test('negative leverage is not auto-low-risk when support metrics are weak', () => {
   const record = buildRecord({
     netDebtToEbitda: { Current: -2.0 },
     debtToEquity: { Current: 1.1 },
     netDebtToEquity: { Current: -0.2 },
-    quickRatio: { Current: 0.2 },
     currentRatio: { Current: 0.9 },
     roic: { Current: 0.5 },
-    roe: { Current: 0.8 },
-    assetTurnover: { Current: 0.08 }
+    roe: { Current: 0.8 }
   });
 
   const result = computeHealthScore(record);
@@ -201,12 +172,9 @@ test('negative leverage stays low-risk when support metrics are strong', () => {
     netDebtToEbitda: { Current: -1.4 },
     debtToEquity: { Current: 0.6 },
     netDebtToEquity: { Current: -0.1 },
-    quickRatio: { Current: 1.2 },
     currentRatio: { Current: 2.3 },
     roic: { Current: 14 },
-    roe: { Current: 16 },
-    payoutRatio: { Current: 80 },
-    assetTurnover: { Current: 0.2 }
+    roe: { Current: 16 }
   });
 
   const result = computeHealthScore(record);
@@ -229,7 +197,7 @@ test('negative leverage uses neutral floor when support metrics are unavailable'
   assert.equal(result.healthScoreComponents.metricAdjustments.netDebtToEbitda.supportBand, 'no_support');
 });
 
-test('partial metric sets can still compute when positive-weight coverage is sufficient', () => {
+test('partial metric sets can still compute when pillar coverage is sufficient', () => {
   const record = buildRecord({
     netDebtToEbitda: { Current: 9 },
     debtToEquity: { Current: 1.4 },
@@ -239,7 +207,7 @@ test('partial metric sets can still compute when positive-weight coverage is suf
 
   const result = computeHealthScore(record);
   assert.notEqual(result.healthScore, null);
-  assert.ok(result.scoreCoverage >= 0.5);
+  assert.ok(result.scoreCoverage >= SCORE_COVERAGE_MIN);
 });
 
 test('simplified model excludes quick ratio, payout ratio, and asset turnover', () => {
@@ -261,26 +229,26 @@ test('simplified model excludes quick ratio, payout ratio, and asset turnover', 
   assert.ok(result.healthScoreComponents.excludedMetrics.includes('assetTurnover'));
 });
 
-test('high leverage mixed profile no longer trivially collapses to 0', () => {
+test('pillar contributors exist and sum to static risk score', () => {
   const record = buildRecord({
-    netDebtToEbitda: { Current: 14, 'FY 2025': 14, 'FY 2024': 13 },
-    debtToEquity: { Current: 2.0, 'FY 2025': 2.0, 'FY 2024': 1.9 },
-    netDebtToEquity: { Current: 1.4 },
-    debtToEbitda: { Current: 16 },
-    quickRatio: { Current: 0.65 },
-    currentRatio: { Current: 1.35 },
-    roic: { Current: 6 },
-    roe: { Current: 8 },
-    payoutRatio: { Current: 110 },
-    assetTurnover: { Current: 0.10 }
+    netDebtToEbitda: { Current: 10 },
+    debtToEquity: { Current: 1.3 },
+    netDebtToEquity: { Current: 0.9 },
+    currentRatio: { Current: 1.6 },
+    roic: { Current: 4 },
+    roe: { Current: 6 }
   });
 
   const result = computeHealthScore(record);
-  assert.notEqual(result.healthScore, null);
-  assert.ok(result.healthScore > 0);
+  const contributors = result.healthScoreComponents.pillarContributors || {};
+  assert.ok(Object.keys(contributors).length >= 2);
+  const deductionSum = Object.values(contributors).reduce((sum, detail) => (
+    sum + (Number.isFinite(detail.weightedRiskContribution) ? detail.weightedRiskContribution : 0)
+  ), 0);
+  assert.equal(Number(deductionSum.toFixed(6)), Number(result.healthScoreComponents.staticRiskScore.toFixed(6)));
 });
 
-test('risk boundaries obey v2 threshold edges', () => {
+test('risk boundaries obey threshold edges', () => {
   assert.equal(riskForMetric('debtToEquity', 0.8), 0);
   assert.equal(riskForMetric('debtToEquity', 2.5), 100);
 
@@ -299,11 +267,11 @@ test('risk boundaries obey v2 threshold edges', () => {
   assert.equal(riskForMetric('currentRatio', 2.0), 0);
   assert.equal(riskForMetric('currentRatio', 1.0), 100);
 
-  assert.equal(riskForMetric('roic', 10), 0);
+  assert.equal(riskForMetric('roic', 5), 0);
   assert.equal(riskForMetric('roic', 1), 100);
 
-  assert.equal(riskForMetric('roe', 12), 0);
-  assert.equal(riskForMetric('roe', 2), 100);
+  assert.equal(riskForMetric('roe', 10), 0);
+  assert.equal(riskForMetric('roe', 0), 100);
 
   assert.equal(riskForMetric('assetTurnover', 0.18), 0);
   assert.equal(riskForMetric('assetTurnover', 0.04), 100);

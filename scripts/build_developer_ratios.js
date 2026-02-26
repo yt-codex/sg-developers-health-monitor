@@ -15,11 +15,18 @@ const {
   buildRatiosUrl
 } = require('./lib/developer_ratios');
 const {
-  BASE_WEIGHTS,
   NEGATIVE_LEVERAGE_SUPPORT,
+  POLICY_NEGATIVE_NET_CASH_SOFTEN,
+  POLICY_PILLAR_AGGREGATION,
+  POLICY_PILLAR_METRICS,
+  POLICY_PILLAR_WEIGHTS,
+  RISK_THRESHOLDS,
   SCORE_COVERAGE_MIN,
+  SCORE_METRICS,
   STATUS_BANDS,
   TREND_PENALTY_CAP,
+  TREND_PENALTY_MULTIPLIER,
+  TREND_MIN_WORSENING_METRICS,
   computeHealthScore
 } = require('./lib/developer_health_score');
 
@@ -171,14 +178,29 @@ function percentile(sortedValues, p) {
 }
 
 function topContributors(record, limit = 3) {
-  const contributors = record?.healthScoreComponents?.weightedContributors || {};
+  const components = record?.healthScoreComponents || {};
+  const pillarContributors = components.pillarContributors || {};
+  if (Object.keys(pillarContributors).length) {
+    return Object.entries(pillarContributors)
+      .sort((a, b) => (b[1]?.weightedRiskContribution || 0) - (a[1]?.weightedRiskContribution || 0))
+      .slice(0, limit)
+      .map(([pillar, detail]) => ({
+        metric: pillar,
+        weightedRiskContribution: Number((detail?.weightedRiskContribution || 0).toFixed(3)),
+        riskScore: Number.isFinite(detail?.pillarRiskScore) ? Number(detail.pillarRiskScore.toFixed(3)) : null,
+        metricKeys: Array.isArray(detail?.metricKeys) ? detail.metricKeys : [],
+        aggregation: detail?.aggregation || null
+      }));
+  }
+
+  const contributors = components.weightedContributors || {};
   return Object.entries(contributors)
     .sort((a, b) => b[1] - a[1])
     .slice(0, limit)
     .map(([metric, weightedRiskContribution]) => ({
       metric,
       weightedRiskContribution: Number(weightedRiskContribution.toFixed(3)),
-      riskScore: record?.healthScoreComponents?.riskByMetric?.[metric] ?? null
+      riskScore: components?.riskByMetric?.[metric] ?? null
     }));
 }
 
@@ -260,18 +282,36 @@ async function main() {
   await fs.mkdir(CACHE_DIR, { recursive: true });
 
   const developers = await readDeveloperCsv(INPUT_CSV);
+  const enabledScoreMetrics = new Set(
+    Object.values(POLICY_PILLAR_METRICS).reduce((all, metricKeys) => all.concat(metricKeys), [])
+  );
   const output = {
     updatedAt: nowIso(),
     source: 'stockanalysis',
     scoringModel: {
-      formula: 'round(clamp((100 - weightedRisk) - trendPenalty, 0, 100))',
-      weightedRisk: 'sum(metricWeight * metricRisk) / sum(availableMetricWeight)',
-      weights: { ...BASE_WEIGHTS },
+      formula: 'round(clamp((100 - weightedPillarRisk) - trendPenalty, 0, 100))',
+      weightedRisk: 'sum(pillarWeight * pillarRisk) / sum(availablePillarWeight)',
+      pillarWeights: { ...POLICY_PILLAR_WEIGHTS },
+      pillars: Object.fromEntries(Object.entries(POLICY_PILLAR_METRICS).map(([pillar, metricKeys]) => [
+        pillar,
+        {
+          metrics: [...metricKeys],
+          aggregation: POLICY_PILLAR_AGGREGATION[pillar]
+        }
+      ])),
       coverageThreshold: SCORE_COVERAGE_MIN,
-      trendPenaltyCap: TREND_PENALTY_CAP,
+      trendPenalty: {
+        cap: TREND_PENALTY_CAP,
+        multiplier: TREND_PENALTY_MULTIPLIER,
+        minWorseningMetrics: TREND_MIN_WORSENING_METRICS
+      },
+      metricThresholds: Object.fromEntries(
+        Object.entries(RISK_THRESHOLDS).map(([metric, cfg]) => [metric, { ...cfg }])
+      ),
       negativeLeverageHandling: {
         targetMetrics: [...NEGATIVE_LEVERAGE_SUPPORT.targetMetrics],
         supportMetrics: [...NEGATIVE_LEVERAGE_SUPPORT.supportMetrics],
+        netCashLeverageSoftener: POLICY_NEGATIVE_NET_CASH_SOFTEN,
         supportBands: {
           strongMinHealthScore: NEGATIVE_LEVERAGE_SUPPORT.strongMinHealthScore,
           mixedMinHealthScore: NEGATIVE_LEVERAGE_SUPPORT.mixedMinHealthScore
@@ -288,9 +328,8 @@ async function main() {
           amber: STATUS_BANDS.amber
         }
       },
-      excludedMetrics: Object.entries(BASE_WEIGHTS)
-        .filter(([, weight]) => !Number.isFinite(weight) || weight <= 0)
-        .map(([metricKey]) => metricKey)
+      excludedMetrics: SCORE_METRICS
+        .filter((metricKey) => !enabledScoreMetrics.has(metricKey))
     },
     developers: []
   };
