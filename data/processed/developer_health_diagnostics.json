@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-28T09:46:54.844Z",
+  "generatedAt": "2026-03-01T05:22:34.399Z",
   "totalDevelopers": 23,
   "coverageDistribution": {
     "gte0_8": 23,
@@ -12,7 +12,7 @@
     "p25": 46,
     "median": 62,
     "p75": 67.5,
-    "p90": 80.6,
+    "p90": 80.8,
     "max": 94
   },
   "statusCounts": {
@@ -303,46 +303,6 @@
       ]
     },
     {
-      "ticker": "O10",
-      "name": "Far East Orchard Ltd",
-      "segment": "mixed",
-      "healthScore": 50,
-      "healthStatus": "Green",
-      "scoreCoverage": 0.9999999999999999,
-      "topRiskContributors": [
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 25.191,
-          "riskScore": 71.975,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
-        },
-        {
-          "metric": "liquidity",
-          "weightedRiskContribution": 24.3,
-          "riskScore": 81,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
-        },
-        {
-          "metric": "leverage",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "netDebtToEbitda",
-            "debtToEquity",
-            "netDebtToEquity"
-          ],
-          "aggregation": "median"
-        }
-      ]
-    },
-    {
       "ticker": "T24",
       "name": "Tuan Sing Holdings Ltd",
       "segment": "mixed",
@@ -404,6 +364,46 @@
           "metric": "liquidity",
           "weightedRiskContribution": 13.5,
           "riskScore": 45,
+          "metricKeys": [
+            "currentRatio"
+          ],
+          "aggregation": "single"
+        },
+        {
+          "metric": "leverage",
+          "weightedRiskContribution": 0,
+          "riskScore": 0,
+          "metricKeys": [
+            "netDebtToEbitda",
+            "debtToEquity",
+            "netDebtToEquity"
+          ],
+          "aggregation": "median"
+        }
+      ]
+    },
+    {
+      "ticker": "O10",
+      "name": "Far East Orchard Ltd",
+      "segment": "mixed",
+      "healthScore": 54,
+      "healthStatus": "Green",
+      "scoreCoverage": 0.9999999999999999,
+      "topRiskContributors": [
+        {
+          "metric": "resilience",
+          "weightedRiskContribution": 23.616,
+          "riskScore": 67.475,
+          "metricKeys": [
+            "roic",
+            "roe"
+          ],
+          "aggregation": "average"
+        },
+        {
+          "metric": "liquidity",
+          "weightedRiskContribution": 22.5,
+          "riskScore": 75,
           "metricKeys": [
             "currentRatio"
           ],
@@ -548,14 +548,14 @@
       "ticker": "U14",
       "name": "UOL Group Ltd",
       "segment": "mixed",
-      "healthScore": 79,
+      "healthScore": 80,
       "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "topRiskContributors": [
         {
           "metric": "resilience",
-          "weightedRiskContribution": 19.434,
-          "riskScore": 55.525,
+          "weightedRiskContribution": 18.401,
+          "riskScore": 52.575,
           "metricKeys": [
             "roic",
             "roe"
@@ -829,7 +829,7 @@
     {
       "segment": "mixed",
       "count": 19,
-      "medianHealthScore": 51
+      "medianHealthScore": 54
     },
     {
       "segment": "residential",
