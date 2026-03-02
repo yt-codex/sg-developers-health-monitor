@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-01T05:22:34.399Z",
+  "generatedAt": "2026-03-02T05:18:58.235Z",
   "totalDevelopers": 23,
   "coverageDistribution": {
     "gte0_8": 23,
@@ -8,17 +8,17 @@
   },
   "healthScoreDistribution": {
     "min": 18,
-    "p10": 37.2,
-    "p25": 46,
+    "p10": 38.2,
+    "p25": 50,
     "median": 62,
-    "p75": 67.5,
-    "p90": 80.8,
+    "p75": 72.5,
+    "p90": 81.8,
     "max": 94
   },
   "statusCounts": {
-    "Green": 16,
+    "Green": 17,
     "Amber": 5,
-    "Red": 2,
+    "Red": 1,
     "Pending data": 0
   },
   "lowestScores": [
@@ -59,46 +59,6 @@
             "netDebtToEquity"
           ],
           "aggregation": "median"
-        }
-      ]
-    },
-    {
-      "ticker": "C09",
-      "name": "City Developments Ltd",
-      "segment": "mixed",
-      "healthScore": 33,
-      "healthStatus": "Red",
-      "scoreCoverage": 0.9999999999999999,
-      "topRiskContributors": [
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 29.855,
-          "riskScore": 85.3,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
-        },
-        {
-          "metric": "leverage",
-          "weightedRiskContribution": 19.5,
-          "riskScore": 55.714,
-          "metricKeys": [
-            "netDebtToEbitda",
-            "debtToEquity",
-            "netDebtToEquity"
-          ],
-          "aggregation": "median"
-        },
-        {
-          "metric": "liquidity",
-          "weightedRiskContribution": 14.4,
-          "riskScore": 48,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
         }
       ]
     },
@@ -421,6 +381,46 @@
           "aggregation": "median"
         }
       ]
+    },
+    {
+      "ticker": "H78",
+      "name": "Hongkong Land Holdings Ltd",
+      "segment": "mixed",
+      "healthScore": 61,
+      "healthStatus": "Green",
+      "scoreCoverage": 0.9999999999999999,
+      "topRiskContributors": [
+        {
+          "metric": "resilience",
+          "weightedRiskContribution": 28.963,
+          "riskScore": 82.75,
+          "metricKeys": [
+            "roic",
+            "roe"
+          ],
+          "aggregation": "average"
+        },
+        {
+          "metric": "liquidity",
+          "weightedRiskContribution": 7.8,
+          "riskScore": 26,
+          "metricKeys": [
+            "currentRatio"
+          ],
+          "aggregation": "single"
+        },
+        {
+          "metric": "leverage",
+          "weightedRiskContribution": 0,
+          "riskScore": 0,
+          "metricKeys": [
+            "netDebtToEbitda",
+            "debtToEquity",
+            "netDebtToEquity"
+          ],
+          "aggregation": "median"
+        }
+      ]
     }
   ],
   "highestScores": [
@@ -505,6 +505,46 @@
       ]
     },
     {
+      "ticker": "U14",
+      "name": "UOL Group Ltd",
+      "segment": "mixed",
+      "healthScore": 82,
+      "healthStatus": "Green",
+      "scoreCoverage": 0.9999999999999999,
+      "topRiskContributors": [
+        {
+          "metric": "resilience",
+          "weightedRiskContribution": 18.401,
+          "riskScore": 52.575,
+          "metricKeys": [
+            "roic",
+            "roe"
+          ],
+          "aggregation": "average"
+        },
+        {
+          "metric": "leverage",
+          "weightedRiskContribution": 0,
+          "riskScore": 0,
+          "metricKeys": [
+            "netDebtToEbitda",
+            "debtToEquity",
+            "netDebtToEquity"
+          ],
+          "aggregation": "median"
+        },
+        {
+          "metric": "liquidity",
+          "weightedRiskContribution": 0,
+          "riskScore": 0,
+          "metricKeys": [
+            "currentRatio"
+          ],
+          "aggregation": "single"
+        }
+      ]
+    },
+    {
       "ticker": "F9D",
       "name": "Boustead Singapore Ltd",
       "segment": "industrial",
@@ -545,17 +585,17 @@
       ]
     },
     {
-      "ticker": "U14",
-      "name": "UOL Group Ltd",
+      "ticker": "C09",
+      "name": "City Developments Ltd",
       "segment": "mixed",
-      "healthScore": 80,
+      "healthScore": 76,
       "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "topRiskContributors": [
         {
           "metric": "resilience",
-          "weightedRiskContribution": 18.401,
-          "riskScore": 52.575,
+          "weightedRiskContribution": 11.9,
+          "riskScore": 34,
           "metricKeys": [
             "roic",
             "roe"
@@ -564,8 +604,8 @@
         },
         {
           "metric": "leverage",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
+          "weightedRiskContribution": 11.735,
+          "riskScore": 33.529,
           "metricKeys": [
             "netDebtToEbitda",
             "debtToEquity",
@@ -783,53 +823,13 @@
           "aggregation": "single"
         }
       ]
-    },
-    {
-      "ticker": "W05",
-      "name": "Wing Tai Holdings Ltd",
-      "segment": "mixed",
-      "healthScore": 62,
-      "healthStatus": "Green",
-      "scoreCoverage": 0.9999999999999999,
-      "topRiskContributors": [
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 35,
-          "riskScore": 100,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
-        },
-        {
-          "metric": "leverage",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "netDebtToEbitda",
-            "debtToEquity",
-            "netDebtToEquity"
-          ],
-          "aggregation": "median"
-        },
-        {
-          "metric": "liquidity",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
-        }
-      ]
     }
   ],
   "segmentBreakdown": [
     {
       "segment": "mixed",
       "count": 19,
-      "medianHealthScore": 54
+      "medianHealthScore": 61
     },
     {
       "segment": "residential",
