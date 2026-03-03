@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-02T05:18:58.235Z",
+  "generatedAt": "2026-03-03T05:17:27.096Z",
   "totalDevelopers": 23,
   "coverageDistribution": {
     "gte0_8": 23,
@@ -11,7 +11,7 @@
     "p10": 38.2,
     "p25": 50,
     "median": 62,
-    "p75": 72.5,
+    "p75": 73,
     "p90": 81.8,
     "max": 94
   },
@@ -66,7 +66,7 @@
       "ticker": "LJ3",
       "name": "OUE Ltd",
       "segment": "mixed",
-      "healthScore": 37,
+      "healthScore": 35,
       "healthStatus": "Amber",
       "scoreCoverage": 0.9999999999999999,
       "topRiskContributors": [
@@ -81,8 +81,8 @@
         },
         {
           "metric": "resilience",
-          "weightedRiskContribution": 28.131,
-          "riskScore": 80.375,
+          "weightedRiskContribution": 27.563,
+          "riskScore": 78.75,
           "metricKeys": [
             "roic",
             "roe"
@@ -91,8 +91,8 @@
         },
         {
           "metric": "leverage",
-          "weightedRiskContribution": 3.25,
-          "riskScore": 9.286,
+          "weightedRiskContribution": 4,
+          "riskScore": 11.429,
           "metricKeys": [
             "netDebtToEbitda",
             "debtToEquity",
@@ -272,8 +272,8 @@
       "topRiskContributors": [
         {
           "metric": "resilience",
-          "weightedRiskContribution": 31.797,
-          "riskScore": 90.85,
+          "weightedRiskContribution": 30.398,
+          "riskScore": 86.85,
           "metricKeys": [
             "roic",
             "roe"
@@ -346,14 +346,14 @@
       "ticker": "O10",
       "name": "Far East Orchard Ltd",
       "segment": "mixed",
-      "healthScore": 54,
+      "healthScore": 53,
       "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "topRiskContributors": [
         {
           "metric": "resilience",
-          "weightedRiskContribution": 23.616,
-          "riskScore": 67.475,
+          "weightedRiskContribution": 24.797,
+          "riskScore": 70.85,
           "metricKeys": [
             "roic",
             "roe"
@@ -665,6 +665,46 @@
       ]
     },
     {
+      "ticker": "5JK",
+      "name": "Hiap Hoe Ltd",
+      "segment": "mixed",
+      "healthScore": 71,
+      "healthStatus": "Green",
+      "scoreCoverage": 0.9999999999999999,
+      "topRiskContributors": [
+        {
+          "metric": "resilience",
+          "weightedRiskContribution": 27.703,
+          "riskScore": 79.15,
+          "metricKeys": [
+            "roic",
+            "roe"
+          ],
+          "aggregation": "average"
+        },
+        {
+          "metric": "leverage",
+          "weightedRiskContribution": 0,
+          "riskScore": 0,
+          "metricKeys": [
+            "netDebtToEbitda",
+            "debtToEquity",
+            "netDebtToEquity"
+          ],
+          "aggregation": "median"
+        },
+        {
+          "metric": "liquidity",
+          "weightedRiskContribution": 0,
+          "riskScore": 0,
+          "metricKeys": [
+            "currentRatio"
+          ],
+          "aggregation": "single"
+        }
+      ]
+    },
+    {
       "ticker": "OU8",
       "name": "Centurion Corp Ltd",
       "segment": "specialised_accommodation",
@@ -781,46 +821,6 @@
             "roe"
           ],
           "aggregation": "average"
-        }
-      ]
-    },
-    {
-      "ticker": "BTE",
-      "name": "Lian Beng Group Ltd",
-      "segment": "mixed",
-      "healthScore": 64,
-      "healthStatus": "Green",
-      "scoreCoverage": 0.9999999999999999,
-      "topRiskContributors": [
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 29.374,
-          "riskScore": 83.925,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
-        },
-        {
-          "metric": "leverage",
-          "weightedRiskContribution": 6.125,
-          "riskScore": 17.5,
-          "metricKeys": [
-            "netDebtToEbitda",
-            "debtToEquity",
-            "netDebtToEquity"
-          ],
-          "aggregation": "median"
-        },
-        {
-          "metric": "liquidity",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
         }
       ]
     }
