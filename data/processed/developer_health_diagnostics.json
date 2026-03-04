@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-03T05:17:27.096Z",
+  "generatedAt": "2026-03-04T05:12:25.199Z",
   "totalDevelopers": 23,
   "coverageDistribution": {
     "gte0_8": 23,
@@ -11,7 +11,7 @@
     "p10": 38.2,
     "p25": 50,
     "median": 62,
-    "p75": 73,
+    "p75": 70.5,
     "p90": 81.8,
     "max": 94
   },
@@ -383,17 +383,17 @@
       ]
     },
     {
-      "ticker": "H78",
-      "name": "Hongkong Land Holdings Ltd",
+      "ticker": "C09",
+      "name": "City Developments Ltd",
       "segment": "mixed",
-      "healthScore": 61,
+      "healthScore": 60,
       "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "topRiskContributors": [
         {
           "metric": "resilience",
-          "weightedRiskContribution": 28.963,
-          "riskScore": 82.75,
+          "weightedRiskContribution": 21.997,
+          "riskScore": 62.85,
           "metricKeys": [
             "roic",
             "roe"
@@ -401,24 +401,24 @@
           "aggregation": "average"
         },
         {
-          "metric": "liquidity",
-          "weightedRiskContribution": 7.8,
-          "riskScore": 26,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
-        },
-        {
           "metric": "leverage",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
+          "weightedRiskContribution": 18,
+          "riskScore": 51.429,
           "metricKeys": [
             "netDebtToEbitda",
             "debtToEquity",
             "netDebtToEquity"
           ],
           "aggregation": "median"
+        },
+        {
+          "metric": "liquidity",
+          "weightedRiskContribution": 0,
+          "riskScore": 0,
+          "metricKeys": [
+            "currentRatio"
+          ],
+          "aggregation": "single"
         }
       ]
     }
@@ -581,46 +581,6 @@
             "roe"
           ],
           "aggregation": "average"
-        }
-      ]
-    },
-    {
-      "ticker": "C09",
-      "name": "City Developments Ltd",
-      "segment": "mixed",
-      "healthScore": 76,
-      "healthStatus": "Green",
-      "scoreCoverage": 0.9999999999999999,
-      "topRiskContributors": [
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 11.9,
-          "riskScore": 34,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
-        },
-        {
-          "metric": "leverage",
-          "weightedRiskContribution": 11.735,
-          "riskScore": 33.529,
-          "metricKeys": [
-            "netDebtToEbitda",
-            "debtToEquity",
-            "netDebtToEquity"
-          ],
-          "aggregation": "median"
-        },
-        {
-          "metric": "liquidity",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
         }
       ]
     },
@@ -823,13 +783,53 @@
           "aggregation": "average"
         }
       ]
+    },
+    {
+      "ticker": "BTE",
+      "name": "Lian Beng Group Ltd",
+      "segment": "mixed",
+      "healthScore": 64,
+      "healthStatus": "Green",
+      "scoreCoverage": 0.9999999999999999,
+      "topRiskContributors": [
+        {
+          "metric": "resilience",
+          "weightedRiskContribution": 29.374,
+          "riskScore": 83.925,
+          "metricKeys": [
+            "roic",
+            "roe"
+          ],
+          "aggregation": "average"
+        },
+        {
+          "metric": "leverage",
+          "weightedRiskContribution": 6.125,
+          "riskScore": 17.5,
+          "metricKeys": [
+            "netDebtToEbitda",
+            "debtToEquity",
+            "netDebtToEquity"
+          ],
+          "aggregation": "median"
+        },
+        {
+          "metric": "liquidity",
+          "weightedRiskContribution": 0,
+          "riskScore": 0,
+          "metricKeys": [
+            "currentRatio"
+          ],
+          "aggregation": "single"
+        }
+      ]
     }
   ],
   "segmentBreakdown": [
     {
       "segment": "mixed",
       "count": 19,
-      "medianHealthScore": 61
+      "medianHealthScore": 60
     },
     {
       "segment": "residential",
