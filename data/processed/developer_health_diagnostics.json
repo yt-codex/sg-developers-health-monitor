@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-10T05:13:42.348Z",
+  "generatedAt": "2026-03-11T05:15:25.272Z",
   "totalDevelopers": 23,
   "coverageDistribution": {
     "gte0_8": 23,
@@ -11,7 +11,7 @@
     "p10": 38.2,
     "p25": 50,
     "median": 62,
-    "p75": 70.5,
+    "p75": 72.5,
     "p90": 83.6,
     "max": 94
   },
@@ -665,6 +665,46 @@
       ]
     },
     {
+      "ticker": "H78",
+      "name": "Hongkong Land Holdings Ltd",
+      "segment": "mixed",
+      "healthScore": 70,
+      "healthStatus": "Green",
+      "scoreCoverage": 0.9999999999999999,
+      "topRiskContributors": [
+        {
+          "metric": "resilience",
+          "weightedRiskContribution": 27.72,
+          "riskScore": 79.2,
+          "metricKeys": [
+            "roic",
+            "roe"
+          ],
+          "aggregation": "average"
+        },
+        {
+          "metric": "leverage",
+          "weightedRiskContribution": 0,
+          "riskScore": 0,
+          "metricKeys": [
+            "netDebtToEbitda",
+            "debtToEquity",
+            "netDebtToEquity"
+          ],
+          "aggregation": "median"
+        },
+        {
+          "metric": "liquidity",
+          "weightedRiskContribution": 0,
+          "riskScore": 0,
+          "metricKeys": [
+            "currentRatio"
+          ],
+          "aggregation": "single"
+        }
+      ]
+    },
+    {
       "ticker": "BTE",
       "name": "Lian Beng Group Ltd",
       "segment": "mixed",
@@ -781,46 +821,6 @@
             "roe"
           ],
           "aggregation": "average"
-        }
-      ]
-    },
-    {
-      "ticker": "W05",
-      "name": "Wing Tai Holdings Ltd",
-      "segment": "mixed",
-      "healthScore": 62,
-      "healthStatus": "Green",
-      "scoreCoverage": 0.9999999999999999,
-      "topRiskContributors": [
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 35,
-          "riskScore": 100,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
-        },
-        {
-          "metric": "leverage",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "netDebtToEbitda",
-            "debtToEquity",
-            "netDebtToEquity"
-          ],
-          "aggregation": "median"
-        },
-        {
-          "metric": "liquidity",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
         }
       ]
     }
