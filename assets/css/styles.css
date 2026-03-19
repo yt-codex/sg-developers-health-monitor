@@ -314,8 +314,18 @@ small { font-size: 0.875rem; }
 
 .indicator-top-row {
   display: flex;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.45rem;
   margin-bottom: 0.45rem;
+}
+
+.indicator-signal-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-left: auto;
 }
 
 .indicator-title-row h3 {
@@ -489,15 +499,19 @@ small { font-size: 0.875rem; }
   transform: translate(-50%, 0);
 }
 
-.macro-stress-tags .status-pill.pill--normal { background: #ffffff; color: #1d4ed8; border-color: var(--border); }
-.macro-stress-tags .status-pill.pill--watch { background: #fffbeb; color: #92400e; border-color: #fcd34d; }
-.macro-stress-tags .status-pill.pill--stress { background: #fef2f2; color: #b42318; border-color: #fca5a5; }
+.status-pill.pill--normal { background: #ffffff; color: #1d4ed8; border-color: var(--border); }
+.status-pill.pill--watch { background: #fffbeb; color: #92400e; border-color: #fcd34d; }
+.status-pill.pill--stress { background: #fef2f2; color: #b42318; border-color: #fca5a5; }
 
 .macro-stress-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 0.7rem;
+}
+
+.macro-driver-pill {
+  flex: 0 0 auto;
 }
 
 

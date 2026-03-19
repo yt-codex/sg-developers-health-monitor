@@ -554,6 +554,54 @@ function computeMacroRisk(cards) {
   return 'Watch';
 }
 
+const MACRO_STRESS_SIGNAL_DEFS = [
+  {
+    keys: ['sector_performance'],
+    label: 'Sector performance',
+    getSeriesId: (signal) => signal?.series_id || 'construction_gdp'
+  },
+  {
+    keys: ['labour_cost'],
+    label: 'Labour cost',
+    getSeriesId: (signal) => signal?.series_id || 'unit_labour_cost_construction'
+  },
+  {
+    keys: ['interest_rate'],
+    label: 'Interest rate',
+    getSeriesId: (signal) => signal?.series_id || 'sora_overnight'
+  },
+  {
+    keys: ['materials_price', 'material_price'],
+    label: 'Material price',
+    getSeriesId: (signal) => signal?.details?.triggered_by || null
+  }
+];
+
+function findStressSignal(stressPayload, keys = []) {
+  return keys
+    .map((key) => stressPayload?.signals?.[key] || null)
+    .find((value) => Boolean(value)) || null;
+}
+
+function buildCardSignalBadgesBySeriesId(stressPayload) {
+  return MACRO_STRESS_SIGNAL_DEFS.reduce((acc, def) => {
+    const signal = findStressSignal(stressPayload, def.keys);
+    const status = signal?.status || null;
+    const seriesId = def.getSeriesId(signal);
+
+    if (!seriesId || (status !== 'Watch' && status !== 'Stress')) return acc;
+
+    const badge = {
+      label: def.label,
+      status,
+      tooltip: signal?.tooltip || `${def.label} signal`
+    };
+
+    acc[seriesId] = [...(acc[seriesId] || []), badge];
+    return acc;
+  }, {});
+}
+
 
 function getStatusPillClass(status) {
   if (status === 'Stress') return 'pill--stress';
@@ -568,18 +616,17 @@ function renderStatusPill(label, status, tooltip) {
   return `<span class="status-pill ${klass}" title="${escapeHtml(effectiveTooltip)}">${escapeHtml(label)}: ${escapeHtml(visualStatus)}</span>`;
 }
 
-function renderStressTags(riskNode, stressPayload) {
-  const defs = [
-    { keys: ['sector_performance'], label: 'Sector performance' },
-    { keys: ['labour_cost'], label: 'Labour cost' },
-    { keys: ['interest_rate'], label: 'Interest rate' },
-    { keys: ['materials_price', 'material_price'], label: 'Material price' }
-  ];
+function renderCardSignalBadge(badge) {
+  const status = badge?.status || '—';
+  const klass = getStatusPillClass(badge?.status);
+  const tooltip = badge?.tooltip || `${badge?.label || 'Macro signal'}: ${status}`;
+  const title = `${badge?.label || 'Macro signal'}: ${tooltip}`;
+  return `<span class="status-pill macro-driver-pill ${klass}" title="${escapeHtml(title)}">${escapeHtml(status)}</span>`;
+}
 
-  const tags = defs.map(({ keys, label }) => {
-    const signal = keys
-      .map((key) => stressPayload?.signals?.[key] || null)
-      .find((value) => Boolean(value));
+function renderStressTags(riskNode, stressPayload) {
+  const tags = MACRO_STRESS_SIGNAL_DEFS.map(({ keys, label }) => {
+    const signal = findStressSignal(stressPayload, keys);
     return renderStatusPill(label, signal?.status || '—', signal?.tooltip || 'Unable to load status');
   });
 
@@ -659,6 +706,7 @@ async function initMacroPage() {
     ]);
     const frequencyMap = await loadFrequencyMap();
     const cards = mapCardsFromSeries(data, frequencyMap);
+    const signalBadgesBySeriesId = buildCardSignalBadgesBySeriesId(stressResult);
 
     const render = () => {
       const selectedCategory = categoryFilter.value;
@@ -676,9 +724,11 @@ async function initMacroPage() {
           const latestText = formatLatestValue(card.latest, card.unit);
           const tooltipId = `macro-tooltip-${index}`;
           const categoryPill = card.categoryLabel ? `<span class="badge macro-category-pill macro-category-pill-${card.majorCategory?.[0]?.toLowerCase() || 'default'}">${escapeHtml(card.categoryLabel)}</span>` : '';
+          const signalPills = (signalBadgesBySeriesId[card.seriesId] || []).map(renderCardSignalBadge).join('');
           return `<article class="panel indicator-tile">
             <div class="indicator-top-row">
               ${categoryPill}
+              ${signalPills ? `<div class="indicator-signal-pills">${signalPills}</div>` : ''}
             </div>
             <div class="indicator-title-row">
               <h3>${escapeHtml(card.title)}</h3>
@@ -718,6 +768,7 @@ if (typeof module !== 'undefined' && module.exports) {
     toQuarterLabel,
     formatLastPointLabel,
     inferFrequencyFromSeriesValues,
-    resolveSeriesFrequency
+    resolveSeriesFrequency,
+    buildCardSignalBadgesBySeriesId
   };
 }
