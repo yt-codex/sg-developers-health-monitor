@@ -108,6 +108,19 @@ test('buildGoogleDedupKeys includes title-date dedup key for cross-source dedupi
   assert.ok(keys.includes(titleDateKey));
 });
 
+test('buildGoogleDedupKeys ignores homepage-like source_url values', () => {
+  const keys = buildGoogleDedupKeys({
+    title: 'Hoi Hup-Sunway MCL to preview Pinery Residences mixed-use project in Tampines West from $2,340 psf',
+    pubDate: '2026-03-11T09:59:00.000Z',
+    publisher: 'EdgeProp Singapore',
+    resolved_link: 'https://news.google.com/rss/articles/ABC?oc=5',
+    source_url: 'https://www.edgeprop.sg',
+    original_link: 'https://news.google.com/rss/articles/ABC?oc=5&hl=en-SG'
+  });
+  assert.ok(!keys.includes('https://www.edgeprop.sg/'));
+  assert.ok(!keys.includes('https://www.edgeprop.sg'));
+});
+
 test('dedupeNewsItems drops duplicate stories and keeps latest copy in append-only order', () => {
   const items = [
     {

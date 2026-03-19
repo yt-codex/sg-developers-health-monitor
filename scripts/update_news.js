@@ -297,8 +297,13 @@ function escapeRegex(text) {
 }
 
 function termToRegex(term) {
-  const normalized = term.toLowerCase().trim().replace(/\s+/g, '\\s+');
-  const escaped = escapeRegex(normalized).replace(/\\\s\+/g, '\\s+');
+  const escaped = String(term || '')
+    .toLowerCase()
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((token) => escapeRegex(token))
+    .join('\\s+');
   const startsWord = /^[a-z0-9]/i.test(term);
   const endsWord = /[a-z0-9]$/i.test(term);
   const prefix = startsWord ? '\\b' : '';
@@ -343,11 +348,13 @@ function isSingaporeContext(text, relevanceRules) {
 function isPropertyDeveloperTopic(text, relevanceRules) {
   const groups = relevanceRules.property_developer_topic_groups || {};
   const matched = [];
+  const weakTerms = new Set((relevanceRules.property_developer_weak_terms || []).map((term) => String(term).toLowerCase()));
   for (const terms of Object.values(groups)) {
     const hit = includesTerm(text, terms || []);
     if (hit) matched.push(hit);
   }
-  return { pass: matched.length > 0, terms: matched };
+  const strongMatched = matched.filter((term) => !weakTerms.has(String(term).toLowerCase()));
+  return { pass: strongMatched.length > 0, terms: strongMatched.length > 0 ? matched : [] };
 }
 
 function hasNegativeMatch(text, relevanceRules) {
@@ -543,7 +550,7 @@ function trimPublisherFromTitle(title, publisher) {
 }
 
 function extractGoogleNewsPublisher(item, allowlistConfig) {
-  const sourcePublisher = item.source_name || null;
+  const sourcePublisher = item.source_name || item.publisher || null;
   const titlePublisher = parsePublisherFromTitle(item.title);
   const extractedPublisher = sourcePublisher || titlePublisher;
   const canonicalPublisher = isAllowlistedGooglePublisher(extractedPublisher, allowlistConfig);
@@ -673,7 +680,9 @@ async function resolveGoogleLink(item) {
 function buildGoogleDedupKeys(item) {
   const keys = [];
   if (item.resolved_link) keys.push(canonicalizeLink(item.resolved_link));
-  if (item.source_url) keys.push(canonicalizeLink(item.source_url));
+  if (item.source_url && !isHomepageLikeUrl(item.source_url)) {
+    keys.push(canonicalizeLink(item.source_url));
+  }
   keys.push(buildTitleDateDedupKey(item.title, item.pubDate));
   keys.push(buildFallbackDedupKey(item.title, item.publisher, item.pubDate));
   if (item.original_link) keys.push(canonicalizeLink(item.original_link));
@@ -772,43 +781,56 @@ async function cleanupExistingNews(items, developerConfig, relevanceRules, compi
   const rejectedLogs = [];
 
   for (const item of items) {
-    if (item.source !== 'google_news') {
-      cleaned.push(item);
-      continue;
-    }
+    let cleanedItem = { ...item };
 
-    const publisherCheck = extractGoogleNewsPublisher(item, allowlistConfig);
-    if (!publisherCheck.publisher) {
-      rejectedLogs.push({
-        title: item.title || 'Untitled',
-        source: 'google_news',
-        reason: 'cleanup_google_publisher_not_allowlisted',
-        timestamp: nowSgtIso()
+    if (item.source === 'google_news') {
+      const publisherCheck = extractGoogleNewsPublisher(item, allowlistConfig);
+      if (!publisherCheck.publisher) {
+        rejectedLogs.push({
+          title: item.title || 'Untitled',
+          source: 'google_news',
+          reason: 'cleanup_google_publisher_not_allowlisted',
+          timestamp: nowSgtIso()
+        });
+        continue;
+      }
+
+      const resolved = await resolveGoogleLink({
+        link: item.original_link || item.link,
+        source_url: item.source_url || null,
+        guid: item.guid || null
       });
-      continue;
+      if (resolved.resolved_link_status === 'homepage_rejected') {
+        rejectedLogs.push({
+          title: item.title || 'Untitled',
+          source: 'google_news',
+          reason: 'google_homepage_resolution',
+          timestamp: nowSgtIso()
+        });
+        continue;
+      }
+
+      cleanedItem = {
+        ...cleanedItem,
+        publisher: publisherCheck.publisher,
+        original_link: resolved.original_link,
+        resolved_link: resolved.resolved_link,
+        resolved_link_status: resolved.resolved_link_status,
+        link: resolved.resolved_link || resolved.original_link
+      };
+    } else {
+      cleanedItem = {
+        ...cleanedItem,
+        link: canonicalizeLink(item.link)
+      };
     }
 
-    const resolved = await resolveGoogleLink({
-      link: item.original_link || item.link,
-      source_url: item.source_url || null,
-      guid: item.guid || null
-    });
-    if (resolved.resolved_link_status === 'homepage_rejected') {
-      rejectedLogs.push({
-        title: item.title || 'Untitled',
-        source: 'google_news',
-        reason: 'google_homepage_resolution',
-        timestamp: nowSgtIso()
-      });
-      continue;
-    }
-
-    const combined = `${item.title || ''} ${item.snippet || ''}`.toLowerCase();
+    const combined = `${cleanedItem.title || ''} ${cleanedItem.snippet || ''}`.toLowerCase();
     const relevance = evaluateRelevance(combined, developerConfig, relevanceRules);
     if (!relevance.pass) {
       rejectedLogs.push({
-        title: item.title || 'Untitled',
-        source: 'google_news',
+        title: cleanedItem.title || 'Untitled',
+        source: cleanedItem.source || 'unknown',
         reason: `cleanup_${relevance.reject_reason}`,
         timestamp: nowSgtIso()
       });
@@ -821,12 +843,8 @@ async function cleanupExistingNews(items, developerConfig, relevanceRules, compi
     });
 
     cleaned.push({
-      ...item,
-      publisher: publisherCheck.publisher,
-      original_link: resolved.original_link,
-      resolved_link: resolved.resolved_link,
-      resolved_link_status: resolved.resolved_link_status,
-      link: resolved.resolved_link || resolved.original_link,
+      ...cleanedItem,
+      developer: extractDeveloper(combined, developerConfig),
       severity,
       tags,
       matched_terms,
@@ -1143,10 +1161,12 @@ if (require.main === module) {
 }
 
 module.exports = {
+  cleanupExistingNews,
   dedupeNewsItems,
   buildGoogleDedupKeys,
   buildTitleDateDedupKey,
   decodeGoogleLinkCandidate,
+  evaluateRelevance,
   isHomepageLikeUrl,
   isLikelyArticleUrl,
   normalizeTitleForDedup,
