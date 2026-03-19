@@ -1,5 +1,5 @@
 {
-  "last_updated_sgt": "2026-02-22 08:00",
+  "last_updated_sgt": "2026-03-19 21:29",
   "signals": {
     "sector_performance": {
       "status": "Normal",
@@ -20,30 +20,35 @@
     "labour_cost": {
       "status": "Normal",
       "series_id": "unit_labour_cost_construction",
-      "as_of": null,
+      "as_of": "2025-Q4",
       "details": {
-        "yoy_latest": null,
-        "yoy_prev": null
+        "yoy_latest": {
+          "period": "2025-Q4",
+          "value": 0.045969
+        },
+        "yoy_prev": {
+          "period": "2025-Q3",
+          "value": 0.028771
+        }
       },
-      "tooltip": "Stress if Construction Unit Labour Cost (ULC) YoY growth ≥ 8% for 2 consecutive quarters.",
-      "note": "Missing latest quarter for unit_labour_cost_construction; defaulted to Normal."
+      "tooltip": "Stress if Construction Unit Labour Cost (ULC) YoY growth ≥ 8% for 2 consecutive quarters."
     },
     "interest_rate": {
       "status": "Normal",
       "series_id": "sora_overnight",
-      "as_of": "2026-01",
+      "as_of": "2026-02",
       "details": {
         "current": {
-          "period": "2026-01",
-          "value": 1.1092
+          "period": "2026-02",
+          "value": 1.0528
         },
         "p80_5y": 3.66438,
-        "chg_6m_pp": -0.6424
+        "chg_6m_pp": 0.0132
       },
       "tooltip": "Stress if SORA overnight is above its 5-year 80th percentile AND the 6-month change ≥ +0.75pp."
     },
     "materials_price": {
-      "status": "Normal",
+      "status": "Watch",
       "series_ids": [
         "construction_material_cement_in_bulk_ordinary_portland_cement",
         "construction_material_concreting_sand",
@@ -51,15 +56,20 @@
         "construction_material_granite_20mm_aggregate",
         "construction_material_ready_mixed_concrete"
       ],
-      "as_of": null,
+      "as_of": "2026-01",
       "details": {
-        "triggered_by": null,
-        "yoy_latest": null,
-        "yoy_prev": null,
+        "triggered_by": "construction_material_cement_in_bulk_ordinary_portland_cement",
+        "yoy_latest": {
+          "period": "2026-01",
+          "value": 0.113027
+        },
+        "yoy_prev": {
+          "period": "2025-12",
+          "value": 0.095463
+        },
         "threshold_pct": 0.08
       },
-      "tooltip": "Watch if any listed construction material price index rises by ≥ 8% YoY for 2 consecutive months.",
-      "note": "All materials series missing required t-12/t-13 lags; defaulted to Normal."
+      "tooltip": "Watch if any listed construction material price index rises by ≥ 8% YoY for 2 consecutive months."
     }
   }
 }

@@ -3,6 +3,21 @@ const {
   MATERIALS_PRICE_SERIES_IDS
 } = require('./macro_stress_constants');
 
+const MONTH_ABBR_TO_NUM = {
+  jan: 1,
+  feb: 2,
+  mar: 3,
+  apr: 4,
+  may: 5,
+  jun: 6,
+  jul: 7,
+  aug: 8,
+  sep: 9,
+  oct: 10,
+  nov: 11,
+  dec: 12
+};
+
 const STRESS_TOOLTIPS = {
   sector_performance: 'Stress if construction_gdp is negative for 2 consecutive quarters.',
   labour_cost: 'Stress if Construction Unit Labour Cost (ULC) YoY growth ≥ 8% for 2 consecutive quarters.',
@@ -27,8 +42,7 @@ function formatSgtTimestamp(date = new Date()) {
 function quarterIndex(period) {
   if (!period) return null;
   const raw = String(period).trim();
-  let match = raw.match(/^(\d{4})-Q([1-4])$/);
-  if (!match) match = raw.match(/^(\d{4})Q([1-4])$/);
+  const match = raw.match(/^(\d{4})(?:-|\s*)Q([1-4])$/i);
   if (!match) {
     const monthMatch = raw.match(/^(\d{4})-(\d{2})$/);
     if (!monthMatch) return null;
@@ -58,10 +72,19 @@ function normalizeQuarterlyValues(values = []) {
 }
 
 function monthIndex(period) {
-  const match = String(period || '').match(/^(\d{4})-(\d{2})$/);
-  if (!match) return null;
-  const year = Number(match[1]);
-  const month = Number(match[2]);
+  const raw = String(period || '').trim();
+  const match = raw.match(/^(\d{4})-(\d{2})$/);
+  if (match) {
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    if (!Number.isFinite(year) || !Number.isFinite(month) || month < 1 || month > 12) return null;
+    return year * 12 + (month - 1);
+  }
+
+  const labelMatch = raw.match(/^(\d{4})(?:\s)?([A-Za-z]{3})$/);
+  if (!labelMatch) return null;
+  const year = Number(labelMatch[1]);
+  const month = MONTH_ABBR_TO_NUM[labelMatch[2].toLowerCase()];
   if (!Number.isFinite(year) || !Number.isFinite(month) || month < 1 || month > 12) return null;
   return year * 12 + (month - 1);
 }

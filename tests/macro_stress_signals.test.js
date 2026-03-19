@@ -5,12 +5,15 @@ const {
   computeSectorPerformanceSignal,
   computeLabourCostSignal,
   computeInterestRateSignal,
-  computeMaterialsPriceSignal
+  computeMaterialsPriceSignal,
+  generateMacroStressSignals
 } = require('../scripts/lib/macro_stress_signals');
 const {
   MATERIALS_PRICE_YOY_THRESHOLD_PCT,
   MATERIALS_PRICE_SERIES_IDS
 } = require('../scripts/lib/macro_stress_constants');
+const macroData = require('../data/macro_indicators.json');
+const committedStressSignals = require('../data/macro_stress_signals.json');
 
 test('sector stress requires two consecutive negative quarters', () => {
   const stress = computeSectorPerformanceSignal([
@@ -45,6 +48,17 @@ test('ULC YoY stress requires >=8% for two consecutive quarters', () => {
   ]);
   assert.equal(missingLag.status, 'Normal');
   assert.match(missingLag.note, /Missing required quarter/);
+});
+
+test('ULC signal accepts persisted spaced quarter periods', () => {
+  const stress = computeLabourCostSignal([
+    { period: '2024 Q1', value: 100 },
+    { period: '2024 Q2', value: 100 },
+    { period: '2025 Q1', value: 109 },
+    { period: '2025 Q2', value: 108 }
+  ]);
+  assert.equal(stress.status, 'Stress');
+  assert.equal(stress.as_of, '2025-Q2');
 });
 
 test('interest rate stress uses p80 and 6m change with t-6 missing fallback', () => {
@@ -116,6 +130,35 @@ test('materials price watch: different series crossing in only one month each =>
   assert.equal(signal.details.triggered_by, null);
 });
 
+test('materials price watch accepts persisted year-month label formats', () => {
+  const targetSeries = MATERIALS_PRICE_SERIES_IDS[0];
+  const seriesById = Object.fromEntries(
+    MATERIALS_PRICE_SERIES_IDS.map((seriesId) => [
+      seriesId,
+      {
+        values: seriesId === targetSeries
+          ? [
+              { period: '2024 Nov', value: 100 },
+              { period: '2024 Dec', value: 100 },
+              { period: '2025 Nov', value: 109 },
+              { period: '2025 Dec', value: 111 }
+            ]
+          : [
+              { period: '2024 Nov', value: 100 },
+              { period: '2024 Dec', value: 100 },
+              { period: '2025 Nov', value: 101 },
+              { period: '2025 Dec', value: 102 }
+            ]
+      }
+    ])
+  );
+
+  const signal = computeMaterialsPriceSignal(seriesById);
+  assert.equal(signal.status, 'Watch');
+  assert.equal(signal.details.triggered_by, targetSeries);
+  assert.equal(signal.as_of, '2025-12');
+});
+
 test('materials price watch: missing t-12/t-13 for all series => Normal with note', () => {
   const seriesById = Object.fromEntries(
     MATERIALS_PRICE_SERIES_IDS.map((seriesId) => [
@@ -133,4 +176,12 @@ test('materials price watch: missing t-12/t-13 for all series => Normal with not
   assert.equal(signal.status, 'Normal');
   assert.equal(signal.details.triggered_by, null);
   assert.match(signal.note, /missing required t-12\/t-13 lags/i);
+});
+
+test('committed macro stress signals stay in sync with committed macro data', () => {
+  const generated = generateMacroStressSignals(
+    macroData.macro_indicators.series,
+    new Date('2026-01-01T00:00:00+08:00')
+  );
+  assert.deepEqual(committedStressSignals.signals, generated.signals);
 });
