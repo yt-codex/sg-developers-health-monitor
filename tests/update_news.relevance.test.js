@@ -11,9 +11,9 @@ const {
 test('evaluateRelevance rejects unrelated Singapore launch and market headlines', () => {
   const cases = [
     'Singapore Exchange to launch Asian government bond futures amid geopolitical turmoil CEO Loh Boon Chye did not specify when the contracts would launch or which markets they would cover.',
-    'Singapore to launch AI tool to flag high-risk patients for cardiovascular disease risk screening Doctors will be encouraged to use the new tool, which can predict a patient’s risk of developing diabetes or high cholesterol.',
+    'Singapore to launch AI tool to flag high-risk patients for cardiovascular disease risk screening Doctors will be encouraged to use the new tool, which can predict a patientâ€™s risk of developing diabetes or high cholesterol.',
     'There will be a Pokemon truck with Switch 2 game stations and sofas around Singapore till June To celebrate the launch of the new Pokemon Pokopia game on the Nintendo Switch 2, a travelling Pokemon truck will make its way across Singapore from Mar 5 to Jun 4.',
-    'Pizza Hut Singapore launches Hut’s Sliders and revamps My Box meals for solo dining Solo dining is reimagined in Pizza Hut Singapore’s new launch.'
+    'Pizza Hut Singapore launches Hutâ€™s Sliders and revamps My Box meals for solo dining Solo dining is reimagined in Pizza Hut Singaporeâ€™s new launch.'
   ];
 
   for (const text of cases) {
@@ -111,30 +111,42 @@ test('evaluateRelevance accepts Singapore new-launch sales roundup coverage', ()
 });
 
 test('cleanupExistingNews reevaluates non-google items and removes direct-feed false positives', async () => {
-  const items = [
-    {
-      id: 'ai-story',
-      title: 'Singapore to launch AI tool to flag high-risk patients for cardiovascular disease risk screening',
-      link: 'https://www.channelnewsasia.com/singapore/ai-diabetes-high-cholesterol-health-screening-woodlands-5972401',
-      source: 'CNA',
-      pubDate: '2026-03-05T03:07:00.000Z',
-      severity: 'info',
-      snippet: 'Doctors will be encouraged to use the new tool, which can predict a patient’s risk of developing diabetes or high cholesterol.'
-    }
-  ];
+  const originalFetch = global.fetch;
+  global.fetch = async () => ({
+    ok: false,
+    url: 'https://www.channelnewsasia.com/singapore/ai-diabetes-high-cholesterol-health-screening-woodlands-5972401',
+    headers: { get: () => 'text/html' },
+    text: async () => ''
+  });
 
-  const { cleaned, rejectedLogs } = await cleanupExistingNews(
-    items,
-    developerConfig,
-    relevanceRules,
-    [],
-    ['warning', 'watch', 'info'],
-    { allowed_publishers: [], aliases: {} }
-  );
+  try {
+    const items = [
+      {
+        id: 'ai-story',
+        title: 'Singapore to launch AI tool to flag high-risk patients for cardiovascular disease risk screening',
+        link: 'https://www.channelnewsasia.com/singapore/ai-diabetes-high-cholesterol-health-screening-woodlands-5972401',
+        source: 'CNA',
+        pubDate: '2026-03-05T03:07:00.000Z',
+        severity: 'info',
+        snippet: 'Doctors will be encouraged to use the new tool, which can predict a patientâ€™s risk of developing diabetes or high cholesterol.'
+      }
+    ];
 
-  assert.equal(cleaned.length, 0);
-  assert.equal(rejectedLogs.length, 1);
-  assert.equal(rejectedLogs[0].reason, 'cleanup_missing_property_developer_topic');
+    const { cleaned, rejectedLogs } = await cleanupExistingNews(
+      items,
+      developerConfig,
+      relevanceRules,
+      [],
+      ['warning', 'watch', 'info'],
+      { allowed_publishers: [], aliases: {} }
+    );
+
+    assert.equal(cleaned.length, 0);
+    assert.equal(rejectedLogs.length, 1);
+    assert.equal(rejectedLogs[0].reason, 'cleanup_missing_property_developer_topic');
+  } finally {
+    global.fetch = originalFetch;
+  }
 });
 
 test('cleanupExistingNews preserves stored google items that already carry an allowlisted publisher', async () => {

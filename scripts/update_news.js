@@ -11,6 +11,7 @@ try {
 const ROOT = process.cwd();
 const DATA_DIR = path.join(ROOT, 'data');
 const CONFIG_DIR = path.join(ROOT, 'config');
+const ARTICLE_CONTEXT_CACHE_DIR = path.join(DATA_DIR, 'cache', 'news_article_context');
 const NEWS_ALL_PATH = path.join(DATA_DIR, 'news_all.json');
 const NEWS_90D_PATH = path.join(DATA_DIR, 'news_latest_90d.json');
 const META_PATH = path.join(DATA_DIR, 'meta.json');
@@ -23,6 +24,16 @@ const GOOGLE_PUBLISHERS_ALLOWLIST_PATH = path.join(CONFIG_DIR, 'google_news_publ
 const TRACKING_PREFIXES = ['utm_', 'fbclid', 'gclid', 'mc_cid', 'mc_eid', 'cmpid', 'igshid', 's_cid'];
 const SEVERITY_SCORE = { warning: 3, watch: 2, info: 1 };
 const NEWS_BACKUP_NAME_RE = /^news_all_backup_\d{4}-\d{2}-\d{2}(?:T[\d-]+Z)?\.json$/;
+const ARTICLE_CONTEXT_CACHE_VERSION = 1;
+const ARTICLE_FETCH_TIMEOUT_MS = 15000;
+const ARTICLE_PARAGRAPH_LIMIT = 12;
+const ARTICLE_DEVELOPER_PARAGRAPH_LIMIT = 2;
+const SOURCE_PUBLISHER_MAP = {
+  BT: 'The Business Times',
+  ST: 'The Straits Times',
+  CNA: 'CNA',
+  TODAY: 'TODAY'
+};
 
 function mapSeverityToCurrent(severity) {
   const key = String(severity || 'info').toLowerCase();
@@ -118,12 +129,24 @@ function toSgtIso(input) {
   return `${sgt.toISOString().replace('Z', '')}+08:00`;
 }
 
-function stripHtml(text = '') {
-  return text
-    .replace(/<!\[CDATA\[(.*?)\]\]>/gis, '$1')
-    .replace(/<[^>]*>/g, ' ')
+function decodeHtmlEntities(text = '') {
+  return String(text)
+    .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number.parseInt(code, 10)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, code) => String.fromCodePoint(Number.parseInt(code, 16)))
     .replace(/&nbsp;/gi, ' ')
     .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&apos;/gi, "'")
+    .replace(/&#39;/gi, "'")
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&ndash;|&mdash;/gi, '-');
+}
+
+function stripHtml(text = '') {
+  return decodeHtmlEntities(text)
+    .replace(/<!\[CDATA\[(.*?)\]\]>/gis, '$1')
+    .replace(/<[^>]*>/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -152,6 +175,28 @@ function canonicalizeLink(link) {
 
 function normalizeTitle(text) {
   return (text || '').toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+function firstNonEmpty(values = []) {
+  for (const value of values) {
+    const normalized = String(value || '').trim();
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
+function uniqueStrings(values = []) {
+  const seen = new Set();
+  const out = [];
+  for (const value of values) {
+    const normalized = String(value || '').trim();
+    if (!normalized) continue;
+    const key = normalized.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(normalized);
+  }
+  return out;
 }
 
 function normalizeTitleForDedup(text) {
@@ -286,19 +331,14 @@ function classifySeverity(text, compiledRules, severityOrder, context = {}) {
 }
 
 function extractDeveloper(text, developerConfig) {
-  const hits = developerConfig.developers.filter((dev) =>
-    dev.aliases.some((alias) => termToRegex(alias).test(text))
-  );
-  if (hits.length === 0) return 'Unknown';
-  if (hits.length > 1) return 'Multiple';
-  return hits[0].name;
+  return resolveDevelopersFromContext(text, developerConfig).primary_developer;
 }
 
 function escapeRegex(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function termToRegex(term) {
+function termToPattern(term) {
   const escaped = String(term || '')
     .toLowerCase()
     .trim()
@@ -310,7 +350,11 @@ function termToRegex(term) {
   const endsWord = /[a-z0-9]$/i.test(term);
   const prefix = startsWord ? '\\b' : '';
   const suffix = endsWord ? '\\b' : '';
-  return new RegExp(`${prefix}${escaped}${suffix}`, 'i');
+  return `${prefix}${escaped}${suffix}`;
+}
+
+function termToRegex(term, flags = 'i') {
+  return new RegExp(termToPattern(term), flags);
 }
 
 function includesTerm(text, terms) {
@@ -320,16 +364,148 @@ function includesTerm(text, terms) {
   return null;
 }
 
-function findDeveloperMatches(text, developerConfig) {
+function findDeveloperAliasEntries(text, developerConfig) {
   const matches = [];
   for (const dev of developerConfig.developers || []) {
     for (const alias of dev.aliases || []) {
-      if (termToRegex(alias).test(text)) {
-        matches.push(alias);
-      }
+      const match = text.match(termToRegex(alias));
+      if (!match) continue;
+      matches.push({
+        alias,
+        developer: dev.name,
+        index: match.index ?? text.indexOf(match[0])
+      });
     }
   }
-  return [...new Set(matches)];
+  matches.sort((a, b) => a.index - b.index || a.alias.length - b.alias.length);
+  const deduped = [];
+  const seen = new Set();
+  for (const match of matches) {
+    const key = `${match.developer}|${match.alias.toLowerCase()}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(match);
+  }
+  return deduped;
+}
+
+function findDeveloperMatches(text, developerConfig) {
+  return findDeveloperAliasEntries(text, developerConfig).map((match) => match.alias);
+}
+
+function buildDeveloperAliasLookup(developerConfig) {
+  const lookup = new Map();
+  for (const dev of developerConfig.developers || []) {
+    for (const alias of dev.aliases || []) {
+      lookup.set(String(alias).toLowerCase(), dev.name);
+    }
+  }
+  return lookup;
+}
+
+function buildDeveloperAliasUnionPattern(developerConfig) {
+  return (developerConfig.developers || [])
+    .flatMap((dev) => dev.aliases || [])
+    .sort((a, b) => b.length - a.length)
+    .map((alias) => termToPattern(alias))
+    .join('|');
+}
+
+function cleanDeveloperEntityLabel(label) {
+  return String(label || '')
+    .replace(/\s+/g, ' ')
+    .replace(/^[,;:\-\s]+|[,;:\-\s]+$/g, '')
+    .trim();
+}
+
+function extractDeveloperRelationships(text, developerConfig) {
+  const aliasLookup = buildDeveloperAliasLookup(developerConfig);
+  const parentPattern = buildDeveloperAliasUnionPattern(developerConfig);
+  if (!parentPattern) return [];
+
+  const entityPattern = `(?<entity>[A-Z][A-Za-z0-9&'().,\\/-]*(?:\\s+[A-Z0-9][A-Za-z0-9&'().,\\/-]*){0,11})`;
+  const relationshipPatterns = [
+    new RegExp(
+      `${entityPattern}\\s*,\\s*(?:an?|the)\\s+(?<relationship>unit|subsidiary|vehicle|joint venture|jv|property arm|development arm)\\s+of\\s+(?<parent>${parentPattern})`,
+      'gi'
+    ),
+    new RegExp(
+      `${entityPattern}\\s+(?:is|was)\\s+(?:an?|the)\\s+(?<relationship>unit|subsidiary|vehicle|joint venture|jv)\\s+of\\s+(?<parent>${parentPattern})`,
+      'gi'
+    ),
+    new RegExp(
+      `${entityPattern}\\s*,\\s*(?:which is|which was)\\s+(?:an?|the)\\s+(?<relationship>unit|subsidiary|vehicle)\\s+of\\s+(?<parent>${parentPattern})`,
+      'gi'
+    ),
+    new RegExp(
+      `${entityPattern}\\s*,\\s*(?:a|an)\\s+(?<relationship>wholly owned subsidiary|wholly-owned subsidiary|indirect subsidiary|direct subsidiary)\\s+of\\s+(?<parent>${parentPattern})`,
+      'gi'
+    ),
+    new RegExp(
+      `${entityPattern}\\s+(?<relationship>owned by|backed by|controlled by)\\s+(?<parent>${parentPattern})`,
+      'gi'
+    )
+  ];
+
+  const relationships = [];
+  for (const regex of relationshipPatterns) {
+    for (const match of text.matchAll(regex)) {
+      const parentAlias = cleanDeveloperEntityLabel(match.groups?.parent || '');
+      const entity = cleanDeveloperEntityLabel(match.groups?.entity || '');
+      const relationship = cleanDeveloperEntityLabel(match.groups?.relationship || '');
+      const canonical = aliasLookup.get(parentAlias.toLowerCase());
+      if (!canonical || !entity) continue;
+      relationships.push({
+        raw_entity: entity,
+        parent_alias: parentAlias,
+        parent: canonical,
+        relationship,
+        matched_text: cleanDeveloperEntityLabel(match[0] || '')
+      });
+    }
+  }
+
+  const deduped = [];
+  const seen = new Set();
+  for (const relationship of relationships) {
+    const key = `${relationship.parent}|${relationship.raw_entity.toLowerCase()}|${relationship.relationship.toLowerCase()}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(relationship);
+  }
+  return deduped;
+}
+
+function resolveDevelopersFromContext(text, developerConfig) {
+  const aliasEntries = findDeveloperAliasEntries(text, developerConfig);
+  const relationships = extractDeveloperRelationships(text, developerConfig);
+  const developers = [];
+  const seenDevelopers = new Set();
+
+  for (const entry of aliasEntries) {
+    if (seenDevelopers.has(entry.developer)) continue;
+    seenDevelopers.add(entry.developer);
+    developers.push(entry.developer);
+  }
+  for (const relationship of relationships) {
+    if (seenDevelopers.has(relationship.parent)) continue;
+    seenDevelopers.add(relationship.parent);
+    developers.push(relationship.parent);
+  }
+
+  return {
+    developers,
+    developer_matches: uniqueStrings([
+      ...aliasEntries.map((entry) => entry.alias),
+      ...relationships.map((relationship) => relationship.parent_alias)
+    ]),
+    raw_entities: uniqueStrings([
+      ...aliasEntries.map((entry) => entry.alias),
+      ...relationships.map((relationship) => relationship.raw_entity)
+    ]),
+    relationships,
+    primary_developer: developers.length === 0 ? 'Unknown' : developers.length > 1 ? 'Multiple' : developers[0]
+  };
 }
 
 function isSingaporeContext(text, relevanceRules) {
@@ -385,7 +561,9 @@ function matchesManualAllowlist(text, relevanceRules) {
 
 function evaluateRelevance(text, developerConfig, relevanceRules, options = {}) {
   const contextText = String(options.contextText || text || '').toLowerCase();
-  const developerMatches = findDeveloperMatches(text, developerConfig);
+  const developerMatches = Array.isArray(options.developerMatches) && options.developerMatches.length > 0
+    ? uniqueStrings(options.developerMatches)
+    : findDeveloperMatches(text, developerConfig);
 
   const allowlistMatches = matchesManualAllowlist(text, relevanceRules);
   if (allowlistMatches.length > 0) {
@@ -570,6 +748,258 @@ function extractGoogleNewsPublisher(item, allowlistConfig) {
   return {
     extracted_publisher: extractedPublisher,
     publisher: canonicalPublisher
+  };
+}
+
+function canonicalizePublisherName(name, allowlistConfig) {
+  const raw = String(name || '').trim();
+  if (!raw) return null;
+  if (SOURCE_PUBLISHER_MAP[raw]) return SOURCE_PUBLISHER_MAP[raw];
+  return isAllowlistedGooglePublisher(raw, allowlistConfig) || raw;
+}
+
+function inferItemPublisher(item, allowlistConfig) {
+  return firstNonEmpty([
+    canonicalizePublisherName(item.publisher, allowlistConfig),
+    canonicalizePublisherName(item.source_name, allowlistConfig),
+    canonicalizePublisherName(parsePublisherFromTitle(item.title), allowlistConfig),
+    canonicalizePublisherName(item.source, allowlistConfig)
+  ]);
+}
+
+function buildArticleContextCachePath(url) {
+  const canonical = canonicalizeLink(url);
+  const hash = crypto.createHash('sha256').update(canonical).digest('hex').slice(0, 24);
+  return path.join(ARTICLE_CONTEXT_CACHE_DIR, `${hash}.json`);
+}
+
+function readArticleContextCache(url) {
+  const cachePath = buildArticleContextCachePath(url);
+  if (!fs.existsSync(cachePath)) return null;
+  const cached = readJson(cachePath, null);
+  if (!cached || cached.version !== ARTICLE_CONTEXT_CACHE_VERSION) return null;
+  return cached;
+}
+
+function writeArticleContextCache(url, payload) {
+  ensureDir(ARTICLE_CONTEXT_CACHE_DIR);
+  const cachePath = buildArticleContextCachePath(url);
+  writeJson(cachePath, payload);
+}
+
+async function fetchTextWithTimeout(url, timeoutMs = ARTICLE_FETCH_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, {
+      method: 'GET',
+      redirect: 'follow',
+      headers: {
+        'user-agent': 'sg-dev-health-monitor/1.0'
+      },
+      signal: controller.signal
+    });
+    return res;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function extractMetaTagContent(html, key, attr = 'property') {
+  const escaped = escapeRegex(key);
+  const patterns = [
+    new RegExp(`<meta[^>]*${attr}=["']${escaped}["'][^>]*content=["']([\\s\\S]*?)["'][^>]*>`, 'i'),
+    new RegExp(`<meta[^>]*content=["']([\\s\\S]*?)["'][^>]*${attr}=["']${escaped}["'][^>]*>`, 'i')
+  ];
+  for (const pattern of patterns) {
+    const match = html.match(pattern);
+    if (!match) continue;
+    const content = decodeHtmlEntities(match[1] || '').replace(/\s+/g, ' ').trim();
+    if (content) return content;
+  }
+  return '';
+}
+
+function collectJsonLdArticleNodes(node, out = []) {
+  if (!node || typeof node !== 'object') return out;
+  if (Array.isArray(node)) {
+    node.forEach((entry) => collectJsonLdArticleNodes(entry, out));
+    return out;
+  }
+
+  const typeValues = asArray(node['@type'] || node.type).map((value) => String(value || '').toLowerCase());
+  if (typeValues.some((value) => value.includes('article') || value.includes('liveblogposting'))) {
+    out.push(node);
+  }
+
+  for (const value of Object.values(node)) {
+    if (value && typeof value === 'object') collectJsonLdArticleNodes(value, out);
+  }
+  return out;
+}
+
+function extractJsonLdArticleData(html) {
+  const blocks = [...html.matchAll(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];
+  const values = [];
+
+  for (const block of blocks) {
+    const raw = (block[1] || '').trim();
+    if (!raw) continue;
+    let parsed;
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      continue;
+    }
+
+    const articles = collectJsonLdArticleNodes(parsed, []);
+    for (const article of articles) {
+      values.push(article.articleBody, article.description, article.headline, article.alternativeHeadline);
+    }
+  }
+
+  return uniqueStrings(values.map((value) => stripHtml(value)).filter(Boolean));
+}
+
+function isUsefulArticleParagraph(text) {
+  const normalized = String(text || '').replace(/\s+/g, ' ').trim();
+  if (!normalized) return false;
+  if (normalized.length < 40) return false;
+  if (
+    /^(copyright|advertisement|sign up|subscribe|follow us|share this article|terms of use|privacy policy)\b/i.test(normalized)
+  ) {
+    return false;
+  }
+  if (
+    /\b(all rights reserved|supported browser|download the mobile app|top stories|newsletter|cookie policy|podcast)\b/i.test(normalized)
+  ) {
+    return false;
+  }
+  return true;
+}
+
+function extractParagraphsFromMatches(matches) {
+  return uniqueStrings(
+    matches
+      .map((match) => stripHtml(match[1] || ''))
+      .filter(isUsefulArticleParagraph)
+      .slice(0, ARTICLE_PARAGRAPH_LIMIT)
+  );
+}
+
+function extractPublisherParagraphs(html, publisher) {
+  const selectors = {
+    'The Business Times': [/<p\b[^>]*data-testid=["']article-paragraph-component["'][^>]*>([\s\S]*?)<\/p>/gi],
+    'The Straits Times': [
+      /<p\b[^>]*data-testid=["']article-paragraph-annotation-test-id["'][^>]*>([\s\S]*?)<\/p>/gi,
+      /<p\b[^>]*data-testid=["']paragraph-comp["'][^>]*>([\s\S]*?)<\/p>/gi
+    ]
+  };
+
+  const patterns = selectors[publisher] || [];
+  const paragraphs = [];
+  for (const pattern of patterns) {
+    paragraphs.push(...extractParagraphsFromMatches([...html.matchAll(pattern)]));
+  }
+  return uniqueStrings(paragraphs).slice(0, ARTICLE_PARAGRAPH_LIMIT);
+}
+
+function extractGenericParagraphs(html) {
+  return extractParagraphsFromMatches([...html.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)]);
+}
+
+function extractArticleContextFromHtml(html, { publisher, url }) {
+  const jsonLdValues = extractJsonLdArticleData(html);
+  const metaDescription = firstNonEmpty([
+    extractMetaTagContent(html, 'og:description'),
+    extractMetaTagContent(html, 'twitter:description', 'name'),
+    extractMetaTagContent(html, 'description', 'name')
+  ]);
+  const publisherParagraphs = extractPublisherParagraphs(html, publisher);
+  const genericParagraphs = publisherParagraphs.length > 0 ? [] : extractGenericParagraphs(html);
+  const paragraphs = uniqueStrings([...publisherParagraphs, ...genericParagraphs]).slice(0, ARTICLE_PARAGRAPH_LIMIT);
+  const textBlocks = uniqueStrings([...paragraphs, metaDescription, ...jsonLdValues]);
+  const text = textBlocks.join(' ').replace(/\s+/g, ' ').trim();
+
+  if (!text) return null;
+
+  return {
+    url: canonicalizeLink(url),
+    publisher,
+    method: publisherParagraphs.length > 0 ? 'publisher_paragraphs' : jsonLdValues.length > 0 ? 'jsonld_meta' : 'generic_paragraphs',
+    paragraphs,
+    description: metaDescription || null,
+    text
+  };
+}
+
+function isGoogleNewsUrl(link) {
+  try {
+    return new URL(link).hostname.includes('news.google.com');
+  } catch {
+    return false;
+  }
+}
+
+function selectArticleContextUrl(item) {
+  const candidates = [item.resolved_link, item.link, item.source_url, item.original_link]
+    .map((value) => canonicalizeLink(value))
+    .filter(Boolean);
+
+  for (const candidate of candidates) {
+    if (isGoogleNewsUrl(candidate)) continue;
+    if (isHomepageLikeUrl(candidate)) continue;
+    if (!isLikelyArticleUrl(candidate)) continue;
+    return candidate;
+  }
+  return null;
+}
+
+async function fetchArticleContext(item, allowlistConfig) {
+  const url = selectArticleContextUrl(item);
+  const publisher = inferItemPublisher(item, allowlistConfig);
+  if (!url || !publisher) return null;
+
+  const cached = readArticleContextCache(url);
+  if (cached?.text) return cached;
+
+  let res;
+  try {
+    res = await fetchTextWithTimeout(url);
+  } catch {
+    return null;
+  }
+  if (!res.ok) return null;
+
+  const contentType = String(res.headers.get('content-type') || '').toLowerCase();
+  if (contentType && !contentType.includes('text/html')) return null;
+
+  const html = await res.text();
+  const extracted = extractArticleContextFromHtml(html, { publisher, url: res.url || url });
+  if (!extracted) return null;
+
+  const payload = {
+    version: ARTICLE_CONTEXT_CACHE_VERSION,
+    fetched_at_sgt: nowSgtIso(),
+    ...extracted
+  };
+  writeArticleContextCache(url, payload);
+  return payload;
+}
+
+function buildArticleAnalysisContext(item, articleContext, developerConfig) {
+  const leadParagraphs = (articleContext?.paragraphs || []).slice(0, ARTICLE_DEVELOPER_PARAGRAPH_LIMIT);
+  const combinedRaw = uniqueStrings([item.title, item.snippet, articleContext?.description, ...(articleContext?.paragraphs || [])]).join(' ');
+  const developerContextRaw = uniqueStrings([item.title, item.snippet, articleContext?.description, ...leadParagraphs]).join(' ');
+  const contextRaw = uniqueStrings([combinedRaw, item.query, articleContext?.publisher]).join(' ');
+  return {
+    combined_raw: combinedRaw.trim(),
+    combined: combinedRaw.toLowerCase(),
+    developer_context_raw: developerContextRaw.trim(),
+    context_raw: contextRaw.trim(),
+    context_text: contextRaw.toLowerCase(),
+    developer_resolution: resolveDevelopersFromContext(developerContextRaw, developerConfig),
+    article_context: articleContext || null
   };
 }
 
@@ -789,6 +1219,30 @@ function refreshLatest90AndMeta(allItems, fetchedAtSgt, feedResults, existingCou
   return latest90;
 }
 
+async function analyzeItemForPipeline(item, developerConfig, relevanceRules, compiledRules, severityOrder, allowlistConfig) {
+  const articleContext = await fetchArticleContext(item, allowlistConfig);
+  const context = buildArticleAnalysisContext(item, articleContext, developerConfig);
+  const relevance = evaluateRelevance(context.combined, developerConfig, relevanceRules, {
+    contextText: context.context_text,
+    developerMatches: context.developer_resolution.developer_matches
+  });
+
+  if (!relevance.pass) {
+    return { ...context, relevance, severity: null, tags: [], matched_terms: [] };
+  }
+
+  const severityInfo = classifySeverity(context.combined, compiledRules, severityOrder, {
+    developerMatches: context.developer_resolution.developer_matches,
+    relevancePassed: relevance.pass
+  });
+
+  return {
+    ...context,
+    relevance,
+    ...severityInfo
+  };
+}
+
 async function cleanupExistingNews(items, developerConfig, relevanceRules, compiledRules, severityOrder, allowlistConfig) {
   const cleaned = [];
   const rejectedLogs = [];
@@ -838,12 +1292,15 @@ async function cleanupExistingNews(items, developerConfig, relevanceRules, compi
       };
     }
 
-    const combined = `${cleanedItem.title || ''} ${cleanedItem.snippet || ''}`.toLowerCase();
-    const contextText =
-      cleanedItem.source === 'google_news' && cleanedItem.query
-        ? `${combined} ${String(cleanedItem.query).toLowerCase()}`
-        : combined;
-    const relevance = evaluateRelevance(combined, developerConfig, relevanceRules, { contextText });
+    const analysis = await analyzeItemForPipeline(
+      cleanedItem,
+      developerConfig,
+      relevanceRules,
+      compiledRules,
+      severityOrder,
+      allowlistConfig
+    );
+    const { relevance } = analysis;
     if (!relevance.pass) {
       rejectedLogs.push({
         title: cleanedItem.title || 'Untitled',
@@ -854,17 +1311,19 @@ async function cleanupExistingNews(items, developerConfig, relevanceRules, compi
       continue;
     }
 
-    const { severity, tags, matched_terms } = classifySeverity(combined, compiledRules, severityOrder, {
-      developerMatches: relevance.relevance_reason === 'developer_match' ? relevance.relevance_terms : [],
-      relevancePassed: relevance.pass
-    });
-
     cleaned.push({
       ...cleanedItem,
-      developer: extractDeveloper(combined, developerConfig),
-      severity,
-      tags,
-      matched_terms,
+      developer: analysis.developer_resolution.primary_developer,
+      developers: analysis.developer_resolution.developers,
+      developer_matches: analysis.developer_resolution.developer_matches,
+      developer_raw_entities: analysis.developer_resolution.raw_entities,
+      developer_relationships: analysis.developer_resolution.relationships,
+      article_context_url: analysis.article_context?.url || null,
+      article_context_publisher: analysis.article_context?.publisher || null,
+      article_context_method: analysis.article_context?.method || null,
+      severity: analysis.severity,
+      tags: analysis.tags,
+      matched_terms: analysis.matched_terms,
       relevance_reason: relevance.relevance_reason,
       relevance_terms: relevance.relevance_terms
     });
@@ -1039,9 +1498,23 @@ async function run() {
       });
       if (dedupKeys.some((key) => existingDedup.has(key))) continue;
 
-      const combined = `${cleanedTitle} ${rawItem.snippet || ''}`.toLowerCase();
-      const contextText = `${combined} ${String(rawItem.query || '').toLowerCase()}`.trim();
-      const relevance = evaluateRelevance(combined, developerConfig, relevanceRules, { contextText });
+      const analysis = await analyzeItemForPipeline(
+        {
+          ...rawItem,
+          title: cleanedTitle,
+          publisher: publisherInfo.publisher,
+          resolved_link: resolved.resolved_link,
+          source_url: rawItem.source_url || null,
+          link: resolved.resolved_link || resolved.original_link,
+          original_link: resolved.original_link
+        },
+        developerConfig,
+        relevanceRules,
+        compiledRules,
+        tagRules.severity_order,
+        googleAllowlistConfig
+      );
+      const { relevance } = analysis;
       if (!relevance.pass) {
         rejectedLogs.push({
           title: cleanedTitle,
@@ -1052,10 +1525,6 @@ async function run() {
         continue;
       }
 
-      const { severity, tags, matched_terms } = classifySeverity(combined, compiledRules, tagRules.severity_order, {
-        developerMatches: relevance.relevance_reason === 'developer_match' ? relevance.relevance_terms : [],
-        relevancePassed: relevance.pass
-      });
       const primaryDedupKey = dedupKeys[0] || buildFallbackDedupKey(cleanedTitle, publisherInfo.publisher, rawItem.pubDate);
       const id = buildId('google_news', primaryDedupKey);
       newItems.push({
@@ -1073,11 +1542,18 @@ async function run() {
         query: rawItem.query,
         pubDate: rawItem.pubDate,
         pubDate_sgt: toSgtIso(rawItem.pubDate),
-        developer: extractDeveloper(combined, developerConfig),
-        severity,
-        tags,
+        developer: analysis.developer_resolution.primary_developer,
+        developers: analysis.developer_resolution.developers,
+        developer_matches: analysis.developer_resolution.developer_matches,
+        developer_raw_entities: analysis.developer_resolution.raw_entities,
+        developer_relationships: analysis.developer_resolution.relationships,
+        article_context_url: analysis.article_context?.url || null,
+        article_context_publisher: analysis.article_context?.publisher || null,
+        article_context_method: analysis.article_context?.method || null,
+        severity: analysis.severity,
+        tags: analysis.tags,
         snippet: rawItem.snippet,
-        matched_terms,
+        matched_terms: analysis.matched_terms,
         fetched_at_sgt: fetchedAtSgt,
         relevance_reason: relevance.relevance_reason,
         relevance_terms: relevance.relevance_terms
@@ -1099,8 +1575,15 @@ async function run() {
           ].filter(Boolean);
           if (dedupKeys.some((key) => existingDedup.has(key))) continue;
 
-          const combined = `${rawItem.title} ${rawItem.snippet}`.toLowerCase();
-          const relevance = evaluateRelevance(combined, developerConfig, relevanceRules);
+          const analysis = await analyzeItemForPipeline(
+            rawItem,
+            developerConfig,
+            relevanceRules,
+            compiledRules,
+            tagRules.severity_order,
+            googleAllowlistConfig
+          );
+          const { relevance } = analysis;
           if (!relevance.pass) {
             rejectedLogs.push({
               title: rawItem.title,
@@ -1111,10 +1594,6 @@ async function run() {
             continue;
           }
 
-          const { severity, tags, matched_terms } = classifySeverity(combined, compiledRules, tagRules.severity_order, {
-            developerMatches: relevance.relevance_reason === 'developer_match' ? relevance.relevance_terms : [],
-            relevancePassed: relevance.pass
-          });
           const item = {
             id: buildId(rawItem.source, canonicalLink),
             title: rawItem.title,
@@ -1122,11 +1601,18 @@ async function run() {
             source: rawItem.source,
             pubDate: rawItem.pubDate,
             pubDate_sgt: toSgtIso(rawItem.pubDate),
-            developer: extractDeveloper(combined, developerConfig),
-            severity,
-            tags,
+            developer: analysis.developer_resolution.primary_developer,
+            developers: analysis.developer_resolution.developers,
+            developer_matches: analysis.developer_resolution.developer_matches,
+            developer_raw_entities: analysis.developer_resolution.raw_entities,
+            developer_relationships: analysis.developer_resolution.relationships,
+            article_context_url: analysis.article_context?.url || null,
+            article_context_publisher: analysis.article_context?.publisher || null,
+            article_context_method: analysis.article_context?.method || null,
+            severity: analysis.severity,
+            tags: analysis.tags,
             snippet: rawItem.snippet,
-            matched_terms,
+            matched_terms: analysis.matched_terms,
             fetched_at_sgt: fetchedAtSgt,
             relevance_reason: relevance.relevance_reason,
             relevance_terms: relevance.relevance_terms
@@ -1179,14 +1665,17 @@ if (require.main === module) {
 }
 
 module.exports = {
+  buildArticleAnalysisContext,
   cleanupExistingNews,
   dedupeNewsItems,
   buildGoogleDedupKeys,
   buildTitleDateDedupKey,
   decodeGoogleLinkCandidate,
   evaluateRelevance,
+  extractArticleContextFromHtml,
   isHomepageLikeUrl,
   isLikelyArticleUrl,
   normalizeTitleForDedup,
+  resolveDevelopersFromContext,
   resolveGoogleLink
 };
