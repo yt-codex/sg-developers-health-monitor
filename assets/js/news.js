@@ -2,6 +2,12 @@ const ITEMS_PER_PAGE = App.newsConfig.pageSize;
 const SEVERITY_META = App.newsConfig.severityMeta;
 const DATE_RANGE_OPTIONS = App.newsConfig.dateRangeOptions;
 const TRACKING_PREFIXES = ['utm_', 'fbclid', 'gclid', 'mc_cid', 'mc_eid', 'cmpid', 'igshid', 's_cid'];
+const SOURCE_LABELS = {
+  BT: 'The Business Times',
+  ST: 'The Straits Times',
+  CNA: 'CNA',
+  TODAY: 'TODAY'
+};
 
 function escapeHtml(value = '') {
   return value
@@ -24,6 +30,14 @@ function renderSeverityBadge(severity) {
       </span>
     </span>
   `;
+}
+
+function getNewsSourceLabel(item = {}) {
+  if (item.publisher) return item.publisher;
+  if (item.article_context_publisher) return item.article_context_publisher;
+  if (SOURCE_LABELS[item.source]) return SOURCE_LABELS[item.source];
+  if (item.source === 'google_news') return 'Google News';
+  return String(item.source || 'Unknown');
 }
 
 function buildPaginationButtons(totalPages, currentPage) {
@@ -86,7 +100,7 @@ function renderNewsItems(items, currentPage) {
             ${renderSeverityBadge(item.severity)}
             <h3><a href="${item.link}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title)}</a></h3>
           </div>
-          <div class="meta-row">${App.formatDateTime(item.pubDate)} • ${item.source} • Developer: ${escapeHtml(item.developer || 'Unknown')}</div>
+          <div class="meta-row">${App.formatDateTime(item.pubDate)} • ${escapeHtml(getNewsSourceLabel(item))} • Developer: ${escapeHtml(item.developer || 'Unknown')}</div>
           <div class="chips">${tags}${matched}</div>
           <p>${escapeHtml(item.snippet || '')}</p>
         </article>
@@ -144,7 +158,7 @@ function dedupeNewsItems(items = []) {
 
   for (const item of items) {
     const titleDateKey = `title_date:${normalizeTitleForDedup(item.title)}|${datePartForDedup(item.pubDate)}`;
-    const fallbackKey = `fallback:${String(item.source || '').toLowerCase().trim()}|${String(item.publisher || '').toLowerCase().trim()}|${datePartForDedup(item.pubDate)}`;
+    const fallbackKey = `fallback:${getNewsSourceLabel(item).toLowerCase().trim()}|${datePartForDedup(item.pubDate)}`;
     const keys = [canonicalizeNewsLink(item.link), titleDateKey, fallbackKey].filter(Boolean);
     if (keys.some((key) => seen.has(key))) {
       dropped += 1;
@@ -194,7 +208,7 @@ function initNewsPage() {
       }
 
       const developers = Array.from(new Set(processedItems.map((i) => i.developer || 'Unknown'))).sort();
-      const sources = Array.from(new Set(processedItems.map((i) => i.source))).sort();
+      const sources = Array.from(new Set(processedItems.map((i) => getNewsSourceLabel(i)))).sort();
 
       const sevSelect = document.getElementById('severity-filter');
       const devSelect = document.getElementById('developer-filter');
@@ -235,9 +249,9 @@ function initNewsPage() {
           if (new Date(item.pubDate).getTime() < cutoff) return false;
           if (selectedSeverity !== 'all' && item.severity !== selectedSeverity) return false;
           if (selectedDeveloper !== 'all' && (item.developer || 'Unknown') !== selectedDeveloper) return false;
-          if (selectedSource !== 'all' && item.source !== selectedSource) return false;
+          if (selectedSource !== 'all' && getNewsSourceLabel(item) !== selectedSource) return false;
           if (searchText) {
-            const blob = `${item.title || ''} ${item.snippet || ''}`.toLowerCase();
+            const blob = `${item.title || ''} ${item.snippet || ''} ${getNewsSourceLabel(item)}`.toLowerCase();
             if (!blob.includes(searchText)) return false;
           }
           return true;
