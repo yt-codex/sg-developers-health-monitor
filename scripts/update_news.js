@@ -286,7 +286,9 @@ function classifySeverity(text, compiledRules, severityOrder, context = {}) {
 }
 
 function extractDeveloper(text, developerConfig) {
-  const hits = developerConfig.developers.filter((dev) => dev.aliases.some((alias) => text.includes(alias.toLowerCase())));
+  const hits = developerConfig.developers.filter((dev) =>
+    dev.aliases.some((alias) => termToRegex(alias).test(text))
+  );
   if (hits.length === 0) return 'Unknown';
   if (hits.length > 1) return 'Multiple';
   return hits[0].name;
@@ -322,7 +324,7 @@ function findDeveloperMatches(text, developerConfig) {
   const matches = [];
   for (const dev of developerConfig.developers || []) {
     for (const alias of dev.aliases || []) {
-      if (text.includes(alias.toLowerCase())) {
+      if (termToRegex(alias).test(text)) {
         matches.push(alias);
       }
     }
@@ -354,7 +356,15 @@ function isPropertyDeveloperTopic(text, relevanceRules) {
     if (hit) matched.push(hit);
   }
   const strongMatched = matched.filter((term) => !weakTerms.has(String(term).toLowerCase()));
-  return { pass: strongMatched.length > 0, terms: strongMatched.length > 0 ? matched : [] };
+  const weakMatched = matched.filter((term) => weakTerms.has(String(term).toLowerCase()));
+  return {
+    pass: strongMatched.length > 0,
+    any_pass: matched.length > 0,
+    terms: strongMatched.length > 0 ? matched : [],
+    matched_terms: matched,
+    strong_terms: strongMatched,
+    weak_terms: weakMatched
+  };
 }
 
 function hasNegativeMatch(text, relevanceRules) {
@@ -373,16 +383,9 @@ function matchesManualAllowlist(text, relevanceRules) {
   return [term];
 }
 
-function evaluateRelevance(text, developerConfig, relevanceRules) {
+function evaluateRelevance(text, developerConfig, relevanceRules, options = {}) {
+  const contextText = String(options.contextText || text || '').toLowerCase();
   const developerMatches = findDeveloperMatches(text, developerConfig);
-  if (developerMatches.length > 0) {
-    return {
-      pass: true,
-      relevance_reason: 'developer_match',
-      relevance_terms: developerMatches,
-      reject_reason: null
-    };
-  }
 
   const allowlistMatches = matchesManualAllowlist(text, relevanceRules);
   if (allowlistMatches.length > 0) {
@@ -404,7 +407,18 @@ function evaluateRelevance(text, developerConfig, relevanceRules) {
     };
   }
 
-  const sgContext = isSingaporeContext(text, relevanceRules);
+  const sgContext = isSingaporeContext(contextText, relevanceRules);
+  const propertyTopic = isPropertyDeveloperTopic(text, relevanceRules);
+
+  if (developerMatches.length > 0 && propertyTopic.any_pass) {
+    return {
+      pass: true,
+      relevance_reason: 'developer_match',
+      relevance_terms: developerMatches,
+      reject_reason: null
+    };
+  }
+
   if (!sgContext.pass) {
     return {
       pass: false,
@@ -414,7 +428,6 @@ function evaluateRelevance(text, developerConfig, relevanceRules) {
     };
   }
 
-  const propertyTopic = isPropertyDeveloperTopic(text, relevanceRules);
   if (!propertyTopic.pass) {
     return {
       pass: false,
@@ -826,7 +839,11 @@ async function cleanupExistingNews(items, developerConfig, relevanceRules, compi
     }
 
     const combined = `${cleanedItem.title || ''} ${cleanedItem.snippet || ''}`.toLowerCase();
-    const relevance = evaluateRelevance(combined, developerConfig, relevanceRules);
+    const contextText =
+      cleanedItem.source === 'google_news' && cleanedItem.query
+        ? `${combined} ${String(cleanedItem.query).toLowerCase()}`
+        : combined;
+    const relevance = evaluateRelevance(combined, developerConfig, relevanceRules, { contextText });
     if (!relevance.pass) {
       rejectedLogs.push({
         title: cleanedItem.title || 'Untitled',
@@ -1023,7 +1040,8 @@ async function run() {
       if (dedupKeys.some((key) => existingDedup.has(key))) continue;
 
       const combined = `${cleanedTitle} ${rawItem.snippet || ''}`.toLowerCase();
-      const relevance = evaluateRelevance(combined, developerConfig, relevanceRules);
+      const contextText = `${combined} ${String(rawItem.query || '').toLowerCase()}`.trim();
+      const relevance = evaluateRelevance(combined, developerConfig, relevanceRules, { contextText });
       if (!relevance.pass) {
         rejectedLogs.push({
           title: cleanedTitle,

@@ -46,6 +46,70 @@ test('evaluateRelevance accepts Hoi Hup and Sunway MCL launch coverage via devel
   assert.ok(relevance.relevance_terms.includes('hoi hup') || relevance.relevance_terms.includes('sunway mcl'));
 });
 
+test('evaluateRelevance rejects non-property Keppel corporate news', () => {
+  const text = [
+    'Keppel shares tumble 3% after delay in planned sale of M1 to Simba',
+    'The telecom transaction remains under review.'
+  ].join(' ').toLowerCase();
+
+  const relevance = evaluateRelevance(text, developerConfig, relevanceRules);
+  assert.equal(relevance.pass, false);
+});
+
+test('evaluateRelevance rejects REIT headlines even when a developer brand appears', () => {
+  const text = [
+    'Lendlease Reit to take full ownership of PLQ Mall in $116 million deal',
+    'Reit portfolio value climbs after the transaction.'
+  ].join(' ').toLowerCase();
+
+  const relevance = evaluateRelevance(text, developerConfig, relevanceRules);
+  assert.equal(relevance.pass, false);
+  assert.match(relevance.reject_reason, /^hard_negative:/);
+});
+
+test('evaluateRelevance accepts developer bid coverage for newly tracked residential developers', () => {
+  const text = [
+    "Forsea-Qingjian's S$1,556 psf ppr top bid sets benchmark for residential land in one-north area",
+    'The winning tender sets a fresh benchmark for the site.'
+  ].join(' ').toLowerCase();
+
+  const relevance = evaluateRelevance(text, developerConfig, relevanceRules);
+  assert.equal(relevance.pass, true);
+  assert.equal(relevance.relevance_reason, 'developer_match');
+  assert.ok(relevance.relevance_terms.includes('forsea') || relevance.relevance_terms.includes('qingjian'));
+});
+
+test('evaluateRelevance accepts developer launch coverage on weak property cues when the developer is explicit', () => {
+  const text = [
+    'GuocoLand sells over 90% of River Modern on launch day at an average of $3,266 psf',
+    'Buyers snapped up units during the first day of sales.'
+  ].join(' ').toLowerCase();
+
+  const relevance = evaluateRelevance(text, developerConfig, relevanceRules);
+  assert.equal(relevance.pass, true);
+  assert.equal(relevance.relevance_reason, 'developer_match');
+});
+
+test('evaluateRelevance accepts launch-performance coverage from google query context', () => {
+  const text = 'Over half of units at Tembusu Grand sold on launch weekend'.toLowerCase();
+  const contextText = [
+    text,
+    '("Singapore" AND (developer OR "property developer" OR residential OR condo) AND ("launch weekend" OR "units sold"))'
+  ].join(' ').toLowerCase();
+
+  const relevance = evaluateRelevance(text, developerConfig, relevanceRules, { contextText });
+  assert.equal(relevance.pass, true);
+  assert.equal(relevance.relevance_reason, 'sg_property_topic');
+});
+
+test('evaluateRelevance accepts Singapore new-launch sales roundup coverage', () => {
+  const text = 'Buyers take up over 900 condo units at three new launches in Singapore over the weekend'.toLowerCase();
+
+  const relevance = evaluateRelevance(text, developerConfig, relevanceRules);
+  assert.equal(relevance.pass, true);
+  assert.equal(relevance.relevance_reason, 'sg_property_topic');
+});
+
 test('cleanupExistingNews reevaluates non-google items and removes direct-feed false positives', async () => {
   const items = [
     {
