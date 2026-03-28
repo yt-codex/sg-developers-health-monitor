@@ -12,6 +12,7 @@ test('evaluateRelevance rejects unrelated Singapore launch and market headlines'
   const cases = [
     'Singapore Exchange to launch Asian government bond futures amid geopolitical turmoil CEO Loh Boon Chye did not specify when the contracts would launch or which markets they would cover.',
     'Singapore to launch AI tool to flag high-risk patients for cardiovascular disease risk screening Doctors will be encouraged to use the new tool, which can predict a patientâ€™s risk of developing diabetes or high cholesterol.',
+    'More seniors in Singapore are embracing strength training, and class take-up rose by 20 per cent year on year.',
     'There will be a Pokemon truck with Switch 2 game stations and sofas around Singapore till June To celebrate the launch of the new Pokemon Pokopia game on the Nintendo Switch 2, a travelling Pokemon truck will make its way across Singapore from Mar 5 to Jun 4.',
     'Pizza Hut Singapore launches Hutâ€™s Sliders and revamps My Box meals for solo dining Solo dining is reimagined in Pizza Hut Singaporeâ€™s new launch.'
   ];
@@ -100,6 +101,22 @@ test('evaluateRelevance accepts launch-performance coverage from google query co
   const relevance = evaluateRelevance(text, developerConfig, relevanceRules, { contextText });
   assert.equal(relevance.pass, true);
   assert.equal(relevance.relevance_reason, 'sg_property_topic');
+});
+
+test('evaluateRelevance rejects foreign developer distress when Singapore only appears in late body context', () => {
+  const text = [
+    'China Vanke seeks bond delay again as it works on restructuring plan',
+    'The distressed developer has been wrestling with a liquidity crunch for more than two years.',
+    "Vanke's stake in Singapore-based GLP is also adding to the strain."
+  ].join(' ').toLowerCase();
+  const contextText = [
+    'China Vanke seeks bond delay again as it works on restructuring plan',
+    'The distressed developer has been wrestling with a liquidity crunch for more than two years.'
+  ].join(' ').toLowerCase();
+
+  const relevance = evaluateRelevance(text, developerConfig, relevanceRules, { contextText });
+  assert.equal(relevance.pass, false);
+  assert.equal(relevance.reject_reason, 'missing_singapore_context');
 });
 
 test('evaluateRelevance accepts Singapore new-launch sales roundup coverage', () => {

@@ -991,7 +991,7 @@ function buildArticleAnalysisContext(item, articleContext, developerConfig) {
   const leadParagraphs = (articleContext?.paragraphs || []).slice(0, ARTICLE_DEVELOPER_PARAGRAPH_LIMIT);
   const combinedRaw = uniqueStrings([item.title, item.snippet, articleContext?.description, ...(articleContext?.paragraphs || [])]).join(' ');
   const developerContextRaw = uniqueStrings([item.title, item.snippet, articleContext?.description, ...leadParagraphs]).join(' ');
-  const contextRaw = uniqueStrings([combinedRaw, item.query, articleContext?.publisher]).join(' ');
+  const contextRaw = uniqueStrings([developerContextRaw, item.query, articleContext?.publisher]).join(' ');
   return {
     combined_raw: combinedRaw.trim(),
     combined: combinedRaw.toLowerCase(),
