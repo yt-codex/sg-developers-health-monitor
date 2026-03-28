@@ -1,12 +1,49 @@
 {
-  "last_updated_sgt": "2026-03-28T22:33:53.419+08:00",
+  "last_updated_sgt": "2026-03-29T02:43:59.635+08:00",
   "status": "success",
   "counts": {
-    "existing_total": 127,
+    "existing_total": 126,
     "new_items": 0,
-    "rejected_items": 1,
+    "rejected_items": 124,
     "total_all": 126,
     "latest_90d": 77
   },
-  "feeds": []
+  "feeds": [
+    {
+      "source": "CNA",
+      "url": "https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=6936",
+      "status": "ok",
+      "items_fetched": 20
+    },
+    {
+      "source": "CNA",
+      "url": "https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=10416",
+      "status": "ok",
+      "items_fetched": 16
+    },
+    {
+      "source": "BT",
+      "url": "https://www.businesstimes.com.sg/rss/property",
+      "status": "ok",
+      "items_fetched": 21
+    },
+    {
+      "source": "BT",
+      "url": "https://www.businesstimes.com.sg/rss/reits-property",
+      "status": "ok",
+      "items_fetched": 5
+    },
+    {
+      "source": "ST",
+      "url": "https://www.straitstimes.com/news/singapore/rss.xml",
+      "status": "ok",
+      "items_fetched": 47
+    },
+    {
+      "source": "ST",
+      "url": "https://www.straitstimes.com/news/business/rss.xml",
+      "status": "ok",
+      "items_fetched": 21
+    }
+  ]
 }
