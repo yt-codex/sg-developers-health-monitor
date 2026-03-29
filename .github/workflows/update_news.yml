@@ -22,7 +22,7 @@ on:
         default: '180'
         type: string
   schedule:
-    - cron: '0 18 * * *'
+    - cron: '0 0,5,10 * * *'
 
 permissions:
   contents: write

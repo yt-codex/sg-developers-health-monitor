@@ -8,6 +8,29 @@ const SOURCE_LABELS = {
   CNA: 'CNA',
   TODAY: 'TODAY'
 };
+const WARNING_SIGNALS = [
+  'Default, missed payment, insolvency, winding up, liquidation, receivership',
+  'Covenant breach, debt restructuring, judicial management'
+];
+const WATCH_SIGNALS = [
+  'Refinancing, debt maturities, asset disposal, divestment, rights issue, negative outlook, downgrade, liquidity stress',
+  'Slower presales, weak take-up, unsold inventory, margin pressure, cost pressure, construction delays, softer sales momentum',
+  'Financial deterioration terms such as profit plunge, earnings fall, net loss, impairment, valuation losses, weak demand'
+];
+const INFO_NOTES = [
+  'Relevant Singapore developer/property articles without warning or watch signals remain Info',
+  'Routine launch, preview, tender, and sector-monitoring stories usually stay Info unless risk terms are present'
+];
+const RELEVANCE_NOTES = [
+  'An item must first pass the relevance gate before it appears in the tab',
+  'Relevant items generally need Singapore property/developer context, unless there is a direct matched developer alias or a manual allowlist hit',
+  'Hard negatives such as crime/courts, unrelated politics/social topics, and clearly unrelated business sectors are rejected'
+];
+const ATTRIBUTION_NOTES = [
+  'Developer attribution comes first from aliases found in the title, snippet, and article context',
+  'For some Google-sourced launch/preview headlines where Google does not expose the article URL, the pipeline can use a developer-specific query as a fallback',
+  'If no reliable developer can be inferred, the article stays under Developer: Unknown'
+];
 
 function escapeHtml(value = '') {
   return value
@@ -38,6 +61,26 @@ function getNewsSourceLabel(item = {}) {
   if (SOURCE_LABELS[item.source]) return SOURCE_LABELS[item.source];
   if (item.source === 'google_news') return 'Google News';
   return String(item.source || 'Unknown');
+}
+
+function renderMethodologyList(items = []) {
+  return `<ul class="methodology-list">${items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
+}
+
+function buildNewsMethodologyHtml() {
+  return `
+    <p class="methodology-line"><strong>Relevance gate:</strong> Only articles that look like Singapore property-developer news are kept for the Developer News tab.</p>
+    ${renderMethodologyList(RELEVANCE_NOTES)}
+    <p class="methodology-line"><strong>${escapeHtml(SEVERITY_META.warning.title)}:</strong> ${escapeHtml(SEVERITY_META.warning.description)}</p>
+    ${renderMethodologyList(WARNING_SIGNALS)}
+    <p class="methodology-line"><strong>${escapeHtml(SEVERITY_META.watch.title)}:</strong> ${escapeHtml(SEVERITY_META.watch.description)}</p>
+    ${renderMethodologyList(WATCH_SIGNALS)}
+    <p class="methodology-line"><strong>Financial deterioration safeguard:</strong> Profit / loss style phrases only upgrade an article to Watch when the article has a matched developer alias, or when at least two distinct deterioration phrases appear after the item already passed relevance.</p>
+    <p class="methodology-line"><strong>${escapeHtml(SEVERITY_META.info.title)}:</strong> ${escapeHtml(SEVERITY_META.info.description)}</p>
+    ${renderMethodologyList(INFO_NOTES)}
+    <p class="methodology-line"><strong>Developer attribution:</strong> The developer label is a best-effort classification, not a guarantee that the article is exclusively about that company.</p>
+    ${renderMethodologyList(ATTRIBUTION_NOTES)}
+  `;
 }
 
 function buildPaginationButtons(totalPages, currentPage) {
@@ -193,6 +236,8 @@ function initNewsPage() {
   const newsList = document.getElementById('news-list');
   if (!newsList || newsList.dataset.initialized === 'true') return;
   newsList.dataset.initialized = 'true';
+  const methodology = document.getElementById('news-methodology-content');
+  if (methodology) methodology.innerHTML = buildNewsMethodologyHtml();
 
   Promise.all([loadNewsData(), App.fetchJson('./data/meta.json')])
     .then(([items, meta]) => {
