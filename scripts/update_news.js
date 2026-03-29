@@ -526,6 +526,43 @@ function resolveDevelopersFromContext(text, developerConfig) {
   };
 }
 
+function mergeDeveloperResolutions(primary, fallback) {
+  const merged = {
+    developers: uniqueStrings([...(primary?.developers || []), ...(fallback?.developers || [])]),
+    developer_matches: uniqueStrings([...(primary?.developer_matches || []), ...(fallback?.developer_matches || [])]),
+    raw_entities: uniqueStrings([...(primary?.raw_entities || []), ...(fallback?.raw_entities || [])]),
+    relationships: [...(primary?.relationships || [])]
+  };
+
+  const relationshipSeen = new Set(
+    merged.relationships.map((relationship) =>
+      `${relationship.parent}|${String(relationship.raw_entity || '').toLowerCase()}|${String(relationship.relationship || '').toLowerCase()}`
+    )
+  );
+
+  for (const relationship of fallback?.relationships || []) {
+    const key = `${relationship.parent}|${String(relationship.raw_entity || '').toLowerCase()}|${String(relationship.relationship || '').toLowerCase()}`;
+    if (relationshipSeen.has(key)) continue;
+    relationshipSeen.add(key);
+    merged.relationships.push(relationship);
+  }
+
+  merged.primary_developer =
+    merged.developers.length === 0 ? 'Unknown' : merged.developers.length > 1 ? 'Multiple' : merged.developers[0];
+
+  return merged;
+}
+
+function shouldUseGoogleQueryDeveloperFallback(item, relevanceRules, queryResolution) {
+  if (!item || item.source !== 'google_news') return false;
+  if (!queryResolution || queryResolution.developers.length === 0) return false;
+
+  // Only use query-driven attribution for clearly transactional launch / preview headlines.
+  const headlineText = `${item.title || ''} ${item.snippet || ''}`.toLowerCase();
+  const headlineSignals = matchRulePatterns(headlineText, relevanceRules.property_developer_topic_patterns || []);
+  return headlineSignals.some((signal) => ['launch_sales_units', 'take_up_signal', 'preview_interest'].includes(signal));
+}
+
 function isSingaporeContext(text, relevanceRules) {
   const directTerm = includesTerm(text, relevanceRules.singapore_context_terms || []);
   if (directTerm) return { pass: true, terms: [directTerm] };
@@ -1243,6 +1280,13 @@ function refreshLatest90AndMeta(allItems, fetchedAtSgt, feedResults, existingCou
 async function analyzeItemForPipeline(item, developerConfig, relevanceRules, compiledRules, severityOrder, allowlistConfig) {
   const articleContext = await fetchArticleContext(item, allowlistConfig);
   const context = buildArticleAnalysisContext(item, articleContext, developerConfig);
+  const queryDeveloperResolution = resolveDevelopersFromContext(item.query || '', developerConfig);
+  if (
+    context.developer_resolution.developers.length === 0 &&
+    shouldUseGoogleQueryDeveloperFallback(item, relevanceRules, queryDeveloperResolution)
+  ) {
+    context.developer_resolution = mergeDeveloperResolutions(context.developer_resolution, queryDeveloperResolution);
+  }
   const relevance = evaluateRelevance(context.combined, developerConfig, relevanceRules, {
     contextText: context.context_text,
     developerMatches: context.developer_resolution.developer_matches
