@@ -364,6 +364,24 @@ function includesTerm(text, terms) {
   return null;
 }
 
+function matchRulePatterns(text, rules = []) {
+  const matches = [];
+  for (const rule of rules) {
+    const pattern = typeof rule === 'string' ? rule : rule?.pattern;
+    if (!pattern) continue;
+    let regex;
+    try {
+      regex = new RegExp(pattern, 'i');
+    } catch {
+      continue;
+    }
+    if (!regex.test(text)) continue;
+    const label = typeof rule === 'string' ? rule : rule?.label || rule?.pattern;
+    matches.push(label);
+  }
+  return uniqueStrings(matches);
+}
+
 function findDeveloperAliasEntries(text, developerConfig) {
   const matches = [];
   for (const dev of developerConfig.developers || []) {
@@ -531,14 +549,17 @@ function isPropertyDeveloperTopic(text, relevanceRules) {
     const hit = includesTerm(text, terms || []);
     if (hit) matched.push(hit);
   }
+  const patternMatches = matchRulePatterns(text, relevanceRules.property_developer_topic_patterns || []);
   const strongMatched = matched.filter((term) => !weakTerms.has(String(term).toLowerCase()));
   const weakMatched = matched.filter((term) => weakTerms.has(String(term).toLowerCase()));
+  const allMatched = uniqueStrings([...matched, ...patternMatches]);
+  const allStrongMatched = uniqueStrings([...strongMatched, ...patternMatches]);
   return {
-    pass: strongMatched.length > 0,
-    any_pass: matched.length > 0,
-    terms: strongMatched.length > 0 ? matched : [],
-    matched_terms: matched,
-    strong_terms: strongMatched,
+    pass: allStrongMatched.length > 0,
+    any_pass: allMatched.length > 0,
+    terms: allStrongMatched.length > 0 ? allMatched : [],
+    matched_terms: allMatched,
+    strong_terms: allStrongMatched,
     weak_terms: weakMatched
   };
 }

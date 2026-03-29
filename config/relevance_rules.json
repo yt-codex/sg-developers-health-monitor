@@ -157,6 +157,24 @@
       "upgrader demand"
     ]
   },
+  "property_developer_topic_patterns": [
+    {
+      "label": "launch_sales_units",
+      "pattern": "\\b(?:sell|sells|sold)\\b.{0,60}\\bunits?\\b.{0,80}\\b(?:launch|preview|booking|weekend)\\b"
+    },
+    {
+      "label": "launch_sales_units",
+      "pattern": "\\b(?:launch|preview|booking)(?:\\s+day|\\s+weekend)?\\b.{0,80}\\b(?:sell|sells|sold)\\b.{0,60}\\bunits?\\b"
+    },
+    {
+      "label": "take_up_signal",
+      "pattern": "\\b(?:take-?up|oversubscrib(?:ed|ing))\\b"
+    },
+    {
+      "label": "preview_interest",
+      "pattern": "\\b(?:preview|launch)\\b.{0,60}\\b(?:draws?|drew|attracts?|attracted)\\b.{0,40}\\bvisitors?\\b"
+    }
+  ],
   "property_developer_weak_terms": [
     "new launch",
     "residences",

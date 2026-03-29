@@ -45,6 +45,10 @@ jobs:
       - name: Update CNA/BT/ST news data
         run: node scripts/update_news.js
 
+      - name: Scheduled Google News delta ingestion
+        if: github.event_name == 'schedule'
+        run: node scripts/update_news.js --source=google --mode=delta --days=7
+
       - name: Optional Google News ingestion
         if: github.event_name == 'workflow_dispatch' && inputs.enable_google
         run: node scripts/update_news.js --source=google --mode=${{ inputs.google_mode }} --days=${{ inputs.backfill_days }}
