@@ -1,6 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const {
   normalizeTicker,
@@ -13,6 +14,17 @@ const {
 const { processDeveloper } = require('../scripts/build_developer_ratios');
 
 const fixtureHtml = fs.readFileSync(path.join(__dirname, 'fixtures', 'stockanalysis_ratios_9CI_sample.html'), 'utf8');
+
+function makeTempDirs(t) {
+  const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), 'stockanalysis-debug-'));
+  const cacheDir = path.join(rootDir, 'cache');
+  const debugDir = path.join(rootDir, 'debug');
+  t.after(() => {
+    fs.rmSync(rootDir, { recursive: true, force: true });
+    delete process.env.DEBUG_STOCKANALYSIS;
+  });
+  return { cacheDir, debugDir };
+}
 
 test('utility functions parse and normalize correctly', () => {
   assert.equal(normalizeTicker(' 9ci '), '9CI');
@@ -86,6 +98,7 @@ test('fetchWithRetry rotates request profile and keeps detailed context', async 
 
 test('processDeveloper preserves original fetch error context', async (t) => {
   const originalFetch = global.fetch;
+  const { cacheDir, debugDir } = makeTempDirs(t);
   global.fetch = async () => {
     throw new Error('socket hang up');
   };
@@ -99,7 +112,7 @@ test('processDeveloper preserves original fetch error context', async (t) => {
     name: 'CapitaLand Investment',
     segment: 'Mainboard',
     stockanalysis_ratios_url: 'https://example.test'
-  }, { verbose: false });
+  }, { verbose: false, cacheDir, debugDir });
 
   assert.equal(record.fetchStatus, 'error');
   assert.match(record.fetchError, /network\/request failure/);
@@ -109,6 +122,7 @@ test('processDeveloper preserves original fetch error context', async (t) => {
 
 test('mocked fetch smoke test produces normalized output shape', async (t) => {
   const originalFetch = global.fetch;
+  const { cacheDir, debugDir } = makeTempDirs(t);
   global.fetch = async () => ({
     ok: true,
     status: 200,
@@ -130,9 +144,13 @@ test('mocked fetch smoke test produces normalized output shape', async (t) => {
     name: 'CapitaLand Investment',
     segment: 'Mainboard',
     stockanalysis_ratios_url: 'https://example.test'
-  }, { verbose: false });
+  }, { verbose: false, cacheDir, debugDir });
 
   assert.equal(record.ticker, '9CI');
   assert.equal(typeof record.current, 'object');
   assert.equal(Array.isArray(record.periods), true);
+  assert.equal(fs.existsSync(path.join(cacheDir, '9CI.html')), true);
+  assert.equal(fs.existsSync(path.join(cacheDir, '9CI.json')), true);
+  assert.equal(fs.existsSync(path.join(debugDir, '9CI.html')), true);
+  assert.equal(fs.existsSync(path.join(debugDir, '9CI.json')), true);
 });

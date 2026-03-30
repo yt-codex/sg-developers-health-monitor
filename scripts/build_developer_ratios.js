@@ -37,11 +37,22 @@ const DIAGNOSTICS_JSON = path.join(ROOT, 'data', 'processed', 'developer_health_
 const CACHE_DIR = path.join(ROOT, 'data', 'cache', 'stockanalysis');
 const DEBUG_DIR = path.join(ROOT, 'data', 'debug', 'stockanalysis');
 
-async function processDeveloper(developer, { verbose = false } = {}) {
-  await fs.mkdir(CACHE_DIR, { recursive: true });
+async function processDeveloper(
+  developer,
+  {
+    verbose = false,
+    cacheDir = CACHE_DIR,
+    debugDir = DEBUG_DIR,
+    persistCache = true
+  } = {}
+) {
+  if (persistCache) {
+    await fs.mkdir(cacheDir, { recursive: true });
+  }
   const tickerRaw = developer.ticker;
   const ticker = normalizeTicker(tickerRaw);
   const ratiosUrl = developer.stockanalysis_ratios_url || buildRatiosUrl(ticker);
+  let fetchedHtml = null;
   const debugReport = {
     tickerRaw,
     normalizedTicker: ticker,
@@ -90,6 +101,7 @@ async function processDeveloper(developer, { verbose = false } = {}) {
 
     const fetchResult = await fetchWithRetry(ratiosUrl, { retries: 2, logger: console });
     const html = fetchResult.html;
+    fetchedHtml = html;
     const htmlSnippet = sanitizeHtmlSnippet(html, 300);
 
     debugReport.fetch = {
@@ -108,7 +120,9 @@ async function processDeveloper(developer, { verbose = false } = {}) {
 
     stageLog('fetch-response', debugReport.fetch);
 
-    await fs.writeFile(path.join(CACHE_DIR, `${ticker}.html`), html, 'utf8');
+    if (persistCache) {
+      await fs.writeFile(path.join(cacheDir, `${ticker}.html`), html, 'utf8');
+    }
 
     const parserDebug = {};
     const parsed = parseRatiosTable(html, {
@@ -125,7 +139,9 @@ async function processDeveloper(developer, { verbose = false } = {}) {
     record.current = parsed.current;
     record.fetchStatus = parsedCount >= Math.floor(Object.keys(METRIC_SCHEMA).length * 0.8) ? 'ok' : 'partial';
     debugReport.fetchStatus = record.fetchStatus;
-    await fs.writeFile(path.join(CACHE_DIR, `${ticker}.json`), JSON.stringify(parsed, null, 2), 'utf8');
+    if (persistCache) {
+      await fs.writeFile(path.join(cacheDir, `${ticker}.json`), JSON.stringify(parsed, null, 2), 'utf8');
+    }
 
     const missingMetrics = Object.keys(METRIC_SCHEMA).filter((key) => record.current[key] == null);
     debugReport.output = {
@@ -155,12 +171,11 @@ async function processDeveloper(developer, { verbose = false } = {}) {
   record.lastScoredAt = scoring.lastScoredAt;
 
   if (process.env.DEBUG_STOCKANALYSIS === 'true') {
-    await fs.mkdir(DEBUG_DIR, { recursive: true });
-    if (debugReport.fetch?.htmlLength) {
-      const html = await fs.readFile(path.join(CACHE_DIR, `${ticker}.html`), 'utf8');
-      await fs.writeFile(path.join(DEBUG_DIR, `${ticker}.html`), html.slice(0, 2_000_000), 'utf8');
+    await fs.mkdir(debugDir, { recursive: true });
+    if (debugReport.fetch?.htmlLength && fetchedHtml) {
+      await fs.writeFile(path.join(debugDir, `${ticker}.html`), fetchedHtml.slice(0, 2_000_000), 'utf8');
     }
-    await fs.writeFile(path.join(DEBUG_DIR, `${ticker}.json`), JSON.stringify(debugReport, null, 2), 'utf8');
+    await fs.writeFile(path.join(debugDir, `${ticker}.json`), JSON.stringify(debugReport, null, 2), 'utf8');
   }
 
   return { record, debugReport };
