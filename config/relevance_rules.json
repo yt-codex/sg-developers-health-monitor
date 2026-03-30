@@ -176,7 +176,11 @@
     },
     {
       "label": "take_up_signal",
-      "pattern": "\\b(?:take-?up|oversubscrib(?:ed|ing))\\b"
+      "pattern": "\\b(?:take-?up(?:\\s+rate)?|oversubscrib(?:ed|ing))\\b.{0,80}\\b(?:units?|homes?|condo|condominium|residential|launch|preview|booking|weekend|project|development|psf)\\b"
+    },
+    {
+      "label": "take_up_signal",
+      "pattern": "\\b(?:units?|homes?|condo|condominium|residential|launch|preview|booking|weekend|project|development|psf)\\b.{0,80}\\b(?:take-?up(?:\\s+rate)?|oversubscrib(?:ed|ing))\\b"
     },
     {
       "label": "preview_interest",

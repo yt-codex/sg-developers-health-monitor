@@ -127,6 +127,18 @@ test('evaluateRelevance accepts Singapore new-launch sales roundup coverage', ()
   assert.equal(relevance.relevance_reason, 'sg_property_topic');
 });
 
+test('evaluateRelevance accepts property take-up rate coverage when housing context is explicit', () => {
+  const text = [
+    'Take-up rate at the new residential launch in Singapore reached 78% over the preview weekend.',
+    'Analysts said the condo project drew strong buyer demand.'
+  ].join(' ').toLowerCase();
+
+  const relevance = evaluateRelevance(text, developerConfig, relevanceRules);
+  assert.equal(relevance.pass, true);
+  assert.equal(relevance.relevance_reason, 'sg_property_topic');
+  assert.ok(relevance.relevance_terms.includes('take_up_signal'));
+});
+
 test('cleanupExistingNews reevaluates non-google items and removes direct-feed false positives', async () => {
   const originalFetch = global.fetch;
   global.fetch = async () => ({
