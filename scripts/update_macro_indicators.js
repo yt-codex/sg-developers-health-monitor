@@ -3,13 +3,7 @@
 const fs = require('fs/promises');
 const path = require('path');
 const {
-  fetchAllRecords,
-  detectTimeFields,
   parseQuarterlyFieldId,
-  findSeriesFieldId,
-  findSeriesRow,
-  extractLatest,
-  extractSeriesValues
 } = require('./lib/datagov');
 const { MAS_I6_API_URL, fetchMasI6LoanLimits } = require('./lib/mas_api');
 const { generateMacroStressSignals } = require('./lib/macro_stress_signals');
@@ -18,6 +12,7 @@ const {
   UNIT_LABOUR_TABLE_ID: SINGSTAT_UNIT_LABOUR_TABLE_ID,
   CONSTRUCTION_GDP_TABLE_ID: SINGSTAT_CONSTRUCTION_GDP_TABLE_ID,
   CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID: SINGSTAT_CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID,
+  CONSTRUCTION_MATERIAL_PRICE_TABLE_ID: SINGSTAT_CONSTRUCTION_MATERIAL_PRICE_TABLE_ID,
   fetchTableBuilderHierarchy,
   hierarchyRowToSeriesValues,
   hierarchyRowLatest,
@@ -25,6 +20,7 @@ const {
   fetchUnitLabourCostConstructionSeries,
   fetchConstructionGdpSeries,
   fetchConstructionMaterialsDemandSeries,
+  fetchConstructionMaterialPriceSeries,
   isoDateToQuarterPeriod
 } = require('./lib/singstat_tablebuilder');
 const {
@@ -42,6 +38,7 @@ const SINGSTAT_RATES_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTA
 const SINGSTAT_UNIT_LABOUR_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_UNIT_LABOUR_TABLE_ID}`;
 const SINGSTAT_CONSTRUCTION_GDP_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_CONSTRUCTION_GDP_TABLE_ID}`;
 const SINGSTAT_CONSTRUCTION_MATERIALS_DEMAND_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID}`;
+const SINGSTAT_CONSTRUCTION_MATERIAL_PRICE_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_CONSTRUCTION_MATERIAL_PRICE_TABLE_ID}`;
 const SINGSTAT_PRIVATE_RES_PIPELINE_TABLE_ID = 'M400391';
 const SINGSTAT_PRIVATE_RES_PIPELINE_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_PRIVATE_RES_PIPELINE_TABLE_ID}`;
 const SINGSTAT_COMMIND_PIPELINE_TABLE_ID = 'M400691';
@@ -53,10 +50,8 @@ const SINGSTAT_VACANT_SPACE_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${
 const SINGSTAT_BANK_LOANS_TABLE_ID = 'M701091';
 const SINGSTAT_BANK_LOANS_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_BANK_LOANS_TABLE_ID}`;
 
-const DATASET_IDS = [
-  'd_29f7b431ad79f61f19a731a6a86b0247'
-];
 const RETIRED_SERIES_IDS = [
+  'dataset_d_29f7b431ad79f61f19a731a6a86b0247',
   'dataset_d_055b6549444dedb341c50805d9682a41',
   'dataset_d_e47c0f0674b46981c4994d5257de5be4',
   'dataset_d_4dca06508cd9d0a8076153443c17ea5f',
@@ -65,8 +60,6 @@ const RETIRED_SERIES_IDS = [
   'dataset_d_ba3c493ad160125ce347d5572712f14f',
   'dataset_d_df200b7f89f94e52964ff45cd7878a30'
 ];
-
-let dataGovApiKey = process.env.DATA_GOV_SG_API_KEY || '';
 
 function parseEnvLine(line) {
   const trimmed = line.trim();
@@ -102,31 +95,6 @@ async function loadLocalEnvIfPresent() {
     }
   }
 
-  dataGovApiKey = process.env.DATA_GOV_SG_API_KEY || '';
-}
-
-
-function inferFrequencyFromTimeFields(timeFields) {
-  const monthlyCount = timeFields.filter((x) => x.periodType === 'M').length;
-  const quarterlyCount = timeFields.filter((x) => x.periodType === 'Q').length;
-  return quarterlyCount > monthlyCount ? 'Q' : 'M';
-}
-
-async function fetchDataset(datasetId) {
-  const dataset = await fetchAllRecords(datasetId, dataGovApiKey, { verifyMode: VERIFY_MODE });
-  const timeFields = detectTimeFields(dataset.fields);
-  const seriesField = findSeriesFieldId(dataset.fields);
-  if (VERIFY_MODE) {
-    console.log(
-      `[dataset] ${datasetId} rows=${dataset.records.length} seriesField=${seriesField || 'n/a'} timeFields=${timeFields.length} newest=${timeFields.slice(0, 3).map((x) => x.id).join(',')}`
-    );
-  }
-  return {
-    ...dataset,
-    timeFields,
-    seriesField,
-    frequency: inferFrequencyFromTimeFields(timeFields)
-  };
 }
 
 function quarterlyParserSelfTest() {
@@ -352,15 +320,6 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
     }
   };
 
-  const datasetCache = new Map();
-  const getDataset = async (datasetId) => {
-    if (!datasetCache.has(datasetId)) {
-      const dataset = await fetchDataset(datasetId);
-      datasetCache.set(datasetId, dataset);
-    }
-    return datasetCache.get(datasetId);
-  };
-
   let singStatBundlePromise;
   const getSingStatBundle = async () => {
     if (!singStatBundlePromise) singStatBundlePromise = extractRatesFromSingStatTableBuilder();
@@ -405,6 +364,56 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
       };
     }
     return { latest_period: rates.term_spread_10y_2y.latest_period, latest_value: rates.term_spread_10y_2y.latest_value };
+  });
+
+  let singStatConstructionMaterialPricePromise;
+  const getSingStatConstructionMaterialPriceBundle = async () => {
+    if (!singStatConstructionMaterialPricePromise) {
+      singStatConstructionMaterialPricePromise = fetchConstructionMaterialPriceSeries();
+    }
+    return singStatConstructionMaterialPricePromise;
+  };
+
+  await tryIndicator({ key: `table_${SINGSTAT_CONSTRUCTION_MATERIAL_PRICE_TABLE_ID}`, source: 'SingStat TableBuilder', dataset_ref: SINGSTAT_CONSTRUCTION_MATERIAL_PRICE_DATASET_REF }, async () => {
+    const bundle = await getSingStatConstructionMaterialPriceBundle();
+    const targets = [
+      { key: 'construction_material_steel_reinforcement_bars_16_32mm_high_tensile', bundleKey: 'STEEL_REINFORCEMENT_BARS' },
+      { key: 'construction_material_cement_in_bulk_ordinary_portland_cement', bundleKey: 'CEMENT' },
+      { key: 'construction_material_concreting_sand', bundleKey: 'CONCRETING_SAND' },
+      { key: 'construction_material_granite_20mm_aggregate', bundleKey: 'GRANITE' },
+      { key: 'construction_material_ready_mixed_concrete', bundleKey: 'READY_MIXED_CONCRETE' }
+    ];
+
+    let latestSeen = null;
+    for (const target of targets) {
+      const seriesBundle = bundle[target.bundleKey];
+      if (!seriesBundle?.latest) throw new Error(`SingStat parse 0 rows for ${target.bundleKey}`);
+      latestSeen = seriesBundle.latest;
+      if (!verifyOnly) {
+        const values = seriesBundle.rows
+          .map((row) => {
+            const period = isoDateToMonthPeriod(row.date);
+            return period ? { period, value: row.value } : null;
+          })
+          .filter(Boolean);
+        const latestPeriod = isoDateToMonthPeriod(seriesBundle.latest.date);
+        if (!latestPeriod) throw new Error(`Unable to convert construction material price date ${seriesBundle.latest.date} to month period`);
+        series[target.key] = {
+          freq: 'M',
+          latest_period: latestPeriod,
+          latest_value: seriesBundle.latest.value,
+          units: '$/Tonne',
+          source_series_name: seriesBundle.rows[0]?.series_name || target.bundleKey,
+          values: mergePeriodHistory(existingSeries[target.key]?.values, values)
+        };
+      }
+      if (VERIFY_MODE) {
+        console.log(`[verify-series] datasetRef=${SINGSTAT_CONSTRUCTION_MATERIAL_PRICE_DATASET_REF} required=${seriesBundle.rows[0]?.series_name || target.bundleKey} latest=${seriesBundle.latest.date}=${seriesBundle.latest.value}`);
+      }
+    }
+
+    if (!latestSeen) throw new Error('0 monthly values extracted');
+    return { latest_period: latestSeen.date, latest_value: latestSeen.value };
   });
 
   let singStatBankLoansPromise;
@@ -570,84 +579,6 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
     return { latest_period: latestSeen?.period, latest_value: latestSeen?.value };
   });
 
-  const optionalDatasetSpecs = [
-    {
-      datasetId: 'd_29f7b431ad79f61f19a731a6a86b0247', source: 'data.gov.sg',
-      build: (records, sf, tf, datasetId) => {
-        const targets = [
-          {
-            key: 'construction_material_steel_reinforcement_bars_16_32mm_high_tensile',
-            label: 'Steel Reinforcement Bars (16-32mm High Tensile)'
-          },
-          {
-            key: 'construction_material_cement_in_bulk_ordinary_portland_cement',
-            label: 'Cement In Bulk (Ordinary Portland Cement)'
-          },
-          {
-            key: 'construction_material_concreting_sand',
-            label: 'Concreting Sand'
-          },
-          {
-            key: 'construction_material_granite_20mm_aggregate',
-            label: 'Granite (20mm Aggregate)'
-          },
-          {
-            key: 'construction_material_ready_mixed_concrete',
-            label: 'Ready Mixed Concrete'
-          }
-        ];
-        return targets.map((target) => {
-          const match = findSeriesRow(records, sf, target.label);
-          if (!match.row) throw new Error(`${target.label}: ${match.error || 'series not found'}`);
-          if (VERIFY_MODE) {
-            console.log(`[verify-series] datasetId=${datasetId} required=${target.label} matched=${match.matchedSeriesName} (${match.matchType})`);
-          }
-          return {
-            key: target.key,
-            freq: inferFrequencyFromTimeFields(tf),
-            units: 'index',
-            latest: extractLatest(match.row, tf),
-            row: match.row,
-            metadata: { source_series_name: match.matchedSeriesName }
-          };
-        });
-      }
-    },
-
-  ];
-
-  for (const spec of optionalDatasetSpecs) {
-    await tryIndicator({ key: `dataset_${spec.datasetId}`, source: spec.source, dataset_ref: spec.datasetId }, async () => {
-      const dataset = await getDataset(spec.datasetId);
-      const records = dataset.records;
-      if (!records.length) throw new Error('dataset returned 0 rows');
-      const seriesField = dataset.seriesField;
-      const timeFields = dataset.timeFields;
-      if (!seriesField) throw new Error('no Data Series field');
-      if (!timeFields.length) throw new Error('0 time fields');
-      const entries = spec.build(records, seriesField, timeFields, spec.datasetId);
-      if (!entries.length) throw new Error('no matching series');
-      let latestSeen = null;
-      for (const entry of entries) {
-        if (!entry.latest) continue;
-        latestSeen = entry.latest;
-        if (!verifyOnly) {
-          const mergedValues = mergePeriodHistory(existingSeries[entry.key]?.values, extractSeriesValues(entry.row, timeFields));
-          series[entry.key] = {
-            freq: entry.freq,
-            latest_period: entry.latest.latest_period,
-            latest_value: entry.latest.latest_value,
-            units: entry.units,
-            values: mergedValues,
-            ...(entry.metadata || {})
-          };
-        }
-      }
-      if (!latestSeen) throw new Error('0 time columns detected');
-      return { latest_period: latestSeen.latest_period, latest_value: latestSeen.latest_value };
-    });
-  }
-
   await tryIndicator({ key: `dataset_${SINGSTAT_CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID}`, source: 'SingStat TableBuilder', dataset_ref: SINGSTAT_CONSTRUCTION_MATERIALS_DEMAND_DATASET_REF }, async () => {
     const bundle = await fetchConstructionMaterialsDemandSeries();
     const targets = [
@@ -806,19 +737,6 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
 async function main() {
   await loadLocalEnvIfPresent();
 
-  const hasApiKey = Boolean((process.env.DATA_GOV_SG_API_KEY || '').trim());
-  dataGovApiKey = process.env.DATA_GOV_SG_API_KEY || '';
-  if (VERIFY_MODE) {
-    console.log(`[auth] data.gov.sg API key present: ${hasApiKey ? 'yes' : 'no'}`);
-  }
-
-  if (!hasApiKey) {
-    if (IS_GITHUB_ACTIONS) {
-      throw new Error('Missing DATA_GOV_SG_API_KEY in GitHub Actions. Add repository secret DATA_GOV_SG_API_KEY and pass it to workflow env.');
-    }
-    throw new Error('Missing DATA_GOV_SG_API_KEY. Create a local .env with DATA_GOV_SG_API_KEY=... or export it in your shell.');
-  }
-
   if (VERIFY_MODE) {
     quarterlyParserSelfTest();
     console.log('Running source verification only...');
@@ -879,7 +797,6 @@ async function main() {
       }))
     },
     sources: [
-      { name: 'data.gov.sg', method: 'datastore_search', dataset_ids: DATASET_IDS },
       {
         name: 'SingStat TableBuilder',
         method: 'json_api_parse',
@@ -887,6 +804,7 @@ async function main() {
           SINGSTAT_RATES_TABLE_ID,
           SINGSTAT_UNIT_LABOUR_TABLE_ID,
           SINGSTAT_CONSTRUCTION_GDP_TABLE_ID,
+          SINGSTAT_CONSTRUCTION_MATERIAL_PRICE_TABLE_ID,
           SINGSTAT_CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID,
           SINGSTAT_PRIVATE_RES_PIPELINE_TABLE_ID,
           SINGSTAT_COMMIND_PIPELINE_TABLE_ID,
@@ -898,6 +816,7 @@ async function main() {
           `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_RATES_TABLE_ID}`,
           `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_UNIT_LABOUR_TABLE_ID}`,
           `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_CONSTRUCTION_GDP_TABLE_ID}`,
+          `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_CONSTRUCTION_MATERIAL_PRICE_TABLE_ID}`,
           `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID}`,
           `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_PRIVATE_RES_PIPELINE_TABLE_ID}`,
           `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_COMMIND_PIPELINE_TABLE_ID}`,

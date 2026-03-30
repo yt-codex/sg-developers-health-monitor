@@ -4,6 +4,7 @@ const RATES_TABLE_ID = 'M700071';
 const UNIT_LABOUR_TABLE_ID = 'M183741';
 const CONSTRUCTION_GDP_TABLE_ID = 'M015792';
 const CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID = 'M400901';
+const CONSTRUCTION_MATERIAL_PRICE_TABLE_ID = 'M211251';
 const DEFAULT_API_BASE = process.env.SINGSTAT_TABLEBUILDER_API_BASE || 'https://tablebuilder.singstat.gov.sg/api/table/tabledata';
 const DEFAULT_TIMEOUT_MS = Number(process.env.SINGSTAT_TABLEBUILDER_TIMEOUT_MS || 30000);
 const DEFAULT_RETRIES = Number(process.env.SINGSTAT_TABLEBUILDER_RETRIES || 3);
@@ -428,11 +429,26 @@ async function fetchConstructionMaterialsDemandSeries(options = {}) {
   });
 }
 
+async function fetchConstructionMaterialPriceSeries(options = {}) {
+  return extractSeries({
+    tableId: options.tableId || CONSTRUCTION_MATERIAL_PRICE_TABLE_ID,
+    wantedSeries: [
+      { key: 'STEEL_REINFORCEMENT_BARS', label: 'Steel Reinforcement Bars (16-32mm High Tensile)', normalized: normalizeLabel('Steel Reinforcement Bars (16-32mm High Tensile)') },
+      { key: 'CEMENT', label: 'Cement In Bulk (Ordinary Portland Cement)', normalized: normalizeLabel('Cement In Bulk (Ordinary Portland Cement)') },
+      { key: 'CONCRETING_SAND', label: 'Concreting Sand', normalized: normalizeLabel('Concreting Sand') },
+      { key: 'GRANITE', label: 'Granite (20mm Aggregate)', normalized: normalizeLabel('Granite (20mm Aggregate)') },
+      { key: 'READY_MIXED_CONCRETE', label: 'Ready Mixed Concrete', normalized: normalizeLabel('Ready Mixed Concrete') }
+    ],
+    ...options
+  });
+}
+
 module.exports = {
   RATES_TABLE_ID,
   UNIT_LABOUR_TABLE_ID,
   CONSTRUCTION_GDP_TABLE_ID,
   CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID,
+  CONSTRUCTION_MATERIAL_PRICE_TABLE_ID,
   DEFAULT_API_BASE,
   SERIES_MAP,
   normalizeLabel,
@@ -451,5 +467,6 @@ module.exports = {
   fetchSingStatRequiredSeries,
   fetchUnitLabourCostConstructionSeries,
   fetchConstructionGdpSeries,
-  fetchConstructionMaterialsDemandSeries
+  fetchConstructionMaterialsDemandSeries,
+  fetchConstructionMaterialPriceSeries
 };

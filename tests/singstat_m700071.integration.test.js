@@ -3,7 +3,8 @@ const assert = require('node:assert/strict');
 const {
   fetchSingStatRequiredSeries,
   fetchUnitLabourCostConstructionSeries,
-  fetchConstructionGdpSeries
+  fetchConstructionGdpSeries,
+  fetchConstructionMaterialPriceSeries
 } = require('../scripts/lib/singstat_tablebuilder');
 
 function isMonotonicAscending(items) {
@@ -95,4 +96,28 @@ test('SingStat M015792 includes Construction GDP (seasonally adjusted) with nume
   }
 
   assertRecentDate(rows[rows.length - 1].date, 200);
+});
+
+test('SingStat M211251 includes construction material price series with numeric ascending monthly data', async (t) => {
+  let bundle;
+  try {
+    bundle = await fetchConstructionMaterialPriceSeries({ tableId: 'M211251' });
+  } catch (err) {
+    if (shouldSkipLive(err)) t.skip(`live SingStat unavailable: ${err.message}`);
+    throw err;
+  }
+
+  for (const key of ['STEEL_REINFORCEMENT_BARS', 'CEMENT', 'CONCRETING_SAND', 'GRANITE', 'READY_MIXED_CONCRETE']) {
+    const rows = bundle[key]?.rows;
+    assert.ok(Array.isArray(rows) && rows.length > 0, `${key} rows are missing/empty`);
+    assert.ok(isMonotonicAscending(rows), `${key} dates are not monotonic ascending`);
+
+    for (const row of rows) {
+      assert.match(row.date, /^\d{4}-\d{2}-\d{2}$/);
+      assert.equal(typeof row.value, 'number');
+      assert.ok(Number.isFinite(row.value));
+    }
+
+    assertRecentDate(rows[rows.length - 1].date, 120);
+  }
 });

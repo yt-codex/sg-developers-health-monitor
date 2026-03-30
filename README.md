@@ -52,7 +52,6 @@ Static multi-page dashboard for GitHub Pages that monitors vulnerability signals
 ### Prerequisites
 - Node.js 20+ (for updater scripts)
 - Python 3 (optional, for local static file server)
-- `DATA_GOV_SG_API_KEY` for authenticated `data.gov.sg` dataset calls
 
 ### Install
 
@@ -130,18 +129,17 @@ node scripts/update_news.js --source=google --mode=delta --days=7 --max_queries=
 - Legacy news severity values such as `critical` are normalized at runtime for backward compatibility.
 
 ## Environment variables
-- `DATA_GOV_SG_API_KEY` (required for authenticated `data.gov.sg` access)
 - `GITHUB_ACTIONS` (set by GitHub Actions automatically; used by updater behavior)
 - `SINGSTAT_TABLEBUILDER_API_BASE` (optional override for SingStat API base URL)
 
 For local development, either export in shell:
 
 ```bash
-export DATA_GOV_SG_API_KEY="..."
+export SINGSTAT_TABLEBUILDER_API_BASE="https://tablebuilder.singstat.gov.sg/api/table/tabledata"
 ```
 
 or create `.env` in repo root:
 
 ```bash
-DATA_GOV_SG_API_KEY=your_key_here
+SINGSTAT_TABLEBUILDER_API_BASE=https://tablebuilder.singstat.gov.sg/api/table/tabledata
 ```
