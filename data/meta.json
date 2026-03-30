@@ -1,12 +1,97 @@
 {
-  "last_updated_sgt": "2026-03-29T22:57:34.701+08:00",
+  "last_updated_sgt": "2026-03-30T09:27:56.059+08:00",
   "status": "success",
   "counts": {
     "existing_total": 142,
-    "new_items": 0,
-    "rejected_items": 0,
-    "total_all": 142,
+    "new_items": 4,
+    "rejected_items": 581,
+    "total_all": 146,
     "latest_90d": 82
   },
-  "feeds": []
+  "feeds": [
+    {
+      "source": "google_news",
+      "query": "(\"Singapore\" AND (developer OR \"property developer\" OR residential OR condo) AND (GLS OR \"land bid\" OR tender OR \"new launch\" OR preview OR \"preview weekend\" OR presales OR \"take-up\" OR \"launch weekend\" OR \"units sold\" OR psf)) (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com OR site:todayonline.com OR site:theedgesingapore.com OR site:edgeprop.sg)",
+      "window_days": 7,
+      "status": "ok",
+      "items_fetched": 100
+    },
+    {
+      "source": "google_news",
+      "query": "(\"Government Land Sales\" OR GLS) Singapore developer tender (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
+      "window_days": 7,
+      "status": "ok",
+      "items_fetched": 53
+    },
+    {
+      "source": "google_news",
+      "query": "URA Singapore private housing supply developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
+      "window_days": 7,
+      "status": "ok",
+      "items_fetched": 13
+    },
+    {
+      "source": "google_news",
+      "query": "\"en bloc\" Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:theedgesingapore.com OR site:edgeprop.sg)",
+      "window_days": 7,
+      "status": "ok",
+      "items_fetched": 100
+    },
+    {
+      "source": "google_news",
+      "query": "(\"City Developments\" OR CDL) Singapore property developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
+      "window_days": 7,
+      "status": "ok",
+      "items_fetched": 53
+    },
+    {
+      "source": "google_news",
+      "query": "UOL Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
+      "window_days": 7,
+      "status": "ok",
+      "items_fetched": 9
+    },
+    {
+      "source": "google_news",
+      "query": "GuocoLand Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:theedgesingapore.com OR site:edgeprop.sg)",
+      "window_days": 7,
+      "status": "ok",
+      "items_fetched": 63
+    },
+    {
+      "source": "google_news",
+      "query": "CapitaLand Development Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
+      "window_days": 7,
+      "status": "ok",
+      "items_fetched": 100
+    },
+    {
+      "source": "google_news",
+      "query": "Frasers Property Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
+      "window_days": 7,
+      "status": "ok",
+      "items_fetched": 51
+    },
+    {
+      "source": "google_news",
+      "query": "(\"Singapore property\" AND (preview OR \"preview weekend\" OR \"launch weekend\" OR showflat OR \"new launch\" OR psf OR residences)) (site:edgeprop.sg OR site:businesstimes.com.sg OR site:straitstimes.com OR site:theedgesingapore.com)",
+      "window_days": 7,
+      "status": "ok",
+      "items_fetched": 100
+    },
+    {
+      "source": "google_news",
+      "query": "(\"property players\" OR \"housing demand\" OR \"development costs\") Singapore property (site:businesstimes.com.sg OR site:straitstimes.com OR site:channelnewsasia.com)",
+      "window_days": 7,
+      "status": "ok",
+      "items_fetched": 5
+    },
+    {
+      "source": "google_news",
+      "query": "(\"Hoi Hup\" OR \"Sunway MCL\" OR \"MCL Land\") Singapore property (site:edgeprop.sg OR site:businesstimes.com.sg OR site:theedgesingapore.com)",
+      "window_days": 7,
+      "status": "ok",
+      "items_fetched": 20
+    }
+  ]
 }
