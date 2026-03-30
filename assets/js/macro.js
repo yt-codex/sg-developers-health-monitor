@@ -325,6 +325,9 @@ const PERIOD_MONTH_MAP = {
 };
 
 const QUARTERLY_SERIES_FALLBACK_IDS = new Set(['unit_labour_cost_construction']);
+const SPARKLINE_START_DATE_BY_SERIES_ID = {
+  construction_gdp: '2021-09-01'
+};
 
 function parseYearMonth(periodStr) {
   const raw = String(periodStr || '').trim();
@@ -452,6 +455,12 @@ function normalizeSeriesPoints(rawSeries = []) {
   });
 
   return points;
+}
+
+function filterSparklineSeries(seriesId, points = []) {
+  const cutoffDate = SPARKLINE_START_DATE_BY_SERIES_ID[seriesId];
+  if (!cutoffDate) return points;
+  return points.filter((point) => !point.date || point.date >= cutoffDate);
 }
 
 function inferDisplayFrequency(points = [], declaredFrequency = null) {
@@ -661,6 +670,7 @@ function mapCardsFromSeries(data, frequencyMap = {}) {
   const cards = MACRO_INDICATOR_METADATA.map((meta) => {
     const seriesObj = macroSeries[meta.seriesId];
     const normalized = normalizeSeriesPoints(seriesObj?.values || []);
+    const sparklineSeries = filterSparklineSeries(meta.seriesId, normalized);
     const latest = normalized[normalized.length - 1] || null;
     const prior = normalized[normalized.length - 2] || null;
     const majorCategory = normalizeCategory(seriesObj?.major_category);
@@ -674,7 +684,7 @@ function mapCardsFromSeries(data, frequencyMap = {}) {
       categoryLabel: majorCategory ? CATEGORY_UI[majorCategory]?.short : null,
       unit: meta.unit || seriesObj?.units || '',
       frequency,
-      sparkline: normalized.slice(-24),
+      sparkline: sparklineSeries.slice(-24),
       latest: latest
         ? {
             ...latest,
@@ -769,6 +779,7 @@ if (typeof module !== 'undefined' && module.exports) {
     formatLastPointLabel,
     inferFrequencyFromSeriesValues,
     resolveSeriesFrequency,
-    buildCardSignalBadgesBySeriesId
+    buildCardSignalBadgesBySeriesId,
+    filterSparklineSeries
   };
 }

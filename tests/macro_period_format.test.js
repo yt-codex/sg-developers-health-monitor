@@ -6,7 +6,8 @@ const {
   toQuarterLabel,
   formatLastPointLabel,
   inferFrequencyFromSeriesValues,
-  resolveSeriesFrequency
+  resolveSeriesFrequency,
+  filterSparklineSeries
 } = require('../assets/js/macro.js');
 
 test('monthly stays monthly when metadata indicates monthly', () => {
@@ -73,4 +74,25 @@ test('formatLastPointLabel preserves quarterly format for quarter tokens from la
 test('fallback whitelist only marks configured IDs as quarterly when inference unavailable', () => {
   assert.equal(resolveSeriesFrequency('unit_labour_cost_construction', {}, [{ period: '2025 Oct' }]), 'Q');
   assert.equal(resolveSeriesFrequency('some_other_series', {}, [{ period: '2025 Oct' }]), 'M');
+});
+
+test('construction GDP sparkline drops 2021 Q2 and earlier before applying moving window', () => {
+  const filtered = filterSparklineSeries('construction_gdp', [
+    { rawDate: '2021Q1', date: '2021-03-01', value: -1 },
+    { rawDate: '2021Q2', date: '2021-06-01', value: -2 },
+    { rawDate: '2021Q3', date: '2021-09-01', value: 3 },
+    { rawDate: '2021Q4', date: '2021-12-01', value: 4 },
+    { rawDate: '2022Q1', date: '2022-03-01', value: 5 }
+  ]);
+
+  assert.deepEqual(
+    filtered.map((point) => point.rawDate),
+    ['2021Q3', '2021Q4', '2022Q1']
+  );
+
+  const untouched = filterSparklineSeries('some_other_series', [
+    { rawDate: '2021Q1', date: '2021-03-01', value: 1 },
+    { rawDate: '2021Q2', date: '2021-06-01', value: 2 }
+  ]);
+  assert.equal(untouched.length, 2);
 });
