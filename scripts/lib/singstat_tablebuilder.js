@@ -3,6 +3,7 @@ const { toFiniteNumber } = require('./datagov');
 const RATES_TABLE_ID = 'M700071';
 const UNIT_LABOUR_TABLE_ID = 'M183741';
 const CONSTRUCTION_GDP_TABLE_ID = 'M015792';
+const CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID = 'M400901';
 const DEFAULT_API_BASE = process.env.SINGSTAT_TABLEBUILDER_API_BASE || 'https://tablebuilder.singstat.gov.sg/api/table/tabledata';
 const DEFAULT_TIMEOUT_MS = Number(process.env.SINGSTAT_TABLEBUILDER_TIMEOUT_MS || 30000);
 const DEFAULT_RETRIES = Number(process.env.SINGSTAT_TABLEBUILDER_RETRIES || 3);
@@ -325,10 +326,24 @@ async function fetchConstructionGdpSeries(options = {}) {
   });
 }
 
+async function fetchConstructionMaterialsDemandSeries(options = {}) {
+  return extractSeries({
+    tableId: options.tableId || CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID,
+    wantedSeries: [
+      { key: 'CEMENT', label: 'Cement', normalized: normalizeLabel('Cement') },
+      { key: 'STEEL_REINFORCEMENT_BARS', label: 'Steel Reinforcement Bars', normalized: normalizeLabel('Steel Reinforcement Bars') },
+      { key: 'GRANITE', label: 'Granite', normalized: normalizeLabel('Granite') },
+      { key: 'READY_MIXED_CONCRETE', label: 'Ready-Mixed Concrete', normalized: normalizeLabel('Ready-Mixed Concrete') }
+    ],
+    ...options
+  });
+}
+
 module.exports = {
   RATES_TABLE_ID,
   UNIT_LABOUR_TABLE_ID,
   CONSTRUCTION_GDP_TABLE_ID,
+  CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID,
   DEFAULT_API_BASE,
   SERIES_MAP,
   normalizeLabel,
@@ -340,5 +355,6 @@ module.exports = {
   extractSeries,
   fetchSingStatRequiredSeries,
   fetchUnitLabourCostConstructionSeries,
-  fetchConstructionGdpSeries
+  fetchConstructionGdpSeries,
+  fetchConstructionMaterialsDemandSeries
 };

@@ -20,9 +20,11 @@ const {
   RATES_TABLE_ID: SINGSTAT_RATES_TABLE_ID,
   UNIT_LABOUR_TABLE_ID: SINGSTAT_UNIT_LABOUR_TABLE_ID,
   CONSTRUCTION_GDP_TABLE_ID: SINGSTAT_CONSTRUCTION_GDP_TABLE_ID,
+  CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID: SINGSTAT_CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID,
   fetchSingStatRequiredSeries,
   fetchUnitLabourCostConstructionSeries,
   fetchConstructionGdpSeries,
+  fetchConstructionMaterialsDemandSeries,
   isoDateToQuarterPeriod
 } = require('./lib/singstat_tablebuilder');
 const {
@@ -39,10 +41,10 @@ const MACRO_STRESS_FILE = path.join(process.cwd(), 'data', 'macro_stress_signals
 const SINGSTAT_RATES_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_RATES_TABLE_ID}`;
 const SINGSTAT_UNIT_LABOUR_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_UNIT_LABOUR_TABLE_ID}`;
 const SINGSTAT_CONSTRUCTION_GDP_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_CONSTRUCTION_GDP_TABLE_ID}`;
+const SINGSTAT_CONSTRUCTION_MATERIALS_DEMAND_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID}`;
 
 const DATASET_IDS = [
   'd_29f7b431ad79f61f19a731a6a86b0247',
-  'd_ba3c493ad160125ce347d5572712f14f',
   'd_055b6549444dedb341c50805d9682a41',
   'd_e47c0f0674b46981c4994d5257de5be4',
   'd_4dca06508cd9d0a8076153443c17ea5f',
@@ -315,6 +317,12 @@ function isoDateToSpacedQuarterPeriod(dateString) {
   return `${match[1]} Q${match[2]}`;
 }
 
+function isoDateToMonthPeriod(dateString) {
+  const match = String(dateString || '').trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+  return `${match[1]}-${match[2]}`;
+}
+
 function applyMajorCategoriesAndValidate(seriesById) {
   const missingSeries = [];
   const unmappedSeries = [];
@@ -501,32 +509,6 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
       }
     },
     {
-      datasetId: 'd_ba3c493ad160125ce347d5572712f14f', source: 'data.gov.sg',
-      build: (records, sf, tf, datasetId) => {
-        const targets = [
-          { key: 'demand_construction_materials_cement', label: 'Cement' },
-          { key: 'demand_construction_materials_steel_reinforcement_bars', label: 'Steel Reinforcement Bars' },
-          { key: 'demand_construction_materials_granite', label: 'Granite' },
-          { key: 'demand_construction_materials_ready_mixed_concrete', label: 'Ready-Mixed Concrete' }
-        ];
-        return targets.map((target) => {
-          const match = findSeriesRow(records, sf, target.label);
-          if (!match.row) throw new Error(`${target.label}: ${match.error || 'series not found'}`);
-          if (VERIFY_MODE) {
-            console.log(`[verify-series] datasetId=${datasetId} required=${target.label} matched=${match.matchedSeriesName} (${match.matchType})`);
-          }
-          return {
-            key: target.key,
-            freq: inferFrequencyFromTimeFields(tf),
-            units: 'index',
-            latest: extractLatest(match.row, tf),
-            row: match.row,
-            metadata: { datasetId, matched_series_label: match.matchedSeriesName }
-          };
-        });
-      }
-    },
-    {
       datasetId: 'd_055b6549444dedb341c50805d9682a41', source: 'data.gov.sg',
       build: (records, sf, tf, datasetId) => {
         const sorted = sortRecordsStable(records);
@@ -688,6 +670,47 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
       return { latest_period: latestSeen.latest_period, latest_value: latestSeen.latest_value };
     });
   }
+
+  await tryIndicator({ key: `dataset_${SINGSTAT_CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID}`, source: 'SingStat TableBuilder', dataset_ref: SINGSTAT_CONSTRUCTION_MATERIALS_DEMAND_DATASET_REF }, async () => {
+    const bundle = await fetchConstructionMaterialsDemandSeries();
+    const targets = [
+      { key: 'demand_construction_materials_cement', bundleKey: 'CEMENT' },
+      { key: 'demand_construction_materials_steel_reinforcement_bars', bundleKey: 'STEEL_REINFORCEMENT_BARS' },
+      { key: 'demand_construction_materials_granite', bundleKey: 'GRANITE' },
+      { key: 'demand_construction_materials_ready_mixed_concrete', bundleKey: 'READY_MIXED_CONCRETE' }
+    ];
+
+    let latestSeen = null;
+    for (const target of targets) {
+      const seriesBundle = bundle[target.bundleKey];
+      if (!seriesBundle?.latest) throw new Error(`SingStat parse 0 rows for ${target.bundleKey}`);
+      latestSeen = seriesBundle.latest;
+      if (!verifyOnly) {
+        const values = seriesBundle.rows
+          .map((row) => {
+            const period = isoDateToMonthPeriod(row.date);
+            return period ? { period, value: row.value } : null;
+          })
+          .filter(Boolean);
+        const latestPeriod = isoDateToMonthPeriod(seriesBundle.latest.date);
+        if (!latestPeriod) throw new Error(`Unable to convert construction materials demand date ${seriesBundle.latest.date} to month period`);
+        series[target.key] = {
+          freq: 'M',
+          latest_period: latestPeriod,
+          latest_value: seriesBundle.latest.value,
+          units: 'K Tonnes',
+          source_series_name: seriesBundle.rows[0]?.series_name || target.bundleKey,
+          values: mergePeriodHistory(existingSeries[target.key]?.values, values)
+        };
+      }
+      if (VERIFY_MODE) {
+        console.log(`[verify-series] datasetRef=${SINGSTAT_CONSTRUCTION_MATERIALS_DEMAND_DATASET_REF} required=${seriesBundle.rows[0]?.series_name || target.bundleKey} latest=${seriesBundle.latest.date}=${seriesBundle.latest.value}`);
+      }
+    }
+
+    if (!latestSeen) throw new Error('0 monthly values extracted');
+    return { latest_period: latestSeen.date, latest_value: latestSeen.value };
+  });
 
   await tryIndicator({ key: 'construction_gdp', source: 'SingStat TableBuilder', dataset_ref: SINGSTAT_CONSTRUCTION_GDP_DATASET_REF, series_name: 'Construction' }, async () => {
     const bundle = await fetchConstructionGdpSeries();
@@ -879,11 +902,12 @@ async function main() {
       {
         name: 'SingStat TableBuilder',
         method: 'json_api_parse',
-        table_ids: [SINGSTAT_RATES_TABLE_ID, SINGSTAT_UNIT_LABOUR_TABLE_ID, SINGSTAT_CONSTRUCTION_GDP_TABLE_ID],
+        table_ids: [SINGSTAT_RATES_TABLE_ID, SINGSTAT_UNIT_LABOUR_TABLE_ID, SINGSTAT_CONSTRUCTION_GDP_TABLE_ID, SINGSTAT_CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID],
         table_urls: [
           `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_RATES_TABLE_ID}`,
           `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_UNIT_LABOUR_TABLE_ID}`,
-          `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_CONSTRUCTION_GDP_TABLE_ID}`
+          `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_CONSTRUCTION_GDP_TABLE_ID}`,
+          `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID}`
         ]
       },
       { name: 'MAS I.6 JSON API', method: 'json_api_parse', url: MAS_I6_API_URL }
