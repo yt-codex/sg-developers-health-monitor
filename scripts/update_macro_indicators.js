@@ -8,9 +8,6 @@ const {
   parseQuarterlyFieldId,
   findSeriesFieldId,
   findSeriesRow,
-  sortRecordsStable,
-  getLatestCommonPeriod,
-  sumCheck,
   extractLatest,
   extractSeriesValues
 } = require('./lib/datagov');
@@ -21,6 +18,9 @@ const {
   UNIT_LABOUR_TABLE_ID: SINGSTAT_UNIT_LABOUR_TABLE_ID,
   CONSTRUCTION_GDP_TABLE_ID: SINGSTAT_CONSTRUCTION_GDP_TABLE_ID,
   CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID: SINGSTAT_CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID,
+  fetchTableBuilderHierarchy,
+  hierarchyRowToSeriesValues,
+  hierarchyRowLatest,
   fetchSingStatRequiredSeries,
   fetchUnitLabourCostConstructionSeries,
   fetchConstructionGdpSeries,
@@ -42,23 +42,29 @@ const SINGSTAT_RATES_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTA
 const SINGSTAT_UNIT_LABOUR_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_UNIT_LABOUR_TABLE_ID}`;
 const SINGSTAT_CONSTRUCTION_GDP_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_CONSTRUCTION_GDP_TABLE_ID}`;
 const SINGSTAT_CONSTRUCTION_MATERIALS_DEMAND_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID}`;
+const SINGSTAT_PRIVATE_RES_PIPELINE_TABLE_ID = 'M400391';
+const SINGSTAT_PRIVATE_RES_PIPELINE_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_PRIVATE_RES_PIPELINE_TABLE_ID}`;
+const SINGSTAT_COMMIND_PIPELINE_TABLE_ID = 'M400691';
+const SINGSTAT_COMMIND_PIPELINE_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_COMMIND_PIPELINE_TABLE_ID}`;
+const SINGSTAT_INDUSTRIAL_PIPELINE_TABLE_ID = 'M400861';
+const SINGSTAT_INDUSTRIAL_PIPELINE_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_INDUSTRIAL_PIPELINE_TABLE_ID}`;
+const SINGSTAT_VACANT_SPACE_TABLE_ID = 'M400681';
+const SINGSTAT_VACANT_SPACE_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_VACANT_SPACE_TABLE_ID}`;
+const SINGSTAT_BANK_LOANS_TABLE_ID = 'M701091';
+const SINGSTAT_BANK_LOANS_DATASET_REF = `tablebuilder.singstat.gov.sg/table/${SINGSTAT_BANK_LOANS_TABLE_ID}`;
 
 const DATASET_IDS = [
-  'd_29f7b431ad79f61f19a731a6a86b0247',
-  'd_055b6549444dedb341c50805d9682a41',
-  'd_e47c0f0674b46981c4994d5257de5be4',
-  'd_4dca06508cd9d0a8076153443c17ea5f',
-  'd_e9cc9d297b1cf8024cf99db4b12505cc',
-  'd_af0415517a3a3a94b3b74039934ef976'
+  'd_29f7b431ad79f61f19a731a6a86b0247'
 ];
-
-const REQUIRED_DATASETS = {
-  d_af0415517a3a3a94b3b74039934ef976: [
-    { key: 'loan_bc_total', target: 'Loans To Businesses - Building And Construction - Total' },
-    { key: 'loan_bc_construction', target: 'Loans To Businesses - Building And Construction - Construction' },
-    { key: 'loan_bc_real_property', target: 'Loans To Businesses - Building And Construction - Real Property And Development Of Land' }
-  ]
-};
+const RETIRED_SERIES_IDS = [
+  'dataset_d_055b6549444dedb341c50805d9682a41',
+  'dataset_d_e47c0f0674b46981c4994d5257de5be4',
+  'dataset_d_4dca06508cd9d0a8076153443c17ea5f',
+  'dataset_d_e9cc9d297b1cf8024cf99db4b12505cc',
+  'dataset_d_af0415517a3a3a94b3b74039934ef976',
+  'dataset_d_ba3c493ad160125ce347d5572712f14f',
+  'dataset_d_df200b7f89f94e52964ff45cd7878a30'
+];
 
 let dataGovApiKey = process.env.DATA_GOV_SG_API_KEY || '';
 
@@ -187,69 +193,11 @@ async function extractRatesFromSingStatTableBuilder() {
   };
 }
 
-function pickByKeywords(records, seriesField, keywords, limit = 2) {
-  return records
-    .map((r) => ({
-      row: r,
-      score: keywords.reduce((acc, kw) => acc + (String(r[seriesField] || '').toLowerCase().includes(kw) ? 1 : 0), 0)
-    }))
-    .filter((x) => x.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, limit)
-    .map((x) => x.row);
-}
-
 function summarizeError(err) {
   const message = String(err?.message || err || 'unknown error').split('\n')[0].trim();
   const httpMatch = message.match(/HTTP\s+(\d{3})/i);
   if (httpMatch) return `HTTP ${httpMatch[1]} ${message.replace(/.*HTTP\s+\d{3}\s*/i, '').trim()}`.trim();
   return message;
-}
-
-function labelOf(row, seriesField) {
-  return String(row?.[seriesField] || '').trim();
-}
-
-function verifyAdjacentComponentBlock(sortedRecords, seriesField, anchorIndex, expectedLabels, datasetId, anchorLabel) {
-  const totalRow = sortedRecords[anchorIndex];
-  const componentRows = sortedRecords.slice(anchorIndex + 1, anchorIndex + 1 + expectedLabels.length);
-  const componentLabels = componentRows.map((row) => labelOf(row, seriesField));
-  if (componentRows.length !== expectedLabels.length) {
-    throw new Error(`expected ${expectedLabels.length} rows below ${anchorLabel}, found ${componentRows.length}`);
-  }
-  const mismatch = expectedLabels.findIndex((expected, idx) => componentLabels[idx] !== expected);
-  if (mismatch !== -1) {
-    const blockLabels = [labelOf(totalRow, seriesField), ...componentLabels];
-    const nearby = sortedRecords
-      .slice(Math.max(0, anchorIndex - 5), anchorIndex + 6)
-      .map((row) => labelOf(row, seriesField));
-    throw new Error(
-      [
-        `component label mismatch for ${anchorLabel}`,
-        `found block: ${blockLabels.join(' | ')}`,
-        `nearby labels: ${nearby.join(' | ')}`
-      ].join(' ; ')
-    );
-  }
-  if (VERIFY_MODE) {
-    console.log(`[verify-block] datasetId=${datasetId} total=${labelOf(totalRow, seriesField)} components=${componentLabels.join(' | ')}`);
-  }
-  return { totalRow, componentRows, componentLabels };
-}
-
-function latestPeriodAndSumCheck({ datasetId, timeFields, totalRow, componentRows, seriesField, absTol = 1, relTol = 1e-3 }) {
-  const period = getLatestCommonPeriod([totalRow, ...componentRows], timeFields);
-  if (!period) throw new Error('no common period with numeric values across total/components');
-  const check = sumCheck(totalRow, componentRows, period, absTol, relTol);
-  if (!check.pass) {
-    console.warn(`[warn] sum-check failed dataset=${datasetId} period=${period} total=${check.total} sum=${check.sum_components} diff=${check.diff}`);
-  }
-  if (VERIFY_MODE) {
-    console.log(
-      `[verify-sum] datasetId=${datasetId} period=${period} total=${check.total} sum_components=${check.sum_components} diff=${check.diff} pass=${check.pass}`
-    );
-  }
-  return { period, check };
 }
 
 function recordOk(results, payload) {
@@ -321,6 +269,27 @@ function isoDateToMonthPeriod(dateString) {
   const match = String(dateString || '').trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (!match) return null;
   return `${match[1]}-${match[2]}`;
+}
+
+function buildSeriesFromHierarchyRow(row, existingValues, { freq, units }) {
+  const values = mergePeriodHistory(existingValues, hierarchyRowToSeriesValues(row));
+  const latest = hierarchyRowLatest(row);
+  if (!latest) {
+    throw new Error(`SingStat hierarchy row ${row?.seriesNo || row?.rowText || 'unknown'} has no numeric values`);
+  }
+
+  return {
+    freq,
+    latest_period: latest.period,
+    latest_value: latest.value,
+    units,
+    source_series_name: row.rowText,
+    values
+  };
+}
+
+async function fetchHierarchyTableRows(tableId) {
+  return fetchTableBuilderHierarchy({ tableId });
 }
 
 function applyMajorCategoriesAndValidate(seriesById) {
@@ -438,32 +407,168 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
     return { latest_period: rates.term_spread_10y_2y.latest_period, latest_value: rates.term_spread_10y_2y.latest_value };
   });
 
-  for (const [datasetId, requirements] of Object.entries(REQUIRED_DATASETS)) {
-    const dataset = await getDataset(datasetId);
-    const records = dataset.records;
-    for (const requirement of requirements) {
-      await tryIndicator(
-        { key: requirement.key, source: 'data.gov.sg', dataset_ref: datasetId, series_name: requirement.target },
-        async () => {
-          if (!records.length) throw new Error('dataset returned 0 rows');
-          if (!dataset.seriesField) throw new Error('no Data Series field');
-          if (!dataset.timeFields.length) throw new Error('0 time fields');
-          const match = findSeriesRow(records, dataset.seriesField, requirement.target);
-          if (!match.row) throw new Error(match.error || 'series not found');
-          const latest = extractLatest(match.row, dataset.timeFields);
-          if (!latest) throw new Error('no numeric values');
-          const units = requirement.key.startsWith('loan_') ? 'S$ million' : '%';
-          const freq = dataset.frequency;
-          if (VERIFY_MODE) {
-            console.log(`[verify-series] datasetId=${datasetId} required=${requirement.target} matched=${match.matchedSeriesName} (${match.matchType}) latest=${latest.latest_period}=${latest.latest_value}`);
-          }
-          const values = extractSeriesValues(match.row, dataset.timeFields);
-          series[requirement.key] = { freq, latest_period: latest.latest_period, latest_value: latest.latest_value, units, values };
-          return { latest_period: latest.latest_period, latest_value: latest.latest_value, series_name: requirement.target };
-        }
-      );
+  let singStatBankLoansPromise;
+  const getSingStatBankLoansTable = async () => {
+    if (!singStatBankLoansPromise) singStatBankLoansPromise = fetchHierarchyTableRows(SINGSTAT_BANK_LOANS_TABLE_ID);
+    return singStatBankLoansPromise;
+  };
+
+  await tryIndicator({ key: `table_${SINGSTAT_BANK_LOANS_TABLE_ID}`, source: 'SingStat TableBuilder', dataset_ref: SINGSTAT_BANK_LOANS_DATASET_REF }, async () => {
+    const table = await getSingStatBankLoansTable();
+    const mappings = [
+      { key: 'loan_bc_total', seriesNo: '1.1.3', units: 'S$ million' },
+      { key: 'loan_bc_construction', seriesNo: '1.1.3.1', units: 'S$ million' },
+      { key: 'loan_bc_real_property', seriesNo: '1.1.3.2', units: 'S$ million' }
+    ];
+
+    let latestSeen = null;
+    for (const mapping of mappings) {
+      const row = table.bySeriesNo.get(mapping.seriesNo);
+      if (!row) throw new Error(`Missing SingStat hierarchy row ${mapping.seriesNo}`);
+      const nextSeries = buildSeriesFromHierarchyRow(row, existingSeries[mapping.key]?.values, { freq: 'M', units: mapping.units });
+      latestSeen = hierarchyRowLatest(row);
+      if (!verifyOnly) series[mapping.key] = nextSeries;
+      if (VERIFY_MODE) {
+        console.log(`[verify-series] datasetRef=${SINGSTAT_BANK_LOANS_DATASET_REF} seriesNo=${mapping.seriesNo} rowText=${row.rowText} latest=${nextSeries.latest_period}=${nextSeries.latest_value}`);
+      }
     }
-  }
+
+    return { latest_period: latestSeen?.period, latest_value: latestSeen?.value };
+  });
+
+  let singStatPrivateResidentialPromise;
+  const getSingStatPrivateResidentialTable = async () => {
+    if (!singStatPrivateResidentialPromise) singStatPrivateResidentialPromise = fetchHierarchyTableRows(SINGSTAT_PRIVATE_RES_PIPELINE_TABLE_ID);
+    return singStatPrivateResidentialPromise;
+  };
+
+  await tryIndicator({ key: `table_${SINGSTAT_PRIVATE_RES_PIPELINE_TABLE_ID}`, source: 'SingStat TableBuilder', dataset_ref: SINGSTAT_PRIVATE_RES_PIPELINE_DATASET_REF }, async () => {
+    const table = await getSingStatPrivateResidentialTable();
+    const mappings = [
+      { key: 'prp_pipeline_total_non_landed', seriesNo: '2', units: 'units' },
+      { key: 'prp_pipeline_non_landed_under_construction', seriesNo: '2.1', units: 'units' },
+      { key: 'prp_pipeline_non_landed_planned_written_permission', seriesNo: '2.2', units: 'units' },
+      { key: 'prp_pipeline_non_landed_planned_provisional_permission', seriesNo: '2.3', units: 'units' },
+      { key: 'prp_pipeline_non_landed_planned_others', seriesNo: '2.4', units: 'units' }
+    ];
+
+    let latestSeen = null;
+    for (const mapping of mappings) {
+      const row = table.bySeriesNo.get(mapping.seriesNo);
+      if (!row) throw new Error(`Missing SingStat hierarchy row ${mapping.seriesNo}`);
+      const nextSeries = buildSeriesFromHierarchyRow(row, existingSeries[mapping.key]?.values, { freq: 'Q', units: mapping.units });
+      latestSeen = hierarchyRowLatest(row);
+      if (!verifyOnly) series[mapping.key] = nextSeries;
+      if (VERIFY_MODE) {
+        console.log(`[verify-series] datasetRef=${SINGSTAT_PRIVATE_RES_PIPELINE_DATASET_REF} seriesNo=${mapping.seriesNo} rowText=${row.rowText} latest=${nextSeries.latest_period}=${nextSeries.latest_value}`);
+      }
+    }
+
+    return { latest_period: latestSeen?.period, latest_value: latestSeen?.value };
+  });
+
+  let singStatCommindPromise;
+  const getSingStatCommindTable = async () => {
+    if (!singStatCommindPromise) singStatCommindPromise = fetchHierarchyTableRows(SINGSTAT_COMMIND_PIPELINE_TABLE_ID);
+    return singStatCommindPromise;
+  };
+
+  await tryIndicator({ key: `table_${SINGSTAT_COMMIND_PIPELINE_TABLE_ID}`, source: 'SingStat TableBuilder', dataset_ref: SINGSTAT_COMMIND_PIPELINE_DATASET_REF }, async () => {
+    const table = await getSingStatCommindTable();
+    const mappings = [
+      { key: 'commind_office_total', seriesNo: '1', units: 'units' },
+      { key: 'commind_office_under_construction', seriesNo: '1.1', units: 'units' },
+      { key: 'commind_office_planned_written_permission', seriesNo: '1.2', units: 'units' },
+      { key: 'commind_office_planned_provisional_permission', seriesNo: '1.3', units: 'units' },
+      { key: 'commind_office_planned_others', seriesNo: '1.4', units: 'units' },
+      { key: 'commind_business_park_total', seriesNo: '4', units: 'units' },
+      { key: 'commind_business_park_under_construction', seriesNo: '4.1', units: 'units' },
+      { key: 'commind_business_park_planned_written_permission', seriesNo: '4.2', units: 'units' },
+      { key: 'commind_business_park_planned_provisional_permission', seriesNo: '4.3', units: 'units' },
+      { key: 'commind_business_park_planned_others', seriesNo: '4.4', units: 'units' },
+      { key: 'commind_retail_total', seriesNo: '8', units: 'units' },
+      { key: 'commind_retail_under_construction', seriesNo: '8.1', units: 'units' },
+      { key: 'commind_retail_planned_written_permission', seriesNo: '8.2', units: 'units' },
+      { key: 'commind_retail_planned_provisional_permission', seriesNo: '8.3', units: 'units' },
+      { key: 'commind_retail_planned_others', seriesNo: '8.4', units: 'units' }
+    ];
+
+    let latestSeen = null;
+    for (const mapping of mappings) {
+      const row = table.bySeriesNo.get(mapping.seriesNo);
+      if (!row) throw new Error(`Missing SingStat hierarchy row ${mapping.seriesNo}`);
+      const nextSeries = buildSeriesFromHierarchyRow(row, existingSeries[mapping.key]?.values, { freq: 'Q', units: mapping.units });
+      latestSeen = hierarchyRowLatest(row);
+      if (!verifyOnly) series[mapping.key] = nextSeries;
+      if (VERIFY_MODE) {
+        console.log(`[verify-series] datasetRef=${SINGSTAT_COMMIND_PIPELINE_DATASET_REF} seriesNo=${mapping.seriesNo} rowText=${row.rowText} latest=${nextSeries.latest_period}=${nextSeries.latest_value}`);
+      }
+    }
+
+    return { latest_period: latestSeen?.period, latest_value: latestSeen?.value };
+  });
+
+  let singStatIndustrialPipelinePromise;
+  const getSingStatIndustrialPipelineTable = async () => {
+    if (!singStatIndustrialPipelinePromise) singStatIndustrialPipelinePromise = fetchHierarchyTableRows(SINGSTAT_INDUSTRIAL_PIPELINE_TABLE_ID);
+    return singStatIndustrialPipelinePromise;
+  };
+
+  await tryIndicator({ key: `table_${SINGSTAT_INDUSTRIAL_PIPELINE_TABLE_ID}`, source: 'SingStat TableBuilder', dataset_ref: SINGSTAT_INDUSTRIAL_PIPELINE_DATASET_REF }, async () => {
+    const table = await getSingStatIndustrialPipelineTable();
+    const mappings = [
+      { key: 'industrial_pipeline_total', seriesNo: '1', units: 'sqm' },
+      { key: 'industrial_pipeline_under_construction', seriesNo: '1.1', units: 'sqm' },
+      { key: 'industrial_pipeline_written_permission', seriesNo: '1.2.1', units: 'sqm' },
+      { key: 'industrial_pipeline_provisional_permission', seriesNo: '1.2.2', units: 'sqm' },
+      { key: 'industrial_pipeline_others', seriesNo: '1.2.3', units: 'sqm' }
+    ];
+
+    let latestSeen = null;
+    for (const mapping of mappings) {
+      const row = table.bySeriesNo.get(mapping.seriesNo);
+      if (!row) throw new Error(`Missing SingStat hierarchy row ${mapping.seriesNo}`);
+      const nextSeries = buildSeriesFromHierarchyRow(row, existingSeries[mapping.key]?.values, { freq: 'Q', units: mapping.units });
+      latestSeen = hierarchyRowLatest(row);
+      if (!verifyOnly) series[mapping.key] = nextSeries;
+      if (VERIFY_MODE) {
+        console.log(`[verify-series] datasetRef=${SINGSTAT_INDUSTRIAL_PIPELINE_DATASET_REF} seriesNo=${mapping.seriesNo} rowText=${row.rowText} latest=${nextSeries.latest_period}=${nextSeries.latest_value}`);
+      }
+    }
+
+    return { latest_period: latestSeen?.period, latest_value: latestSeen?.value };
+  });
+
+  let singStatVacantSpacePromise;
+  const getSingStatVacantSpaceTable = async () => {
+    if (!singStatVacantSpacePromise) singStatVacantSpacePromise = fetchHierarchyTableRows(SINGSTAT_VACANT_SPACE_TABLE_ID);
+    return singStatVacantSpacePromise;
+  };
+
+  await tryIndicator({ key: `table_${SINGSTAT_VACANT_SPACE_TABLE_ID}`, source: 'SingStat TableBuilder', dataset_ref: SINGSTAT_VACANT_SPACE_DATASET_REF }, async () => {
+    const table = await getSingStatVacantSpaceTable();
+    const mappings = [
+      { key: 'private_vacant_private_sector_office_space_vacant', rowText: 'Private Sector Office Space Vacant', units: 'sqm' },
+      { key: 'private_vacant_private_sector_business_park_space_vacant', rowText: 'Private Sector Business Park Space Vacant', units: 'sqm' },
+      { key: 'private_vacant_private_sector_multiple_user_factory_space_vacant', rowText: 'Private Sector Multiple-User Factory Space Vacant', units: 'sqm' },
+      { key: 'private_vacant_private_sector_retail_space_vacant', rowText: 'Private Sector Retail Space Vacant', units: 'sqm' }
+    ];
+
+    let latestSeen = null;
+    for (const mapping of mappings) {
+      const matches = table.byRowText.get(mapping.rowText) || [];
+      if (matches.length !== 1) throw new Error(`Expected exactly 1 SingStat hierarchy row for "${mapping.rowText}", found ${matches.length}`);
+      const row = matches[0];
+      const nextSeries = buildSeriesFromHierarchyRow(row, existingSeries[mapping.key]?.values, { freq: 'Q', units: mapping.units });
+      latestSeen = hierarchyRowLatest(row);
+      if (!verifyOnly) series[mapping.key] = nextSeries;
+      if (VERIFY_MODE) {
+        console.log(`[verify-series] datasetRef=${SINGSTAT_VACANT_SPACE_DATASET_REF} rowText=${row.rowText} latest=${nextSeries.latest_period}=${nextSeries.latest_value}`);
+      }
+    }
+
+    return { latest_period: latestSeen?.period, latest_value: latestSeen?.value };
+  });
 
   const optionalDatasetSpecs = [
     {
@@ -501,134 +606,6 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
             key: target.key,
             freq: inferFrequencyFromTimeFields(tf),
             units: 'index',
-            latest: extractLatest(match.row, tf),
-            row: match.row,
-            metadata: { source_series_name: match.matchedSeriesName }
-          };
-        });
-      }
-    },
-    {
-      datasetId: 'd_055b6549444dedb341c50805d9682a41', source: 'data.gov.sg',
-      build: (records, sf, tf, datasetId) => {
-        const sorted = sortRecordsStable(records);
-        const anchorLabel = 'Total Non-Landed Properties';
-        const expected = ['Under Construction', 'Planned - Written Permission', 'Planned - Provisional Permission', 'Planned - Others'];
-        const anchorIndex = sorted.findIndex((row) => labelOf(row, sf) === anchorLabel);
-        if (anchorIndex === -1) throw new Error(`anchor not found: ${anchorLabel}`);
-        const { totalRow, componentRows } = verifyAdjacentComponentBlock(sorted, sf, anchorIndex, expected, datasetId, anchorLabel);
-        const { check } = latestPeriodAndSumCheck({ datasetId, timeFields: tf, totalRow, componentRows, seriesField: sf, absTol: 1, relTol: 1e-3 });
-        const status = check.pass ? 'ok' : 'ok_with_warning';
-        const keys = [
-          'prp_pipeline_total_non_landed',
-          'prp_pipeline_non_landed_under_construction',
-          'prp_pipeline_non_landed_planned_written_permission',
-          'prp_pipeline_non_landed_planned_provisional_permission',
-          'prp_pipeline_non_landed_planned_others'
-        ];
-        const rows = [totalRow, ...componentRows];
-        return rows.map((row, idx) => ({
-          key: keys[idx],
-          freq: inferFrequencyFromTimeFields(tf),
-          units: 'units',
-          latest: extractLatest(row, tf),
-          row,
-          metadata: { source_series_name: row[sf], check, status }
-        }));
-      }
-    },
-    {
-      datasetId: 'd_e47c0f0674b46981c4994d5257de5be4', source: 'data.gov.sg',
-      build: (records, sf, tf, datasetId) => {
-        const sorted = sortRecordsStable(records);
-        const expected = ['Under Construction', 'Planned - Written Permission', 'Planned - Provisional Permission', 'Planned - Others'];
-        const categories = [
-          {
-            total: 'Total Office Space',
-            category: 'office',
-            keys: ['commind_office_total', 'commind_office_under_construction', 'commind_office_planned_written_permission', 'commind_office_planned_provisional_permission', 'commind_office_planned_others']
-          },
-          {
-            total: 'Total Business Park Space',
-            category: 'business_park',
-            keys: ['commind_business_park_total', 'commind_business_park_under_construction', 'commind_business_park_planned_written_permission', 'commind_business_park_planned_provisional_permission', 'commind_business_park_planned_others']
-          },
-          {
-            total: 'Total Retail Space',
-            category: 'retail',
-            keys: ['commind_retail_total', 'commind_retail_under_construction', 'commind_retail_planned_written_permission', 'commind_retail_planned_provisional_permission', 'commind_retail_planned_others']
-          }
-        ];
-
-        const out = [];
-        for (const cat of categories) {
-          try {
-            const anchorIndex = sorted.findIndex((row) => labelOf(row, sf) === cat.total);
-            if (anchorIndex === -1) throw new Error(`anchor not found: ${cat.total}`);
-            const { totalRow, componentRows } = verifyAdjacentComponentBlock(sorted, sf, anchorIndex, expected, datasetId, cat.total);
-            const { check } = latestPeriodAndSumCheck({ datasetId, timeFields: tf, totalRow, componentRows, seriesField: sf, absTol: 1, relTol: 1e-3 });
-            const status = check.pass ? 'ok' : 'ok_with_warning';
-            [totalRow, ...componentRows].forEach((row, idx) => {
-              out.push({
-                key: cat.keys[idx],
-                freq: inferFrequencyFromTimeFields(tf),
-                units: 'units',
-                latest: extractLatest(row, tf),
-                row,
-                metadata: { source_series_name: row[sf], parent_total: cat.total, category: cat.category, check, status }
-              });
-            });
-          } catch (err) {
-            console.warn(`[warn] dataset=${datasetId} category=${cat.category} block extraction failed: ${summarizeError(err)}`);
-          }
-        }
-        if (!out.length) throw new Error('all category blocks failed');
-        return out;
-      }
-    },
-    {
-      datasetId: 'd_4dca06508cd9d0a8076153443c17ea5f', source: 'data.gov.sg',
-      build: (records, sf, tf, datasetId) => {
-        const labels = ['Total', 'Under Construction', 'Written Permission', 'Provisional Permission', 'Others'];
-        const rows = labels.map((label) => {
-          const match = findSeriesRow(records, sf, label);
-          if (!match.row || match.matchType !== 'exact') throw new Error(`required exact series missing: ${label}`);
-          return match.row;
-        });
-        const totalRow = rows[0];
-        const componentRows = rows.slice(1);
-        const { check } = latestPeriodAndSumCheck({ datasetId, timeFields: tf, totalRow, componentRows, seriesField: sf, absTol: 1, relTol: 1e-3 });
-        const status = check.pass ? 'ok' : 'ok_with_warning';
-        const keys = ['industrial_pipeline_total', 'industrial_pipeline_under_construction', 'industrial_pipeline_written_permission', 'industrial_pipeline_provisional_permission', 'industrial_pipeline_others'];
-        return rows.map((row, idx) => ({
-          key: keys[idx],
-          freq: inferFrequencyFromTimeFields(tf),
-          units: 'sqm',
-          latest: extractLatest(row, tf),
-          row,
-          metadata: { source_series_name: row[sf], check, status }
-        }));
-      }
-    },
-    {
-      datasetId: 'd_e9cc9d297b1cf8024cf99db4b12505cc', source: 'data.gov.sg',
-      build: (records, sf, tf, datasetId) => {
-        const targets = [
-          { key: 'private_vacant_private_sector_office_space_vacant', label: 'Private Sector Office Space Vacant' },
-          { key: 'private_vacant_private_sector_business_park_space_vacant', label: 'Private Sector Business Park Space Vacant' },
-          { key: 'private_vacant_private_sector_multiple_user_factory_space_vacant', label: 'Private Sector Multiple-User Factory Space Vacant' },
-          { key: 'private_vacant_private_sector_retail_space_vacant', label: 'Private Sector Retail Space Vacant' }
-        ];
-        return targets.map((target) => {
-          const match = findSeriesRow(records, sf, target.label);
-          if (!match.row) throw new Error(`${target.label}: ${match.error || 'series not found'}`);
-          if (VERIFY_MODE) {
-            console.log(`[verify-series] datasetId=${datasetId} required=${target.label} matched=${match.matchedSeriesName} (${match.matchType})`);
-          }
-          return {
-            key: target.key,
-            freq: inferFrequencyFromTimeFields(tf),
-            units: 'sqm',
             latest: extractLatest(match.row, tf),
             row: match.row,
             metadata: { source_series_name: match.matchedSeriesName }
@@ -880,6 +857,10 @@ async function main() {
     };
   }
 
+  for (const retiredSeriesId of RETIRED_SERIES_IDS) {
+    delete mergedSeries[retiredSeriesId];
+  }
+
   applyMajorCategoriesAndValidate(mergedSeries);
 
   delete existing.indicators;
@@ -902,12 +883,27 @@ async function main() {
       {
         name: 'SingStat TableBuilder',
         method: 'json_api_parse',
-        table_ids: [SINGSTAT_RATES_TABLE_ID, SINGSTAT_UNIT_LABOUR_TABLE_ID, SINGSTAT_CONSTRUCTION_GDP_TABLE_ID, SINGSTAT_CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID],
+        table_ids: [
+          SINGSTAT_RATES_TABLE_ID,
+          SINGSTAT_UNIT_LABOUR_TABLE_ID,
+          SINGSTAT_CONSTRUCTION_GDP_TABLE_ID,
+          SINGSTAT_CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID,
+          SINGSTAT_PRIVATE_RES_PIPELINE_TABLE_ID,
+          SINGSTAT_COMMIND_PIPELINE_TABLE_ID,
+          SINGSTAT_INDUSTRIAL_PIPELINE_TABLE_ID,
+          SINGSTAT_VACANT_SPACE_TABLE_ID,
+          SINGSTAT_BANK_LOANS_TABLE_ID
+        ],
         table_urls: [
           `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_RATES_TABLE_ID}`,
           `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_UNIT_LABOUR_TABLE_ID}`,
           `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_CONSTRUCTION_GDP_TABLE_ID}`,
-          `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID}`
+          `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_CONSTRUCTION_MATERIALS_DEMAND_TABLE_ID}`,
+          `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_PRIVATE_RES_PIPELINE_TABLE_ID}`,
+          `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_COMMIND_PIPELINE_TABLE_ID}`,
+          `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_INDUSTRIAL_PIPELINE_TABLE_ID}`,
+          `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_VACANT_SPACE_TABLE_ID}`,
+          `https://tablebuilder.singstat.gov.sg/table/${SINGSTAT_BANK_LOANS_TABLE_ID}`
         ]
       },
       { name: 'MAS I.6 JSON API', method: 'json_api_parse', url: MAS_I6_API_URL }

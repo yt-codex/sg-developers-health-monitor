@@ -215,6 +215,85 @@ function parseTableBuilderPivotJson(payload) {
   return tidy;
 }
 
+function parseTableBuilderHierarchyRows(payload) {
+  const rows = payload?.Data?.row;
+  if (!Array.isArray(rows) || !rows.length) {
+    throw new Error('SingStat response has no raw hierarchy rows');
+  }
+
+  const parsed = rows
+    .map((row) => {
+      const seriesNo = String(row?.seriesNo || '').trim();
+      const rowText = findSeriesRowLabel(row);
+      const columns = Array.isArray(row?.columns)
+        ? row.columns
+          .map((column) => {
+            const key = typeof column?.key === 'string' ? column.key.trim() : null;
+            if (!key) return null;
+            return {
+              key,
+              value: parseNumericValueCandidate(column?.value)
+            };
+          })
+          .filter(Boolean)
+        : [];
+
+      return {
+        seriesNo,
+        rowText,
+        uoM: typeof row?.uoM === 'string' ? row.uoM.trim() : null,
+        footnote: typeof row?.footnote === 'string' ? row.footnote.trim() : '',
+        columns
+      };
+    })
+    .filter((row) => row.seriesNo && row.rowText);
+
+  if (!parsed.length) {
+    throw new Error('SingStat response hierarchy rows could not be parsed');
+  }
+
+  return parsed;
+}
+
+function indexTableBuilderHierarchyRows(rows) {
+  const bySeriesNo = new Map();
+  const byRowText = new Map();
+
+  for (const row of rows || []) {
+    if (bySeriesNo.has(row.seriesNo)) {
+      throw new Error(`Duplicate SingStat hierarchy row seriesNo "${row.seriesNo}"`);
+    }
+    bySeriesNo.set(row.seriesNo, row);
+
+    const existing = byRowText.get(row.rowText) || [];
+    existing.push(row);
+    byRowText.set(row.rowText, existing);
+  }
+
+  return { bySeriesNo, byRowText };
+}
+
+function formatDataGovCompatiblePeriod(periodLabel) {
+  const label = String(periodLabel || '').trim();
+  const quarterMatch = label.match(/^(\d{4})\s+([1-4])Q$/i);
+  if (quarterMatch) return `${quarterMatch[1]}${quarterMatch[2]}Q`;
+  return label;
+}
+
+function hierarchyRowToSeriesValues(row, { periodFormatter = formatDataGovCompatiblePeriod } = {}) {
+  return (row?.columns || [])
+    .map((column) => ({
+      period: periodFormatter(column.key),
+      value: column.value
+    }))
+    .filter((point) => point.period && point.value != null);
+}
+
+function hierarchyRowLatest(row, { periodFormatter = formatDataGovCompatiblePeriod } = {}) {
+  const values = hierarchyRowToSeriesValues(row, { periodFormatter });
+  return values[values.length - 1] || null;
+}
+
 function matchRequiredSeries(tidyRows, wantedSeries) {
   const availableLabels = [...new Set(tidyRows.map((row) => row.series_name))];
   const selected = new Map();
@@ -290,6 +369,16 @@ async function extractSeries({ tableId, wantedSeries, ...options }) {
   return result;
 }
 
+async function fetchTableBuilderHierarchy(options = {}) {
+  const { endpoint, payload } = await fetchTableBuilderJson(options);
+  const rows = parseTableBuilderHierarchyRows(payload);
+  return {
+    endpoint,
+    rows,
+    ...indexTableBuilderHierarchyRows(rows)
+  };
+}
+
 async function fetchSingStatRequiredSeries(options = {}) {
   return extractSeries({
     tableId: options.tableId || RATES_TABLE_ID,
@@ -350,8 +439,14 @@ module.exports = {
   parseMonthLabel,
   isoDateToQuarterPeriod,
   parseTableBuilderPivotJson,
+  parseTableBuilderHierarchyRows,
+  indexTableBuilderHierarchyRows,
+  formatDataGovCompatiblePeriod,
+  hierarchyRowToSeriesValues,
+  hierarchyRowLatest,
   matchRequiredSeries,
   fetchTableBuilderJson,
+  fetchTableBuilderHierarchy,
   extractSeries,
   fetchSingStatRequiredSeries,
   fetchUnitLabourCostConstructionSeries,
