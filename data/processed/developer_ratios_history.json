@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-05T03:49:28.405Z",
+  "updatedAt": "2026-04-06T03:53:17.790Z",
   "source": "stockanalysis",
   "scoringModel": {
     "formula": "round(clamp((100 - weightedPillarRisk) - trendPenalty, 0, 100))",
@@ -133,7 +133,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Apr '26 Apr 1, 2026"
+          "periodEnding": "Apr '26 Apr 2, 2026"
         },
         {
           "label": "FY 2025",
@@ -181,17 +181,17 @@
           "label": "Net Debt / EBITDA Ratio",
           "unit": null,
           "values": {
-            "Current": 17.6,
-            "FY 2025": 17.6,
-            "FY 2024": 16.28,
+            "Current": 18.62,
+            "FY 2025": 18.62,
+            "FY 2024": 16.63,
             "FY 2023": 11.19,
             "FY 2022": 17.65,
             "FY 2021": 22.2
           },
           "rawValues": {
-            "Current": "17.60",
-            "FY 2025": "17.60",
-            "FY 2024": "16.28",
+            "Current": "18.62",
+            "FY 2025": "18.62",
+            "FY 2024": "16.63",
             "FY 2023": "11.19",
             "FY 2022": "17.65",
             "FY 2021": "22.20"
@@ -241,17 +241,17 @@
           "label": "Debt / EBITDA Ratio",
           "unit": null,
           "values": {
-            "Current": 20.72,
-            "FY 2025": 20.72,
-            "FY 2024": 20.03,
+            "Current": 20.71,
+            "FY 2025": 20.71,
+            "FY 2024": 20.43,
             "FY 2023": 13.39,
             "FY 2022": 21.26,
             "FY 2021": 25.92
           },
           "rawValues": {
-            "Current": "20.72",
-            "FY 2025": "20.72",
-            "FY 2024": "20.03",
+            "Current": "20.71",
+            "FY 2025": "20.71",
+            "FY 2024": "20.43",
             "FY 2023": "13.39",
             "FY 2022": "21.26",
             "FY 2021": "25.92"
@@ -303,7 +303,7 @@
           "values": {
             "Current": 1.42,
             "FY 2025": 1.5,
-            "FY 2024": 1.21,
+            "FY 2024": 1.17,
             "FY 2023": 2.64,
             "FY 2022": 0.85,
             "FY 2021": 0.52
@@ -311,7 +311,7 @@
           "rawValues": {
             "Current": "1.42%",
             "FY 2025": "1.50%",
-            "FY 2024": "1.21%",
+            "FY 2024": "1.17%",
             "FY 2023": "2.64%",
             "FY 2022": "0.85%",
             "FY 2021": "0.52%"
@@ -342,7 +342,7 @@
           "unit": null,
           "values": {
             "Current": 17.89,
-            "FY 2025": 17.1,
+            "FY 2025": 17.89,
             "FY 2024": 53.85,
             "FY 2023": 30.7,
             "FY 2022": 8.13,
@@ -350,7 +350,7 @@
           },
           "rawValues": {
             "Current": "17.89%",
-            "FY 2025": "17.10%",
+            "FY 2025": "17.89%",
             "FY 2024": "53.85%",
             "FY 2023": "30.70%",
             "FY 2022": "8.13%",
@@ -380,10 +380,10 @@
       },
       "current": {
         "marketCap": 7326,
-        "netDebtToEbitda": 17.6,
+        "netDebtToEbitda": 18.62,
         "debtToEquity": 1.32,
         "netDebtToEquity": 1.12,
-        "debtToEbitda": 20.72,
+        "debtToEbitda": 20.71,
         "quickRatio": 0.73,
         "currentRatio": 2.23,
         "roic": 1.42,
@@ -391,7 +391,7 @@
         "payoutRatio": 17.89,
         "assetTurnover": 0.14
       },
-      "lastFetchedAt": "2026-04-05T03:49:25.980Z",
+      "lastFetchedAt": "2026-04-06T03:53:15.252Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 60,
@@ -420,7 +420,7 @@
           "roe"
         ],
         "riskByMetric": {
-          "netDebtToEbitda": 96.66666666666669,
+          "netDebtToEbitda": 100,
           "debtToEquity": 30.58823529411765,
           "netDebtToEquity": 51.42857142857144,
           "currentRatio": 0,
@@ -527,7 +527,7 @@
         "rawTrendPenalty": 3,
         "worseningMetricCount": 1
       },
-      "lastScoredAt": "2026-04-05T03:49:26.303Z"
+      "lastScoredAt": "2026-04-06T03:53:15.496Z"
     },
     {
       "ticker": "U14",
@@ -795,7 +795,7 @@
         "payoutRatio": 31.57,
         "assetTurnover": 0.14
       },
-      "lastFetchedAt": "2026-04-05T03:49:26.304Z",
+      "lastFetchedAt": "2026-04-06T03:53:15.497Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 82,
@@ -931,7 +931,7 @@
         "rawTrendPenalty": 1,
         "worseningMetricCount": 1
       },
-      "lastScoredAt": "2026-04-05T03:49:26.398Z"
+      "lastScoredAt": "2026-04-06T03:53:15.594Z"
     },
     {
       "ticker": "F17",
@@ -1199,7 +1199,7 @@
         "payoutRatio": 66.12,
         "assetTurnover": 0.14
       },
-      "lastFetchedAt": "2026-04-05T03:49:26.399Z",
+      "lastFetchedAt": "2026-04-06T03:53:15.594Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 65,
@@ -1335,7 +1335,7 @@
         "rawTrendPenalty": 5.5,
         "worseningMetricCount": 2
       },
-      "lastScoredAt": "2026-04-05T03:49:26.479Z"
+      "lastScoredAt": "2026-04-06T03:53:15.683Z"
     },
     {
       "ticker": "TQ5",
@@ -1345,7 +1345,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Apr '26 Apr 1, 2026"
+          "periodEnding": "Apr '26 Apr 2, 2026"
         },
         {
           "label": "FY 2025",
@@ -1603,7 +1603,7 @@
         "payoutRatio": 72.68,
         "assetTurnover": 0.09
       },
-      "lastFetchedAt": "2026-04-05T03:49:26.479Z",
+      "lastFetchedAt": "2026-04-06T03:53:15.683Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 39,
@@ -1739,7 +1739,7 @@
         "rawTrendPenalty": 5.5,
         "worseningMetricCount": 2
       },
-      "lastScoredAt": "2026-04-05T03:49:26.569Z"
+      "lastScoredAt": "2026-04-06T03:53:15.778Z"
     },
     {
       "ticker": "9CI",
@@ -1749,7 +1749,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Apr '26 Apr 1, 2026"
+          "periodEnding": "Apr '26 Apr 2, 2026"
         },
         {
           "label": "FY 2025",
@@ -2007,7 +2007,7 @@
         "payoutRatio": 413.1,
         "assetTurnover": 0.09
       },
-      "lastFetchedAt": "2026-04-05T03:49:26.569Z",
+      "lastFetchedAt": "2026-04-06T03:53:15.778Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 48,
@@ -2143,7 +2143,7 @@
         "rawTrendPenalty": 6,
         "worseningMetricCount": 4
       },
-      "lastScoredAt": "2026-04-05T03:49:26.649Z"
+      "lastScoredAt": "2026-04-06T03:53:15.870Z"
     },
     {
       "ticker": "H78",
@@ -2153,7 +2153,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Apr '26 Apr 1, 2026"
+          "periodEnding": "Apr '26 Apr 2, 2026"
         },
         {
           "label": "FY 2025",
@@ -2411,7 +2411,7 @@
         "payoutRatio": 39.78,
         "assetTurnover": 0.04
       },
-      "lastFetchedAt": "2026-04-05T03:49:26.649Z",
+      "lastFetchedAt": "2026-04-06T03:53:15.870Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 70,
@@ -2547,7 +2547,7 @@
         "rawTrendPenalty": 5.5,
         "worseningMetricCount": 2
       },
-      "lastScoredAt": "2026-04-05T03:49:26.734Z"
+      "lastScoredAt": "2026-04-06T03:53:15.972Z"
     },
     {
       "ticker": "LJ3",
@@ -2815,7 +2815,7 @@
         "payoutRatio": null,
         "assetTurnover": 0.07
       },
-      "lastFetchedAt": "2026-04-05T03:49:26.734Z",
+      "lastFetchedAt": "2026-04-06T03:53:15.972Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 35,
@@ -2951,7 +2951,7 @@
         "rawTrendPenalty": 8,
         "worseningMetricCount": 4
       },
-      "lastScoredAt": "2026-04-05T03:49:26.814Z"
+      "lastScoredAt": "2026-04-06T03:53:16.060Z"
     },
     {
       "ticker": "W05",
@@ -3219,7 +3219,7 @@
         "payoutRatio": null,
         "assetTurnover": 0.09
       },
-      "lastFetchedAt": "2026-04-05T03:49:26.814Z",
+      "lastFetchedAt": "2026-04-06T03:53:16.061Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 62,
@@ -3355,7 +3355,7 @@
         "rawTrendPenalty": 8,
         "worseningMetricCount": 3
       },
-      "lastScoredAt": "2026-04-05T03:49:26.925Z"
+      "lastScoredAt": "2026-04-06T03:53:16.167Z"
     },
     {
       "ticker": "B61",
@@ -3623,7 +3623,7 @@
         "payoutRatio": 10.51,
         "assetTurnover": 0.21
       },
-      "lastFetchedAt": "2026-04-05T03:49:26.925Z",
+      "lastFetchedAt": "2026-04-06T03:53:16.167Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 92,
@@ -3788,7 +3788,7 @@
         "rawTrendPenalty": 4,
         "worseningMetricCount": 2
       },
-      "lastScoredAt": "2026-04-05T03:49:27.012Z"
+      "lastScoredAt": "2026-04-06T03:53:16.259Z"
     },
     {
       "ticker": "H13",
@@ -4056,7 +4056,7 @@
         "payoutRatio": 26.51,
         "assetTurnover": 0.07
       },
-      "lastFetchedAt": "2026-04-05T03:49:27.012Z",
+      "lastFetchedAt": "2026-04-06T03:53:16.259Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 43,
@@ -4192,7 +4192,7 @@
         "rawTrendPenalty": 6.5,
         "worseningMetricCount": 4
       },
-      "lastScoredAt": "2026-04-05T03:49:27.131Z"
+      "lastScoredAt": "2026-04-06T03:53:16.357Z"
     },
     {
       "ticker": "T24",
@@ -4202,7 +4202,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Apr '26 Apr 1, 2026"
+          "periodEnding": "Apr '26 Apr 2, 2026"
         },
         {
           "label": "FY 2025",
@@ -4460,7 +4460,7 @@
         "payoutRatio": 23.14,
         "assetTurnover": 0.05
       },
-      "lastFetchedAt": "2026-04-05T03:49:27.132Z",
+      "lastFetchedAt": "2026-04-06T03:53:16.357Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 51,
@@ -4596,7 +4596,7 @@
         "rawTrendPenalty": 9,
         "worseningMetricCount": 4
       },
-      "lastScoredAt": "2026-04-05T03:49:27.247Z"
+      "lastScoredAt": "2026-04-06T03:53:16.454Z"
     },
     {
       "ticker": "O10",
@@ -4864,7 +4864,7 @@
         "payoutRatio": 41.86,
         "assetTurnover": 0.09
       },
-      "lastFetchedAt": "2026-04-05T03:49:27.247Z",
+      "lastFetchedAt": "2026-04-06T03:53:16.454Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 53,
@@ -5000,7 +5000,7 @@
         "rawTrendPenalty": 1.5,
         "worseningMetricCount": 1
       },
-      "lastScoredAt": "2026-04-05T03:49:27.328Z"
+      "lastScoredAt": "2026-04-06T03:53:16.580Z"
     },
     {
       "ticker": "5IC",
@@ -5268,7 +5268,7 @@
         "payoutRatio": 2.82,
         "assetTurnover": 0.67
       },
-      "lastFetchedAt": "2026-04-05T03:49:27.328Z",
+      "lastFetchedAt": "2026-04-06T03:53:16.580Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 65,
@@ -5404,7 +5404,7 @@
         "rawTrendPenalty": 1.5,
         "worseningMetricCount": 1
       },
-      "lastScoredAt": "2026-04-05T03:49:27.415Z"
+      "lastScoredAt": "2026-04-06T03:53:16.684Z"
     },
     {
       "ticker": "5DP",
@@ -5672,7 +5672,7 @@
         "payoutRatio": null,
         "assetTurnover": 0.08
       },
-      "lastFetchedAt": "2026-04-05T03:49:27.415Z",
+      "lastFetchedAt": "2026-04-06T03:53:16.684Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 18,
@@ -5808,7 +5808,7 @@
         "rawTrendPenalty": 5.5,
         "worseningMetricCount": 4
       },
-      "lastScoredAt": "2026-04-05T03:49:27.509Z"
+      "lastScoredAt": "2026-04-06T03:53:16.772Z"
     },
     {
       "ticker": "5JK",
@@ -6076,7 +6076,7 @@
         "payoutRatio": 11.62,
         "assetTurnover": 0.08
       },
-      "lastFetchedAt": "2026-04-05T03:49:27.509Z",
+      "lastFetchedAt": "2026-04-06T03:53:16.772Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 64,
@@ -6212,7 +6212,7 @@
         "rawTrendPenalty": 3.5,
         "worseningMetricCount": 2
       },
-      "lastScoredAt": "2026-04-05T03:49:27.602Z"
+      "lastScoredAt": "2026-04-06T03:53:16.925Z"
     },
     {
       "ticker": "F1E",
@@ -6480,7 +6480,7 @@
         "payoutRatio": null,
         "assetTurnover": 0.25
       },
-      "lastFetchedAt": "2026-04-05T03:49:27.602Z",
+      "lastFetchedAt": "2026-04-06T03:53:16.925Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 51,
@@ -6616,7 +6616,7 @@
         "rawTrendPenalty": 2.5,
         "worseningMetricCount": 2
       },
-      "lastScoredAt": "2026-04-05T03:49:27.723Z"
+      "lastScoredAt": "2026-04-06T03:53:17.021Z"
     },
     {
       "ticker": "ER0",
@@ -6884,7 +6884,7 @@
         "payoutRatio": 120.7,
         "assetTurnover": 0.4
       },
-      "lastFetchedAt": "2026-04-05T03:49:27.724Z",
+      "lastFetchedAt": "2026-04-06T03:53:17.022Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 75,
@@ -7035,7 +7035,7 @@
         "rawTrendPenalty": 2,
         "worseningMetricCount": 1
       },
-      "lastScoredAt": "2026-04-05T03:49:27.814Z"
+      "lastScoredAt": "2026-04-06T03:53:17.156Z"
     },
     {
       "ticker": "BTE",
@@ -7045,7 +7045,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Apr '26 Apr 1, 2026"
+          "periodEnding": "Apr '26 Apr 2, 2026"
         },
         {
           "label": "FY 2025",
@@ -7303,7 +7303,7 @@
         "payoutRatio": 358.2,
         "assetTurnover": 0.2
       },
-      "lastFetchedAt": "2026-04-05T03:49:27.814Z",
+      "lastFetchedAt": "2026-04-06T03:53:17.156Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 66,
@@ -7468,7 +7468,7 @@
         "rawTrendPenalty": 2.5,
         "worseningMetricCount": 2
       },
-      "lastScoredAt": "2026-04-05T03:49:27.909Z"
+      "lastScoredAt": "2026-04-06T03:53:17.244Z"
     },
     {
       "ticker": "5UX",
@@ -7736,7 +7736,7 @@
         "payoutRatio": null,
         "assetTurnover": 0.11
       },
-      "lastFetchedAt": "2026-04-05T03:49:27.909Z",
+      "lastFetchedAt": "2026-04-06T03:53:17.244Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 38,
@@ -7872,7 +7872,7 @@
         "rawTrendPenalty": 1.5,
         "worseningMetricCount": 1
       },
-      "lastScoredAt": "2026-04-05T03:49:27.998Z"
+      "lastScoredAt": "2026-04-06T03:53:17.337Z"
     },
     {
       "ticker": "F9D",
@@ -8140,7 +8140,7 @@
         "payoutRatio": 19.02,
         "assetTurnover": 0.48
       },
-      "lastFetchedAt": "2026-04-05T03:49:27.998Z",
+      "lastFetchedAt": "2026-04-06T03:53:17.337Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 81,
@@ -8305,7 +8305,7 @@
         "rawTrendPenalty": 4.5,
         "worseningMetricCount": 2
       },
-      "lastScoredAt": "2026-04-05T03:49:28.088Z"
+      "lastScoredAt": "2026-04-06T03:53:17.499Z"
     },
     {
       "ticker": "OU8",
@@ -8573,7 +8573,7 @@
         "payoutRatio": 29.3,
         "assetTurnover": 0.12
       },
-      "lastFetchedAt": "2026-04-05T03:49:28.088Z",
+      "lastFetchedAt": "2026-04-06T03:53:17.499Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 84,
@@ -8709,7 +8709,7 @@
         "rawTrendPenalty": 2.5,
         "worseningMetricCount": 2
       },
-      "lastScoredAt": "2026-04-05T03:49:28.221Z"
+      "lastScoredAt": "2026-04-06T03:53:17.607Z"
     },
     {
       "ticker": "C33",
@@ -8977,7 +8977,7 @@
         "payoutRatio": 63.27,
         "assetTurnover": 0.08
       },
-      "lastFetchedAt": "2026-04-05T03:49:28.221Z",
+      "lastFetchedAt": "2026-04-06T03:53:17.607Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 62,
@@ -9142,7 +9142,7 @@
         "rawTrendPenalty": 7,
         "worseningMetricCount": 3
       },
-      "lastScoredAt": "2026-04-05T03:49:28.299Z"
+      "lastScoredAt": "2026-04-06T03:53:17.707Z"
     },
     {
       "ticker": "S9B",
@@ -9396,7 +9396,7 @@
         "payoutRatio": null,
         "assetTurnover": 0.05
       },
-      "lastFetchedAt": "2026-04-05T03:49:28.299Z",
+      "lastFetchedAt": "2026-04-06T03:53:17.707Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 94,
@@ -9561,7 +9561,7 @@
         "rawTrendPenalty": 2,
         "worseningMetricCount": 1
       },
-      "lastScoredAt": "2026-04-05T03:49:28.405Z"
+      "lastScoredAt": "2026-04-06T03:53:17.790Z"
     }
   ]
 }
