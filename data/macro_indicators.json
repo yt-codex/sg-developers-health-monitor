@@ -4,7 +4,7 @@
     "sourceNote": "Compiled from public indicators and proxies"
   },
   "macro_indicators": {
-    "last_updated_utc": "2026-04-10T04:37:45.505Z",
+    "last_updated_utc": "2026-04-11T04:11:53.052Z",
     "sources": [
       {
         "name": "SingStat TableBuilder",
@@ -46,7 +46,7 @@
         "latest_period": "2026-02-01",
         "latest_value": 1.95,
         "units": "%",
-        "status": "ok",
+        "status": "failed",
         "last_ok_utc": "2026-04-10T04:37:45.505Z",
         "values": [
           {
@@ -1383,14 +1383,15 @@
           }
         ],
         "major_category": "C_funding_credit",
-        "major_category_label": "Funding & credit"
+        "major_category_label": "Funding & credit",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
       },
       "sgs_2y": {
         "freq": "M",
         "latest_period": "2026-02-01",
         "latest_value": 1.39,
         "units": "%",
-        "status": "ok",
+        "status": "failed",
         "last_ok_utc": "2026-04-10T04:37:45.505Z",
         "values": [
           {
@@ -3227,14 +3228,15 @@
           }
         ],
         "major_category": "C_funding_credit",
-        "major_category_label": "Funding & credit"
+        "major_category_label": "Funding & credit",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
       },
       "term_spread_10y_2y": {
         "freq": "M",
         "latest_period": "2026-02-01",
         "latest_value": 0.56,
         "units": "pp",
-        "status": "ok",
+        "status": "failed",
         "last_ok_utc": "2026-04-10T04:37:45.505Z",
         "values": [
           {
@@ -4571,7 +4573,8 @@
           }
         ],
         "major_category": "C_funding_credit",
-        "major_category_label": "Funding & credit"
+        "major_category_label": "Funding & credit",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
       },
       "unit_labour_cost_construction": {
         "status": "ok",
@@ -4579,7 +4582,7 @@
         "latest_period": "2025 Q4",
         "latest_value": 147.9,
         "units": "index",
-        "last_ok_utc": "2026-04-10T04:37:45.505Z",
+        "last_ok_utc": "2026-04-11T04:11:53.052Z",
         "values": [
           {
             "period": "1980 Q1",
@@ -6033,7 +6036,7 @@
         "source_series_name": "Loans To Businesses - Building And Construction - Real Property And Development Of Land"
       },
       "sora_overnight": {
-        "status": "ok",
+        "status": "failed",
         "freq": "M",
         "values": [
           {
@@ -7034,10 +7037,11 @@
         "units": "%",
         "last_ok_utc": "2026-04-10T04:37:45.505Z",
         "major_category": "C_funding_credit",
-        "major_category_label": "Funding & credit"
+        "major_category_label": "Funding & credit",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
       },
       "loan_limits_granted_building_construction": {
-        "status": "ok",
+        "status": "failed",
         "freq": "M",
         "latest_period": "2026-02",
         "latest_value": 268061.3,
@@ -7326,10 +7330,11 @@
         ],
         "last_ok_utc": "2026-04-10T04:37:45.505Z",
         "major_category": "C_funding_credit",
-        "major_category_label": "Funding & credit"
+        "major_category_label": "Funding & credit",
+        "error_summary": "MAS API I.6 fetch/parse failed: MAS API request failed after 5 attempts: received non-JSON response from MAS I.6 endpoint"
       },
       "loan_limits_utilised_building_construction": {
-        "status": "ok",
+        "status": "failed",
         "freq": "M",
         "latest_period": "2026-02",
         "latest_value": 81.5,
@@ -7618,7 +7623,8 @@
         ],
         "last_ok_utc": "2026-04-10T04:37:45.505Z",
         "major_category": "C_funding_credit",
-        "major_category_label": "Funding & credit"
+        "major_category_label": "Funding & credit",
+        "error_summary": "MAS API I.6 fetch/parse failed: MAS API request failed after 5 attempts: received non-JSON response from MAS I.6 endpoint"
       },
       "construction_material_steel_reinforcement_bars_16_32mm_high_tensile": {
         "freq": "M",
@@ -31811,7 +31817,7 @@
         "latest_value": 0.6,
         "units": "S$ million",
         "source_series_name": "Construction",
-        "status": "ok",
+        "status": "failed",
         "last_ok_utc": "2026-04-10T04:37:45.505Z",
         "values": [
           {
@@ -32628,7 +32634,8 @@
           }
         ],
         "major_category": "D_macro_regime",
-        "major_category_label": "Macro regime"
+        "major_category_label": "Macro regime",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M015792)"
       },
       "construction_material_granite_20mm_aggregate": {
         "freq": "M",
@@ -39663,12 +39670,125 @@
         "last_ok_utc": "2026-04-10T04:37:45.505Z",
         "major_category": "A_pipeline_absorption",
         "major_category_label": "Pipeline & absorption"
+      },
+      "table_M211251": {
+        "status": "failed",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M211251)"
+      },
+      "table_M701091": {
+        "status": "failed",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M701091)"
+      },
+      "table_M400391": {
+        "status": "failed",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400391)"
+      },
+      "table_M400691": {
+        "status": "failed",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400691)"
+      },
+      "table_M400861": {
+        "status": "failed",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400861)"
+      },
+      "table_M400681": {
+        "status": "failed",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400681)"
+      },
+      "dataset_M400901": {
+        "status": "failed",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400901)"
       }
     },
     "update_run": {
-      "ok_count": 15,
-      "failed_count": 0,
-      "failed_items": []
+      "ok_count": 1,
+      "failed_count": 14,
+      "failed_items": [
+        {
+          "name": "sgs_10y",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M700071",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
+        },
+        {
+          "name": "sgs_2y",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M700071",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
+        },
+        {
+          "name": "term_spread_10y_2y",
+          "source": "derived",
+          "dataset_ref": "sgs_10y-sgs_2y",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
+        },
+        {
+          "name": "table_M211251",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M211251",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M211251)"
+        },
+        {
+          "name": "table_M701091",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M701091",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M701091)"
+        },
+        {
+          "name": "table_M400391",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M400391",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400391)"
+        },
+        {
+          "name": "table_M400691",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M400691",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400691)"
+        },
+        {
+          "name": "table_M400861",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M400861",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400861)"
+        },
+        {
+          "name": "table_M400681",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M400681",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400681)"
+        },
+        {
+          "name": "dataset_M400901",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M400901",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400901)"
+        },
+        {
+          "name": "construction_gdp",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M015792",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M015792)"
+        },
+        {
+          "name": "sora_overnight",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M700071",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
+        },
+        {
+          "name": "loan_limits_granted_building_construction",
+          "source": "MAS API I.6",
+          "dataset_ref": "https://www.mas.gov.sg/api/v1/MAS/chart/table_i_6_commercial_banks_loan_limits_granted_to_non_bank_customers_by_industry",
+          "error_summary": "MAS API I.6 fetch/parse failed: MAS API request failed after 5 attempts: received non-JSON response from MAS I.6 endpoint"
+        },
+        {
+          "name": "loan_limits_utilised_building_construction",
+          "source": "MAS API I.6",
+          "dataset_ref": "https://www.mas.gov.sg/api/v1/MAS/chart/table_i_6_commercial_banks_loan_limits_granted_to_non_bank_customers_by_industry",
+          "error_summary": "MAS API I.6 fetch/parse failed: MAS API request failed after 5 attempts: received non-JSON response from MAS I.6 endpoint"
+        }
+      ]
     }
   }
 }
