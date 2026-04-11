@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-10T03:55:29.300Z",
+  "generatedAt": "2026-04-11T03:32:06.693Z",
   "totalDevelopers": 23,
   "coverageDistribution": {
     "gte0_8": 23,
@@ -9,15 +9,15 @@
   "healthScoreDistribution": {
     "min": 18,
     "p10": 38.2,
-    "p25": 49.5,
+    "p25": 48.5,
     "median": 62,
     "p75": 72.5,
     "p90": 83.6,
     "max": 94
   },
   "statusCounts": {
-    "Green": 17,
-    "Amber": 5,
+    "Green": 16,
+    "Amber": 6,
     "Red": 1,
     "Pending data": 0
   },
@@ -81,8 +81,8 @@
         },
         {
           "metric": "resilience",
-          "weightedRiskContribution": 27.606,
-          "riskScore": 78.875,
+          "weightedRiskContribution": 27.694,
+          "riskScore": 79.125,
           "metricKeys": [
             "roic",
             "roe"
@@ -263,6 +263,46 @@
       ]
     },
     {
+      "ticker": "O10",
+      "name": "Far East Orchard Ltd",
+      "segment": "mixed",
+      "healthScore": 49,
+      "healthStatus": "Amber",
+      "scoreCoverage": 0.9999999999999999,
+      "topRiskContributors": [
+        {
+          "metric": "resilience",
+          "weightedRiskContribution": 25.279,
+          "riskScore": 72.225,
+          "metricKeys": [
+            "roic",
+            "roe"
+          ],
+          "aggregation": "average"
+        },
+        {
+          "metric": "liquidity",
+          "weightedRiskContribution": 22.5,
+          "riskScore": 75,
+          "metricKeys": [
+            "currentRatio"
+          ],
+          "aggregation": "single"
+        },
+        {
+          "metric": "leverage",
+          "weightedRiskContribution": 2,
+          "riskScore": 5.714,
+          "metricKeys": [
+            "netDebtToEbitda",
+            "debtToEquity",
+            "netDebtToEquity"
+          ],
+          "aggregation": "median"
+        }
+      ]
+    },
+    {
       "ticker": "T24",
       "name": "Tuan Sing Holdings Ltd",
       "segment": "mixed",
@@ -324,46 +364,6 @@
           "metric": "liquidity",
           "weightedRiskContribution": 13.5,
           "riskScore": 45,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
-        },
-        {
-          "metric": "leverage",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "netDebtToEbitda",
-            "debtToEquity",
-            "netDebtToEquity"
-          ],
-          "aggregation": "median"
-        }
-      ]
-    },
-    {
-      "ticker": "O10",
-      "name": "Far East Orchard Ltd",
-      "segment": "mixed",
-      "healthScore": 53,
-      "healthStatus": "Green",
-      "scoreCoverage": 0.9999999999999999,
-      "topRiskContributors": [
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 24.797,
-          "riskScore": 70.85,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
-        },
-        {
-          "metric": "liquidity",
-          "weightedRiskContribution": 22.5,
-          "riskScore": 75,
           "metricKeys": [
             "currentRatio"
           ],
