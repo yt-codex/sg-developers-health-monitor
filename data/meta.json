@@ -1,12 +1,12 @@
 {
-  "last_updated_sgt": "2026-04-24T15:02:34.164+08:00",
+  "last_updated_sgt": "2026-04-24T19:01:07.509+08:00",
   "status": "success",
   "counts": {
-    "existing_total": 304,
+    "existing_total": 308,
     "new_items": 0,
-    "rejected_items": 580,
-    "total_all": 304,
-    "latest_90d": 174
+    "rejected_items": 563,
+    "total_all": 308,
+    "latest_90d": 178
   },
   "feeds": [
     {
@@ -21,14 +21,14 @@
       "query": "(\"Government Land Sales\" OR GLS) Singapore developer tender (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
       "window_days": 7,
       "status": "ok",
-      "items_fetched": 2
+      "items_fetched": 3
     },
     {
       "source": "google_news",
       "query": "URA Singapore private housing supply developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
       "window_days": 7,
       "status": "ok",
-      "items_fetched": 12
+      "items_fetched": 17
     },
     {
       "source": "google_news",
@@ -91,7 +91,7 @@
       "query": "(\"Hoi Hup\" OR \"Sunway MCL\" OR \"MCL Land\") Singapore property (site:edgeprop.sg OR site:businesstimes.com.sg OR site:theedgesingapore.com)",
       "window_days": 7,
       "status": "ok",
-      "items_fetched": 15
+      "items_fetched": 14
     }
   ]
 }
