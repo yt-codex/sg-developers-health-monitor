@@ -4,7 +4,7 @@
     "sourceNote": "Compiled from public indicators and proxies"
   },
   "macro_indicators": {
-    "last_updated_utc": "2026-04-24T04:46:16.104Z",
+    "last_updated_utc": "2026-04-25T04:28:14.517Z",
     "sources": [
       {
         "name": "SingStat TableBuilder",
@@ -47,7 +47,7 @@
         "latest_value": 2.29,
         "units": "%",
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "1998-06",
@@ -1395,7 +1395,7 @@
         "latest_value": 1.61,
         "units": "%",
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "1988-01",
@@ -3243,7 +3243,7 @@
         "latest_value": 0.68,
         "units": "pp",
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "1998-06",
@@ -4591,7 +4591,7 @@
         "latest_period": "2025 Q4",
         "latest_value": 147.9,
         "units": "index",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "1980 Q1",
@@ -5339,7 +5339,7 @@
         "latest_period": "2026 Feb",
         "latest_value": 183775.9,
         "units": "S$ million",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "2021 Aug",
@@ -5576,7 +5576,7 @@
         "latest_period": "2026 Feb",
         "latest_value": 9059.3,
         "units": "S$ million",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "2021 Aug",
@@ -5813,7 +5813,7 @@
         "latest_period": "2026 Feb",
         "latest_value": 174716.6,
         "units": "S$ million",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "2021 Aug",
@@ -7048,12 +7048,12 @@
         "latest_period": "2026-03-01",
         "latest_value": 0.9954,
         "units": "%",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "major_category": "C_funding_credit",
         "major_category_label": "Funding & credit"
       },
       "loan_limits_granted_building_construction": {
-        "status": "ok",
+        "status": "failed",
         "freq": "M",
         "latest_period": "2026-02",
         "latest_value": 268061.3,
@@ -7342,10 +7342,11 @@
         ],
         "last_ok_utc": "2026-04-24T04:46:16.104Z",
         "major_category": "C_funding_credit",
-        "major_category_label": "Funding & credit"
+        "major_category_label": "Funding & credit",
+        "error_summary": "MAS API I.6 fetch/parse failed: MAS API request failed after 5 attempts: received non-JSON response from MAS I.6 endpoint"
       },
       "loan_limits_utilised_building_construction": {
-        "status": "ok",
+        "status": "failed",
         "freq": "M",
         "latest_period": "2026-02",
         "latest_value": 81.5,
@@ -7634,7 +7635,8 @@
         ],
         "last_ok_utc": "2026-04-24T04:46:16.104Z",
         "major_category": "C_funding_credit",
-        "major_category_label": "Funding & credit"
+        "major_category_label": "Funding & credit",
+        "error_summary": "MAS API I.6 fetch/parse failed: MAS API request failed after 5 attempts: received non-JSON response from MAS I.6 endpoint"
       },
       "construction_material_steel_reinforcement_bars_16_32mm_high_tensile": {
         "freq": "M",
@@ -7643,7 +7645,7 @@
         "units": "$/Tonne",
         "source_series_name": "Steel Reinforcement Bars (16-32mm High Tensile)",
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "1999 Apr",
@@ -10264,7 +10266,7 @@
         "units": "$/Tonne",
         "source_series_name": "Cement In Bulk (Ordinary Portland Cement)",
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "1999 Apr",
@@ -12885,7 +12887,7 @@
         "units": "$/Tonne",
         "source_series_name": "Concreting Sand",
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "1999 Apr",
@@ -17297,7 +17299,7 @@
         "latest_value": 396.88,
         "units": "K Tonnes",
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "1999-01",
@@ -18614,7 +18616,7 @@
         "latest_value": 165.5,
         "units": "K Tonnes",
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "1999-01",
@@ -19931,7 +19933,7 @@
         "latest_value": 1726.7,
         "units": "K Tonnes",
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "1999-01",
@@ -21248,7 +21250,7 @@
         "latest_value": 1123.1,
         "units": "K Tonnes",
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "1999-01",
@@ -22561,8 +22563,8 @@
       },
       "prp_pipeline_total_non_landed": {
         "freq": "Q",
-        "latest_period": "20254Q",
-        "latest_value": 47358,
+        "latest_period": "20261Q",
+        "latest_value": 48111,
         "units": "units",
         "source_series_name": "Total Non-Landed Properties",
         "check": {
@@ -22573,7 +22575,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "19932Q",
@@ -23098,6 +23100,10 @@
           {
             "period": "20254Q",
             "value": 47358
+          },
+          {
+            "period": "20261Q",
+            "value": 48111
           }
         ],
         "major_category": "A_pipeline_absorption",
@@ -23105,8 +23111,8 @@
       },
       "prp_pipeline_non_landed_under_construction": {
         "freq": "Q",
-        "latest_period": "20254Q",
-        "latest_value": 28903,
+        "latest_period": "20261Q",
+        "latest_value": 30827,
         "units": "units",
         "source_series_name": "Under Construction",
         "check": {
@@ -23117,7 +23123,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "19932Q",
@@ -23642,6 +23648,10 @@
           {
             "period": "20254Q",
             "value": 28903
+          },
+          {
+            "period": "20261Q",
+            "value": 30827
           }
         ],
         "major_category": "A_pipeline_absorption",
@@ -23649,8 +23659,8 @@
       },
       "prp_pipeline_non_landed_planned_written_permission": {
         "freq": "Q",
-        "latest_period": "20254Q",
-        "latest_value": 1924,
+        "latest_period": "20261Q",
+        "latest_value": 1080,
         "units": "units",
         "source_series_name": "Planned - Written Permission",
         "check": {
@@ -23661,7 +23671,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "19932Q",
@@ -24186,6 +24196,10 @@
           {
             "period": "20254Q",
             "value": 1924
+          },
+          {
+            "period": "20261Q",
+            "value": 1080
           }
         ],
         "major_category": "A_pipeline_absorption",
@@ -24193,8 +24207,8 @@
       },
       "prp_pipeline_non_landed_planned_provisional_permission": {
         "freq": "Q",
-        "latest_period": "20254Q",
-        "latest_value": 3541,
+        "latest_period": "20261Q",
+        "latest_value": 4894,
         "units": "units",
         "source_series_name": "Planned - Provisional Permission",
         "check": {
@@ -24205,7 +24219,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "19932Q",
@@ -24730,6 +24744,10 @@
           {
             "period": "20254Q",
             "value": 3541
+          },
+          {
+            "period": "20261Q",
+            "value": 4894
           }
         ],
         "major_category": "A_pipeline_absorption",
@@ -24737,8 +24755,8 @@
       },
       "prp_pipeline_non_landed_planned_others": {
         "freq": "Q",
-        "latest_period": "20254Q",
-        "latest_value": 12990,
+        "latest_period": "20261Q",
+        "latest_value": 11310,
         "units": "units",
         "source_series_name": "Planned - Others",
         "check": {
@@ -24749,7 +24767,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "19932Q",
@@ -25274,6 +25292,10 @@
           {
             "period": "20254Q",
             "value": 12990
+          },
+          {
+            "period": "20261Q",
+            "value": 11310
           }
         ],
         "major_category": "A_pipeline_absorption",
@@ -25281,7 +25303,7 @@
       },
       "commind_office_total": {
         "freq": "Q",
-        "latest_period": "20254Q",
+        "latest_period": "20261Q",
         "latest_value": 867,
         "units": "units",
         "source_series_name": "Total Office Space",
@@ -25295,7 +25317,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "19932Q",
@@ -25820,6 +25842,10 @@
           {
             "period": "20254Q",
             "value": 867
+          },
+          {
+            "period": "20261Q",
+            "value": 867
           }
         ],
         "major_category": "A_pipeline_absorption",
@@ -25827,8 +25853,8 @@
       },
       "commind_office_under_construction": {
         "freq": "Q",
-        "latest_period": "20254Q",
-        "latest_value": 531,
+        "latest_period": "20261Q",
+        "latest_value": 520,
         "units": "units",
         "source_series_name": "Under Construction",
         "parent_total": "Total Office Space",
@@ -25841,7 +25867,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "19932Q",
@@ -26366,6 +26392,10 @@
           {
             "period": "20254Q",
             "value": 531
+          },
+          {
+            "period": "20261Q",
+            "value": 520
           }
         ],
         "major_category": "A_pipeline_absorption",
@@ -26373,8 +26403,8 @@
       },
       "commind_office_planned_written_permission": {
         "freq": "Q",
-        "latest_period": "20254Q",
-        "latest_value": 63,
+        "latest_period": "20261Q",
+        "latest_value": 76,
         "units": "units",
         "source_series_name": "Planned - Written Permission",
         "parent_total": "Total Office Space",
@@ -26387,7 +26417,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "19932Q",
@@ -26912,6 +26942,10 @@
           {
             "period": "20254Q",
             "value": 63
+          },
+          {
+            "period": "20261Q",
+            "value": 76
           }
         ],
         "major_category": "A_pipeline_absorption",
@@ -26919,8 +26953,8 @@
       },
       "commind_office_planned_provisional_permission": {
         "freq": "Q",
-        "latest_period": "20254Q",
-        "latest_value": 273,
+        "latest_period": "20261Q",
+        "latest_value": 271,
         "units": "units",
         "source_series_name": "Planned - Provisional Permission",
         "parent_total": "Total Office Space",
@@ -26933,7 +26967,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "19932Q",
@@ -27458,6 +27492,10 @@
           {
             "period": "20254Q",
             "value": 273
+          },
+          {
+            "period": "20261Q",
+            "value": 271
           }
         ],
         "major_category": "A_pipeline_absorption",
@@ -27465,7 +27503,7 @@
       },
       "commind_office_planned_others": {
         "freq": "Q",
-        "latest_period": "20254Q",
+        "latest_period": "20261Q",
         "latest_value": 0,
         "units": "units",
         "source_series_name": "Planned - Others",
@@ -27479,7 +27517,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "19932Q",
@@ -28004,6 +28042,10 @@
           {
             "period": "20254Q",
             "value": 0
+          },
+          {
+            "period": "20261Q",
+            "value": 0
           }
         ],
         "major_category": "A_pipeline_absorption",
@@ -28025,7 +28067,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "20023Q",
@@ -28427,7 +28469,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "20023Q",
@@ -28829,7 +28871,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "20134Q",
@@ -29051,7 +29093,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "20134Q",
@@ -29273,7 +29315,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "20134Q",
@@ -29481,8 +29523,8 @@
       },
       "commind_retail_total": {
         "freq": "Q",
-        "latest_period": "20254Q",
-        "latest_value": 643,
+        "latest_period": "20261Q",
+        "latest_value": 674,
         "units": "units",
         "source_series_name": "Total Retail Space",
         "parent_total": "Total Retail Space",
@@ -29495,7 +29537,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "20111Q",
@@ -29736,6 +29778,10 @@
           {
             "period": "20254Q",
             "value": 643
+          },
+          {
+            "period": "20261Q",
+            "value": 674
           }
         ],
         "major_category": "A_pipeline_absorption",
@@ -29743,8 +29789,8 @@
       },
       "commind_retail_under_construction": {
         "freq": "Q",
-        "latest_period": "20254Q",
-        "latest_value": 311,
+        "latest_period": "20261Q",
+        "latest_value": 359,
         "units": "units",
         "source_series_name": "Under Construction",
         "parent_total": "Total Retail Space",
@@ -29757,7 +29803,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "20111Q",
@@ -29998,6 +30044,10 @@
           {
             "period": "20254Q",
             "value": 311
+          },
+          {
+            "period": "20261Q",
+            "value": 359
           }
         ],
         "major_category": "A_pipeline_absorption",
@@ -30005,7 +30055,7 @@
       },
       "commind_retail_planned_written_permission": {
         "freq": "Q",
-        "latest_period": "20254Q",
+        "latest_period": "20261Q",
         "latest_value": 12,
         "units": "units",
         "source_series_name": "Planned - Written Permission",
@@ -30019,7 +30069,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "20111Q",
@@ -30260,6 +30310,10 @@
           {
             "period": "20254Q",
             "value": 12
+          },
+          {
+            "period": "20261Q",
+            "value": 12
           }
         ],
         "major_category": "A_pipeline_absorption",
@@ -30267,8 +30321,8 @@
       },
       "commind_retail_planned_provisional_permission": {
         "freq": "Q",
-        "latest_period": "20254Q",
-        "latest_value": 237,
+        "latest_period": "20261Q",
+        "latest_value": 234,
         "units": "units",
         "source_series_name": "Planned - Provisional Permission",
         "parent_total": "Total Retail Space",
@@ -30281,7 +30335,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "20111Q",
@@ -30522,6 +30576,10 @@
           {
             "period": "20254Q",
             "value": 237
+          },
+          {
+            "period": "20261Q",
+            "value": 234
           }
         ],
         "major_category": "A_pipeline_absorption",
@@ -30529,8 +30587,8 @@
       },
       "commind_retail_planned_others": {
         "freq": "Q",
-        "latest_period": "20254Q",
-        "latest_value": 83,
+        "latest_period": "20261Q",
+        "latest_value": 69,
         "units": "units",
         "source_series_name": "Planned - Others",
         "parent_total": "Total Retail Space",
@@ -30543,7 +30601,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "20111Q",
@@ -30784,6 +30842,10 @@
           {
             "period": "20254Q",
             "value": 83
+          },
+          {
+            "period": "20261Q",
+            "value": 69
           }
         ],
         "major_category": "A_pipeline_absorption",
@@ -30803,7 +30865,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "20134Q",
@@ -31023,7 +31085,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "20134Q",
@@ -31243,7 +31305,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "20134Q",
@@ -31463,7 +31525,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "20134Q",
@@ -31683,7 +31745,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "20134Q",
@@ -31896,7 +31958,7 @@
         "units": "S$ million",
         "source_series_name": "Construction",
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "values": [
           {
             "period": "1975Q2",
@@ -35331,7 +35393,7 @@
         ],
         "source_series_name": "Granite (20mm Aggregate)",
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "major_category": "B_margin_pressures",
         "major_category_label": "Margin pressures"
       },
@@ -37952,14 +38014,14 @@
         ],
         "source_series_name": "Ready Mixed Concrete",
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "major_category": "B_margin_pressures",
         "major_category_label": "Margin pressures"
       },
       "private_vacant_private_sector_office_space_vacant": {
         "freq": "Q",
-        "latest_period": "20254Q",
-        "latest_value": 783,
+        "latest_period": "20261Q",
+        "latest_value": 753,
         "units": "sqm",
         "values": [
           {
@@ -38485,11 +38547,15 @@
           {
             "period": "20254Q",
             "value": 783
+          },
+          {
+            "period": "20261Q",
+            "value": 753
           }
         ],
         "source_series_name": "Private Sector Office Space Vacant",
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "major_category": "A_pipeline_absorption",
         "major_category_label": "Pipeline & absorption"
       },
@@ -38882,7 +38948,7 @@
         ],
         "source_series_name": "Private Sector Business Park Space Vacant",
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "major_category": "A_pipeline_absorption",
         "major_category_label": "Pipeline & absorption"
       },
@@ -39507,14 +39573,14 @@
         ],
         "source_series_name": "Private Sector Multiple-User Factory Space Vacant",
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "major_category": "A_pipeline_absorption",
         "major_category_label": "Pipeline & absorption"
       },
       "private_vacant_private_sector_retail_space_vacant": {
         "freq": "Q",
-        "latest_period": "20254Q",
-        "latest_value": 303,
+        "latest_period": "20261Q",
+        "latest_value": 305,
         "units": "sqm",
         "values": [
           {
@@ -39756,11 +39822,15 @@
           {
             "period": "20254Q",
             "value": 303
+          },
+          {
+            "period": "20261Q",
+            "value": 305
           }
         ],
         "source_series_name": "Private Sector Retail Space Vacant",
         "status": "ok",
-        "last_ok_utc": "2026-04-24T04:46:16.104Z",
+        "last_ok_utc": "2026-04-25T04:28:14.517Z",
         "major_category": "A_pipeline_absorption",
         "major_category_label": "Pipeline & absorption"
       },
@@ -39794,9 +39864,22 @@
       }
     },
     "update_run": {
-      "ok_count": 15,
-      "failed_count": 0,
-      "failed_items": []
+      "ok_count": 13,
+      "failed_count": 2,
+      "failed_items": [
+        {
+          "name": "loan_limits_granted_building_construction",
+          "source": "MAS API I.6",
+          "dataset_ref": "https://www.mas.gov.sg/api/v1/MAS/chart/table_i_6_commercial_banks_loan_limits_granted_to_non_bank_customers_by_industry",
+          "error_summary": "MAS API I.6 fetch/parse failed: MAS API request failed after 5 attempts: received non-JSON response from MAS I.6 endpoint"
+        },
+        {
+          "name": "loan_limits_utilised_building_construction",
+          "source": "MAS API I.6",
+          "dataset_ref": "https://www.mas.gov.sg/api/v1/MAS/chart/table_i_6_commercial_banks_loan_limits_granted_to_non_bank_customers_by_industry",
+          "error_summary": "MAS API I.6 fetch/parse failed: MAS API request failed after 5 attempts: received non-JSON response from MAS I.6 endpoint"
+        }
+      ]
     }
   }
 }
