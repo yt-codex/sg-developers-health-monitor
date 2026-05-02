@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "status": "OK",
-  "last_run_time": "2026-05-02T04:14:39Z",
+  "status": "WARN",
+  "last_run_time": "2026-05-02T04:52:23Z",
   "duration_seconds": null,
   "freshness": {
-    "max_date": "2026-05-02T04:14:21.094Z",
-    "lag_seconds": 15.0,
+    "max_date": "2026-05-02T04:51:39.151Z",
+    "lag_seconds": 42.0,
     "stale": false
   },
   "row_counts": {
@@ -16,15 +16,15 @@
     "news_total_all": 359,
     "news_latest_90d": 222,
     "news_new_items": 1,
-    "macro_ok_count": 15,
-    "macro_failed_count": 0,
-    "macro_failed_series_count": 7,
+    "macro_ok_count": 13,
+    "macro_failed_count": 2,
+    "macro_failed_series_count": 9,
     "dev_total": 23,
     "dev_ok": 23,
     "dev_partial": 0,
     "dev_error": 0
   },
-  "schema_hash": "03638fc5a1a93dca338d86ae90309b814e2813b9ff33d121f6d7b0d1723b0b4c",
+  "schema_hash": "7bcff63504a9a71a4db50c4f3ad0dec9a0c9cbcd97d41131131ad2761613bc66",
   "key_checks": [
     {
       "name": "required_file.data_meta.json",
@@ -65,14 +65,14 @@
     {
       "name": "macro.ok_count",
       "status": "OK",
-      "detail": "ok_count=15",
-      "metric": 15
+      "detail": "ok_count=13",
+      "metric": 13
     },
     {
       "name": "macro.partial_degradation",
-      "status": "OK",
-      "detail": "macro failures unchanged vs baseline (0/7)",
-      "metric": 7
+      "status": "WARN",
+      "detail": "macro failures increased vs baseline (0/7 -> 2/9); MAS API I.6 fetch/parse failed: MAS API request failed after 5 attempts: received non-JSON response from MAS I.6 endpoint | MAS API I.6 fetch/parse failed: MAS API request failed after 5 attempts: received non-JSON response from MAS I.6 endpoint | HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M211251)",
+      "metric": 9
     },
     {
       "name": "developer.fetch_health",
@@ -113,26 +113,26 @@
     {
       "name": "freshness.news",
       "status": "OK",
-      "detail": "news lag=8408s",
-      "metric": 8408
+      "detail": "news lag=10672s",
+      "metric": 10672
     },
     {
       "name": "freshness.macro",
       "status": "OK",
-      "detail": "macro lag=81639s",
-      "metric": 81639
+      "detail": "macro lag=42s",
+      "metric": 42
     },
     {
       "name": "freshness.ratios",
       "status": "OK",
-      "detail": "ratios lag=15s",
-      "metric": 15
+      "detail": "ratios lag=2280s",
+      "metric": 2280
     },
     {
       "name": "freshness.overall",
       "status": "OK",
-      "detail": "lag=15s",
-      "metric": 15
+      "detail": "lag=42s",
+      "metric": 42
     },
     {
       "name": "developer.diagnostics",
@@ -141,35 +141,38 @@
       "metric": 23
     }
   ],
-  "warnings": [],
+  "warnings": [
+    "macro.partial_degradation: macro failures increased vs baseline (0/7 -> 2/9); MAS API I.6 fetch/parse failed: MAS API request failed after 5 attempts: received non-JSON response from MAS I.6 endpoint | MAS API I.6 fetch/parse failed: MAS API request failed after 5 attempts: received non-JSON response from MAS I.6 endpoint | HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M211251)",
+    "macro.failed_items: loan_limits_granted_building_construction:MAS API I.6 fetch/parse failed: MAS API request failed after 5 attempts: received non-JSON response from MAS I.6 endpoint | loan_limits_utilised_building_construction:MAS API I.6 fetch/parse failed: MAS API request failed after 5 attempts: received non-JSON response from MAS I.6 endpoint"
+  ],
   "artifact_links": [
     {
       "label": "workflow_run",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/25243509119"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/25244143195"
     },
     {
       "label": "input:data_meta.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/2013e96948645ee1acdb5429719871adc3f51abb/data/meta.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/330280c558d9006bc3c2a615591b4a2c100e0993/data/meta.json"
     },
     {
       "label": "input:data_news_all.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/2013e96948645ee1acdb5429719871adc3f51abb/data/news_all.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/330280c558d9006bc3c2a615591b4a2c100e0993/data/news_all.json"
     },
     {
       "label": "input:data_news_latest_90d.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/2013e96948645ee1acdb5429719871adc3f51abb/data/news_latest_90d.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/330280c558d9006bc3c2a615591b4a2c100e0993/data/news_latest_90d.json"
     },
     {
       "label": "input:data_macro_indicators.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/2013e96948645ee1acdb5429719871adc3f51abb/data/macro_indicators.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/330280c558d9006bc3c2a615591b4a2c100e0993/data/macro_indicators.json"
     },
     {
       "label": "input:data_processed_developer_ratios_history.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/2013e96948645ee1acdb5429719871adc3f51abb/data/processed/developer_ratios_history.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/330280c558d9006bc3c2a615591b4a2c100e0993/data/processed/developer_ratios_history.json"
     },
     {
       "label": "input:data_processed_developer_health_diagnostics.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/2013e96948645ee1acdb5429719871adc3f51abb/data/processed/developer_health_diagnostics.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/330280c558d9006bc3c2a615591b4a2c100e0993/data/processed/developer_health_diagnostics.json"
     },
     {
       "label": "workflow:update_dashboard_data",
@@ -177,7 +180,7 @@
     },
     {
       "label": "workflow:update_macro_indicators",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/25203776884"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/25244121493"
     },
     {
       "label": "workflow:update_developer_news",
@@ -186,34 +189,34 @@
   ],
   "meta": {
     "repo": "yt-codex/sg-developers-health-monitor",
-    "run_id": "25243509119",
-    "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/25243509119",
+    "run_id": "25244143195",
+    "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/25244143195",
     "workflow": "Ops probe aggregator",
     "job": "emit-probe",
-    "sha": "2013e96948645ee1acdb5429719871adc3f51abb",
-    "generated_at_utc": "2026-05-02T04:14:36.992Z",
+    "sha": "330280c558d9006bc3c2a615591b4a2c100e0993",
+    "generated_at_utc": "2026-05-02T04:52:21.178Z",
     "workflow_conclusions": {
       "Update dashboard data": {
         "conclusion": "success",
         "status": "completed",
         "completed_at": "2026-05-02T04:14:01Z",
-        "age_seconds": 35,
+        "age_seconds": 2300,
         "stale": false,
         "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/25243501501"
       },
       "Update macro indicators": {
         "conclusion": "success",
         "status": "completed",
-        "completed_at": "2026-05-01T05:33:34Z",
-        "age_seconds": 81662,
+        "completed_at": "2026-05-02T04:50:54Z",
+        "age_seconds": 87,
         "stale": false,
-        "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/25203776884"
+        "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/25244121493"
       },
       "Update developer news": {
         "conclusion": "success",
         "status": "completed",
         "completed_at": "2026-05-02T01:51:42Z",
-        "age_seconds": 8574,
+        "age_seconds": 10839,
         "stale": false,
         "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/25240833879"
       }
@@ -230,15 +233,15 @@
     "freshness_sources": {
       "news": {
         "date": "2026-05-02T01:54:28.413Z",
-        "lag_seconds": 8408
+        "lag_seconds": 10672
       },
       "macro": {
-        "date": "2026-05-01T05:33:57.358Z",
-        "lag_seconds": 81639
+        "date": "2026-05-02T04:51:39.151Z",
+        "lag_seconds": 42
       },
       "ratios": {
         "date": "2026-05-02T04:14:21.094Z",
-        "lag_seconds": 15
+        "lag_seconds": 2280
       }
     }
   }
