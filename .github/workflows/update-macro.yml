@@ -49,6 +49,7 @@ jobs:
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add data/macro_indicators.json
+          git add data/macro_indicators.json data/macro_stress_signals.json
           git diff --staged --quiet || git commit -m "chore(data): update macro indicators"
+          git pull --rebase origin main
           git push
