@@ -182,6 +182,13 @@ function recordFail(results, payload) {
   return result;
 }
 
+function recordCachedOk(results, payload) {
+  const result = { ...payload, status: 'ok', used_cached_source: true };
+  results.push(result);
+  console.log(`[OK-CACHED] ${result.key} ${result.dataset_ref} ${result.series_name || '-'} ${result.latest_period || '-'} ${result.latest_value ?? '-'} ${result.cache_note || ''}`);
+  return result;
+}
+
 function printRunSummary(results) {
   const ok = results.filter((x) => x.status === 'ok');
   const failed = results.filter((x) => x.status === 'failed');
@@ -314,6 +321,9 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
   const tryIndicator = async (meta, fn) => {
     try {
       const payload = await fn();
+      if (payload?.used_cached_source) {
+        return recordCachedOk(results, { ...meta, ...payload });
+      }
       return recordOk(results, { ...meta, ...payload });
     } catch (err) {
       return recordFail(results, { ...meta, error_summary: summarizeError(err) });
@@ -681,53 +691,73 @@ async function buildMacroIndicators(verifyOnly = false, existingSeries = {}) {
     return { latest_period: latest.date, latest_value: latest.value };
   });
 
-  let masI6ApiPromise;
-  const getMasI6Api = async () => {
-    if (!masI6ApiPromise) masI6ApiPromise = fetchMasI6LoanLimits({ verifyMode: VERIFY_MODE });
-    return masI6ApiPromise;
+  let masI6ApiResultPromise;
+  const getMasI6ApiResult = async () => {
+    if (!masI6ApiResultPromise) {
+      masI6ApiResultPromise = fetchMasI6LoanLimits({ verifyMode: VERIFY_MODE })
+        .then((payload) => ({ ok: true, payload }))
+        .catch((err) => ({ ok: false, error: err }));
+    }
+    return masI6ApiResultPromise;
   };
 
-  await tryIndicator({ key: 'loan_limits_granted_building_construction', source: 'MAS API I.6', dataset_ref: MAS_I6_API_URL }, async () => {
-    const i6 = await getMasI6Api();
-    const merged = mergeMonthlyHistory(existingSeries.loan_limits_granted_building_construction?.values, i6.grantedValues);
-    const grantedLatest = merged.merged[merged.merged.length - 1];
-    if (!grantedLatest) throw new Error('0 monthly values extracted');
-    if (!verifyOnly) {
-      series.loan_limits_granted_building_construction = {
-        freq: 'M',
-        latest_period: grantedLatest.period,
-        latest_value: grantedLatest.value,
-        units: 'S$ million',
-        values: merged.merged
-      };
+  const useMasI6Series = async ({ key, valueKey, units }) => {
+    const i6Result = await getMasI6ApiResult();
+    const fetchedValues = i6Result.ok ? i6Result.payload[valueKey] : [];
+    const existingValues = existingSeries[key]?.values;
+    const merged = mergeMonthlyHistory(existingValues, fetchedValues);
+    const latest = merged.merged[merged.merged.length - 1];
+    if (!latest) {
+      if (i6Result.ok) throw new Error('0 monthly values extracted');
+      throw i6Result.error;
     }
-    if (VERIFY_MODE) {
-      console.log(`[OK] loan_limits_granted_building_construction latest_period=${grantedLatest.period} latest_value=${grantedLatest.value} prelim=${Boolean(grantedLatest.prelim)}`);
-      console.log(`[verify-mas-api-i6] granted counts extracted_rows=${i6.extractedRowCount} merged_updated=${merged.updated} merged_appended=${merged.appended}`);
-    }
-    return { latest_period: grantedLatest.period, latest_value: grantedLatest.value };
-  });
 
-  await tryIndicator({ key: 'loan_limits_utilised_building_construction', source: 'MAS API I.6', dataset_ref: MAS_I6_API_URL }, async () => {
-    const i6 = await getMasI6Api();
-    const merged = mergeMonthlyHistory(existingSeries.loan_limits_utilised_building_construction?.values, i6.utilisedValues);
-    const utilisedLatest = merged.merged[merged.merged.length - 1];
-    if (!utilisedLatest) throw new Error('0 monthly values extracted');
+    const usedCachedSource = !i6Result.ok;
     if (!verifyOnly) {
-      series.loan_limits_utilised_building_construction = {
+      series[key] = {
         freq: 'M',
-        latest_period: utilisedLatest.period,
-        latest_value: utilisedLatest.value,
-        units: '%',
-        values: merged.merged
+        latest_period: latest.period,
+        latest_value: latest.value,
+        units,
+        values: merged.merged,
+        ...(usedCachedSource
+          ? {
+              source_status: 'cached_due_to_upstream_unavailable',
+              source_error_summary: summarizeError(i6Result.error)
+            }
+          : {})
       };
     }
+
     if (VERIFY_MODE) {
-      console.log(`[OK] loan_limits_utilised_building_construction latest_period=${utilisedLatest.period} latest_value=${utilisedLatest.value} prelim=${Boolean(utilisedLatest.prelim)}`);
-      console.log(`[verify-mas-api-i6] utilised counts extracted_rows=${i6.extractedRowCount} merged_updated=${merged.updated} merged_appended=${merged.appended}`);
+      if (usedCachedSource) {
+        console.log(`[verify-mas-api-i6] upstream unavailable for ${key}; reused existing cached series latest_period=${latest.period} latest_value=${latest.value}`);
+      } else {
+        console.log(`[OK] ${key} latest_period=${latest.period} latest_value=${latest.value} prelim=${Boolean(latest.prelim)}`);
+        console.log(`[verify-mas-api-i6] ${key} counts extracted_rows=${i6Result.payload.extractedRowCount} merged_updated=${merged.updated} merged_appended=${merged.appended}`);
+      }
     }
-    return { latest_period: utilisedLatest.period, latest_value: utilisedLatest.value };
-  });
+
+    return {
+      latest_period: latest.period,
+      latest_value: latest.value,
+      ...(usedCachedSource
+        ? {
+            used_cached_source: true,
+            cache_note: `MAS I.6 upstream unavailable; reused cached ${latest.period} value`,
+            source_error_summary: summarizeError(i6Result.error)
+          }
+        : {})
+    };
+  };
+
+  await tryIndicator({ key: 'loan_limits_granted_building_construction', source: 'MAS API I.6', dataset_ref: MAS_I6_API_URL }, async () => (
+    useMasI6Series({ key: 'loan_limits_granted_building_construction', valueKey: 'grantedValues', units: 'S$ million' })
+  ));
+
+  await tryIndicator({ key: 'loan_limits_utilised_building_construction', source: 'MAS API I.6', dataset_ref: MAS_I6_API_URL }, async () => (
+    useMasI6Series({ key: 'loan_limits_utilised_building_construction', valueKey: 'utilisedValues', units: '%' })
+  ));
 
 
   const updateRun = printRunSummary(results);
@@ -765,6 +795,10 @@ async function main() {
       last_ok_utc: nowIso
     };
     delete mergedSeries[key].error_summary;
+  }
+
+  for (const result of results.filter((r) => r.status === 'ok' && !Object.prototype.hasOwnProperty.call(fetchedSeries, r.key))) {
+    delete mergedSeries[result.key];
   }
 
   for (const result of results.filter((r) => r.status === 'failed')) {

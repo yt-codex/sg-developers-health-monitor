@@ -4,7 +4,7 @@
     "sourceNote": "Compiled from public indicators and proxies"
   },
   "macro_indicators": {
-    "last_updated_utc": "2026-05-02T04:51:39.151Z",
+    "last_updated_utc": "2026-05-03T02:24:47.540Z",
     "sources": [
       {
         "name": "SingStat TableBuilder",
@@ -47,7 +47,7 @@
         "latest_value": 2.29,
         "units": "%",
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "1998-06",
@@ -1395,7 +1395,7 @@
         "latest_value": 1.61,
         "units": "%",
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "1988-01",
@@ -3243,7 +3243,7 @@
         "latest_value": 0.68,
         "units": "pp",
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "1998-06",
@@ -4591,7 +4591,7 @@
         "latest_period": "2025 Q4",
         "latest_value": 147.9,
         "units": "index",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "1980 Q1",
@@ -5339,7 +5339,7 @@
         "latest_period": "2026 Mar",
         "latest_value": 183703,
         "units": "S$ million",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "2021 Aug",
@@ -5580,7 +5580,7 @@
         "latest_period": "2026 Mar",
         "latest_value": 9229.4,
         "units": "S$ million",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "2021 Aug",
@@ -5821,7 +5821,7 @@
         "latest_period": "2026 Mar",
         "latest_value": 174473.6,
         "units": "S$ million",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "2021 Aug",
@@ -7060,12 +7060,12 @@
         "latest_period": "2026-03-01",
         "latest_value": 0.9954,
         "units": "%",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "major_category": "C_funding_credit",
         "major_category_label": "Funding & credit"
       },
       "loan_limits_granted_building_construction": {
-        "status": "failed",
+        "status": "ok",
         "freq": "M",
         "latest_period": "2026-03",
         "latest_value": 268835.2,
@@ -7357,13 +7357,14 @@
             "value": 268835.2
           }
         ],
-        "last_ok_utc": "2026-05-01T05:33:57.358Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "major_category": "C_funding_credit",
         "major_category_label": "Funding & credit",
-        "error_summary": "MAS API I.6 fetch/parse failed: MAS API request failed after 5 attempts: received non-JSON response from MAS I.6 endpoint"
+        "source_status": "cached_due_to_upstream_unavailable",
+        "source_error_summary": "MAS API I.6 fetch/parse failed: MAS API request failed after 5 attempts: received non-JSON response from MAS I.6 endpoint"
       },
       "loan_limits_utilised_building_construction": {
-        "status": "failed",
+        "status": "ok",
         "freq": "M",
         "latest_period": "2026-03",
         "latest_value": 81.2,
@@ -7655,10 +7656,11 @@
             "value": 81.2
           }
         ],
-        "last_ok_utc": "2026-05-01T05:33:57.358Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "major_category": "C_funding_credit",
         "major_category_label": "Funding & credit",
-        "error_summary": "MAS API I.6 fetch/parse failed: MAS API request failed after 5 attempts: received non-JSON response from MAS I.6 endpoint"
+        "source_status": "cached_due_to_upstream_unavailable",
+        "source_error_summary": "MAS API I.6 fetch/parse failed: MAS API request failed after 5 attempts: received non-JSON response from MAS I.6 endpoint"
       },
       "construction_material_steel_reinforcement_bars_16_32mm_high_tensile": {
         "freq": "M",
@@ -7667,7 +7669,7 @@
         "units": "$/Tonne",
         "source_series_name": "Steel Reinforcement Bars (16-32mm High Tensile)",
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "1999 Apr",
@@ -10288,7 +10290,7 @@
         "units": "$/Tonne",
         "source_series_name": "Cement In Bulk (Ordinary Portland Cement)",
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "1999 Apr",
@@ -12909,7 +12911,7 @@
         "units": "$/Tonne",
         "source_series_name": "Concreting Sand",
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "1999 Apr",
@@ -17321,7 +17323,7 @@
         "latest_value": 396.88,
         "units": "K Tonnes",
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "1999-01",
@@ -18638,7 +18640,7 @@
         "latest_value": 165.5,
         "units": "K Tonnes",
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "1999-01",
@@ -19955,7 +19957,7 @@
         "latest_value": 1726.7,
         "units": "K Tonnes",
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "1999-01",
@@ -21272,7 +21274,7 @@
         "latest_value": 1123.1,
         "units": "K Tonnes",
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "1999-01",
@@ -22597,7 +22599,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "19932Q",
@@ -23145,7 +23147,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "19932Q",
@@ -23693,7 +23695,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "19932Q",
@@ -24241,7 +24243,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "19932Q",
@@ -24789,7 +24791,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "19932Q",
@@ -25339,7 +25341,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "19932Q",
@@ -25889,7 +25891,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "19932Q",
@@ -26439,7 +26441,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "19932Q",
@@ -26989,7 +26991,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "19932Q",
@@ -27539,7 +27541,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "19932Q",
@@ -28089,7 +28091,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "20023Q",
@@ -28491,7 +28493,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "20023Q",
@@ -28893,7 +28895,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "20134Q",
@@ -29115,7 +29117,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "20134Q",
@@ -29337,7 +29339,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "20134Q",
@@ -29559,7 +29561,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "20111Q",
@@ -29825,7 +29827,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "20111Q",
@@ -30091,7 +30093,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "20111Q",
@@ -30357,7 +30359,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "20111Q",
@@ -30623,7 +30625,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "20111Q",
@@ -30887,7 +30889,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "20134Q",
@@ -31107,7 +31109,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "20134Q",
@@ -31327,7 +31329,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "20134Q",
@@ -31547,7 +31549,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "20134Q",
@@ -31767,7 +31769,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "20134Q",
@@ -31980,7 +31982,7 @@
         "units": "S$ million",
         "source_series_name": "Construction",
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "values": [
           {
             "period": "1975Q2",
@@ -35415,7 +35417,7 @@
         ],
         "source_series_name": "Granite (20mm Aggregate)",
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "major_category": "B_margin_pressures",
         "major_category_label": "Margin pressures"
       },
@@ -38036,7 +38038,7 @@
         ],
         "source_series_name": "Ready Mixed Concrete",
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "major_category": "B_margin_pressures",
         "major_category_label": "Margin pressures"
       },
@@ -38577,7 +38579,7 @@
         ],
         "source_series_name": "Private Sector Office Space Vacant",
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "major_category": "A_pipeline_absorption",
         "major_category_label": "Pipeline & absorption"
       },
@@ -38970,7 +38972,7 @@
         ],
         "source_series_name": "Private Sector Business Park Space Vacant",
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "major_category": "A_pipeline_absorption",
         "major_category_label": "Pipeline & absorption"
       },
@@ -39595,7 +39597,7 @@
         ],
         "source_series_name": "Private Sector Multiple-User Factory Space Vacant",
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "major_category": "A_pipeline_absorption",
         "major_category_label": "Pipeline & absorption"
       },
@@ -39852,56 +39854,15 @@
         ],
         "source_series_name": "Private Sector Retail Space Vacant",
         "status": "ok",
-        "last_ok_utc": "2026-05-02T04:51:39.151Z",
+        "last_ok_utc": "2026-05-03T02:24:47.540Z",
         "major_category": "A_pipeline_absorption",
         "major_category_label": "Pipeline & absorption"
-      },
-      "table_M211251": {
-        "status": "failed",
-        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M211251)"
-      },
-      "table_M701091": {
-        "status": "failed",
-        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M701091)"
-      },
-      "table_M400391": {
-        "status": "failed",
-        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400391)"
-      },
-      "table_M400691": {
-        "status": "failed",
-        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400691)"
-      },
-      "table_M400861": {
-        "status": "failed",
-        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400861)"
-      },
-      "table_M400681": {
-        "status": "failed",
-        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400681)"
-      },
-      "dataset_M400901": {
-        "status": "failed",
-        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400901)"
       }
     },
     "update_run": {
-      "ok_count": 13,
-      "failed_count": 2,
-      "failed_items": [
-        {
-          "name": "loan_limits_granted_building_construction",
-          "source": "MAS API I.6",
-          "dataset_ref": "https://www.mas.gov.sg/api/v1/MAS/chart/table_i_6_commercial_banks_loan_limits_granted_to_non_bank_customers_by_industry",
-          "error_summary": "MAS API I.6 fetch/parse failed: MAS API request failed after 5 attempts: received non-JSON response from MAS I.6 endpoint"
-        },
-        {
-          "name": "loan_limits_utilised_building_construction",
-          "source": "MAS API I.6",
-          "dataset_ref": "https://www.mas.gov.sg/api/v1/MAS/chart/table_i_6_commercial_banks_loan_limits_granted_to_non_bank_customers_by_industry",
-          "error_summary": "MAS API I.6 fetch/parse failed: MAS API request failed after 5 attempts: received non-JSON response from MAS I.6 endpoint"
-        }
-      ]
+      "ok_count": 15,
+      "failed_count": 0,
+      "failed_items": []
     }
   }
 }
