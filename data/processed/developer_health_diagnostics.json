@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-08T04:11:58.711Z",
+  "generatedAt": "2026-05-09T04:18:09.126Z",
   "totalDevelopers": 23,
   "coverageDistribution": {
     "gte0_8": 23,
@@ -8,7 +8,7 @@
   },
   "healthScoreDistribution": {
     "min": 23,
-    "p10": 38.2,
+    "p10": 35.6,
     "p25": 48.5,
     "median": 62,
     "p75": 72.5,
@@ -17,8 +17,8 @@
   },
   "statusCounts": {
     "Green": 16,
-    "Amber": 6,
-    "Red": 1,
+    "Amber": 5,
+    "Red": 2,
     "Pending data": 0
   },
   "lowestScores": [
@@ -53,6 +53,46 @@
           "metric": "leverage",
           "weightedRiskContribution": 17.75,
           "riskScore": 50.714,
+          "metricKeys": [
+            "netDebtToEbitda",
+            "debtToEquity",
+            "netDebtToEquity"
+          ],
+          "aggregation": "median"
+        }
+      ]
+    },
+    {
+      "ticker": "TQ5",
+      "name": "Frasers Property Ltd",
+      "segment": "mixed",
+      "healthScore": 30,
+      "healthStatus": "Red",
+      "scoreCoverage": 0.9999999999999999,
+      "topRiskContributors": [
+        {
+          "metric": "liquidity",
+          "weightedRiskContribution": 28.8,
+          "riskScore": 96,
+          "metricKeys": [
+            "currentRatio"
+          ],
+          "aggregation": "single"
+        },
+        {
+          "metric": "resilience",
+          "weightedRiskContribution": 23.293,
+          "riskScore": 66.55,
+          "metricKeys": [
+            "roic",
+            "roe"
+          ],
+          "aggregation": "average"
+        },
+        {
+          "metric": "leverage",
+          "weightedRiskContribution": 15.25,
+          "riskScore": 43.571,
           "metricKeys": [
             "netDebtToEbitda",
             "debtToEquity",
@@ -139,46 +179,6 @@
             "currentRatio"
           ],
           "aggregation": "single"
-        }
-      ]
-    },
-    {
-      "ticker": "TQ5",
-      "name": "Frasers Property Ltd",
-      "segment": "mixed",
-      "healthScore": 39,
-      "healthStatus": "Amber",
-      "scoreCoverage": 0.9999999999999999,
-      "topRiskContributors": [
-        {
-          "metric": "liquidity",
-          "weightedRiskContribution": 23.1,
-          "riskScore": 77,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
-        },
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 21.595,
-          "riskScore": 61.7,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
-        },
-        {
-          "metric": "leverage",
-          "weightedRiskContribution": 14.25,
-          "riskScore": 40.714,
-          "metricKeys": [
-            "netDebtToEbitda",
-            "debtToEquity",
-            "netDebtToEquity"
-          ],
-          "aggregation": "median"
         }
       ]
     },
