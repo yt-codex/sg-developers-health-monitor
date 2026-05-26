@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-25T05:13:45.363Z",
+  "generatedAt": "2026-05-26T04:56:00.165Z",
   "totalDevelopers": 23,
   "coverageDistribution": {
     "gte0_8": 23,
@@ -12,7 +12,7 @@
     "p25": 48.5,
     "median": 62,
     "p75": 72.5,
-    "p90": 83.6,
+    "p90": 90.4,
     "max": 94
   },
   "statusCounts": {
@@ -505,6 +505,46 @@
       ]
     },
     {
+      "ticker": "F9D",
+      "name": "Boustead Singapore Ltd",
+      "segment": "industrial",
+      "healthScore": 92,
+      "healthStatus": "Green",
+      "scoreCoverage": 0.9999999999999999,
+      "topRiskContributors": [
+        {
+          "metric": "liquidity",
+          "weightedRiskContribution": 7.2,
+          "riskScore": 24,
+          "metricKeys": [
+            "currentRatio"
+          ],
+          "aggregation": "single"
+        },
+        {
+          "metric": "leverage",
+          "weightedRiskContribution": 0,
+          "riskScore": 0,
+          "metricKeys": [
+            "netDebtToEbitda",
+            "debtToEquity",
+            "netDebtToEquity"
+          ],
+          "aggregation": "median"
+        },
+        {
+          "metric": "resilience",
+          "weightedRiskContribution": 0,
+          "riskScore": 0,
+          "metricKeys": [
+            "roic",
+            "roe"
+          ],
+          "aggregation": "average"
+        }
+      ]
+    },
+    {
       "ticker": "OU8",
       "name": "Centurion Corp Ltd",
       "segment": "specialised_accommodation",
@@ -581,46 +621,6 @@
             "currentRatio"
           ],
           "aggregation": "single"
-        }
-      ]
-    },
-    {
-      "ticker": "F9D",
-      "name": "Boustead Singapore Ltd",
-      "segment": "industrial",
-      "healthScore": 81,
-      "healthStatus": "Green",
-      "scoreCoverage": 0.9999999999999999,
-      "topRiskContributors": [
-        {
-          "metric": "liquidity",
-          "weightedRiskContribution": 17.4,
-          "riskScore": 58,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
-        },
-        {
-          "metric": "leverage",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "netDebtToEbitda",
-            "debtToEquity",
-            "netDebtToEquity"
-          ],
-          "aggregation": "median"
-        },
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
         }
       ]
     },
@@ -839,7 +839,7 @@
     {
       "segment": "industrial",
       "count": 1,
-      "medianHealthScore": 81
+      "medianHealthScore": 92
     },
     {
       "segment": "specialised_accommodation",
