@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-28T05:02:36.998Z",
+  "generatedAt": "2026-05-29T05:04:19.142Z",
   "totalDevelopers": 23,
   "coverageDistribution": {
     "gte0_8": 23,
@@ -9,15 +9,15 @@
   "healthScoreDistribution": {
     "min": 23,
     "p10": 35.6,
-    "p25": 48.5,
-    "median": 62,
-    "p75": 72.5,
+    "p25": 45.5,
+    "median": 60,
+    "p75": 68,
     "p90": 90.4,
     "max": 94
   },
   "statusCounts": {
-    "Green": 16,
-    "Amber": 5,
+    "Green": 15,
+    "Amber": 6,
     "Red": 2,
     "Pending data": 0
   },
@@ -179,6 +179,46 @@
             "currentRatio"
           ],
           "aggregation": "single"
+        }
+      ]
+    },
+    {
+      "ticker": "ER0",
+      "name": "KSH Holdings Ltd",
+      "segment": "mixed",
+      "healthScore": 42,
+      "healthStatus": "Amber",
+      "scoreCoverage": 0.9999999999999999,
+      "topRiskContributors": [
+        {
+          "metric": "liquidity",
+          "weightedRiskContribution": 21.9,
+          "riskScore": 73,
+          "metricKeys": [
+            "currentRatio"
+          ],
+          "aggregation": "single"
+        },
+        {
+          "metric": "resilience",
+          "weightedRiskContribution": 21.403,
+          "riskScore": 61.15,
+          "metricKeys": [
+            "roic",
+            "roe"
+          ],
+          "aggregation": "average"
+        },
+        {
+          "metric": "leverage",
+          "weightedRiskContribution": 13.475,
+          "riskScore": 38.5,
+          "metricKeys": [
+            "netDebtToEbitda",
+            "debtToEquity",
+            "netDebtToEquity"
+          ],
+          "aggregation": "median"
         }
       ]
     },
@@ -379,46 +419,6 @@
             "netDebtToEquity"
           ],
           "aggregation": "median"
-        }
-      ]
-    },
-    {
-      "ticker": "C09",
-      "name": "City Developments Ltd",
-      "segment": "mixed",
-      "healthScore": 60,
-      "healthStatus": "Green",
-      "scoreCoverage": 0.9999999999999999,
-      "topRiskContributors": [
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 21.997,
-          "riskScore": 62.85,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
-        },
-        {
-          "metric": "leverage",
-          "weightedRiskContribution": 18,
-          "riskScore": 51.429,
-          "metricKeys": [
-            "netDebtToEbitda",
-            "debtToEquity",
-            "netDebtToEquity"
-          ],
-          "aggregation": "median"
-        },
-        {
-          "metric": "liquidity",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
         }
       ]
     }
@@ -625,46 +625,6 @@
       ]
     },
     {
-      "ticker": "ER0",
-      "name": "KSH Holdings Ltd",
-      "segment": "mixed",
-      "healthScore": 75,
-      "healthStatus": "Green",
-      "scoreCoverage": 0.9999999999999999,
-      "topRiskContributors": [
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 16.888,
-          "riskScore": 48.25,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
-        },
-        {
-          "metric": "liquidity",
-          "weightedRiskContribution": 8.4,
-          "riskScore": 28,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
-        },
-        {
-          "metric": "leverage",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "netDebtToEbitda",
-            "debtToEquity",
-            "netDebtToEquity"
-          ],
-          "aggregation": "median"
-        }
-      ]
-    },
-    {
       "ticker": "H78",
       "name": "Hongkong Land Holdings Ltd",
       "segment": "mixed",
@@ -823,13 +783,53 @@
           "aggregation": "average"
         }
       ]
+    },
+    {
+      "ticker": "W05",
+      "name": "Wing Tai Holdings Ltd",
+      "segment": "mixed",
+      "healthScore": 62,
+      "healthStatus": "Green",
+      "scoreCoverage": 0.9999999999999999,
+      "topRiskContributors": [
+        {
+          "metric": "resilience",
+          "weightedRiskContribution": 35,
+          "riskScore": 100,
+          "metricKeys": [
+            "roic",
+            "roe"
+          ],
+          "aggregation": "average"
+        },
+        {
+          "metric": "leverage",
+          "weightedRiskContribution": 0,
+          "riskScore": 0,
+          "metricKeys": [
+            "netDebtToEbitda",
+            "debtToEquity",
+            "netDebtToEquity"
+          ],
+          "aggregation": "median"
+        },
+        {
+          "metric": "liquidity",
+          "weightedRiskContribution": 0,
+          "riskScore": 0,
+          "metricKeys": [
+            "currentRatio"
+          ],
+          "aggregation": "single"
+        }
+      ]
     }
   ],
   "segmentBreakdown": [
     {
       "segment": "mixed",
       "count": 19,
-      "medianHealthScore": 60
+      "medianHealthScore": 51
     },
     {
       "segment": "residential",
