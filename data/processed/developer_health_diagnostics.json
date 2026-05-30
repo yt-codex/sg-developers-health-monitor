@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-29T05:04:19.142Z",
+  "generatedAt": "2026-05-30T04:43:42.079Z",
   "totalDevelopers": 23,
   "coverageDistribution": {
     "gte0_8": 23,
@@ -11,8 +11,8 @@
     "p10": 35.6,
     "p25": 45.5,
     "median": 60,
-    "p75": 68,
-    "p90": 90.4,
+    "p75": 65.5,
+    "p90": 83.6,
     "max": 94
   },
   "statusCounts": {
@@ -465,46 +465,6 @@
       ]
     },
     {
-      "ticker": "S9B",
-      "name": "Amcorp Global Ltd",
-      "segment": "mixed",
-      "healthScore": 94,
-      "healthStatus": "Green",
-      "scoreCoverage": 0.9999999999999999,
-      "topRiskContributors": [
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 6.055,
-          "riskScore": 17.3,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
-        },
-        {
-          "metric": "leverage",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "netDebtToEbitda",
-            "debtToEquity",
-            "netDebtToEquity"
-          ],
-          "aggregation": "median"
-        },
-        {
-          "metric": "liquidity",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
-        }
-      ]
-    },
-    {
       "ticker": "F9D",
       "name": "Boustead Singapore Ltd",
       "segment": "industrial",
@@ -806,6 +766,46 @@
           "metric": "leverage",
           "weightedRiskContribution": 0,
           "riskScore": 0,
+          "metricKeys": [
+            "netDebtToEbitda",
+            "debtToEquity",
+            "netDebtToEquity"
+          ],
+          "aggregation": "median"
+        },
+        {
+          "metric": "liquidity",
+          "weightedRiskContribution": 0,
+          "riskScore": 0,
+          "metricKeys": [
+            "currentRatio"
+          ],
+          "aggregation": "single"
+        }
+      ]
+    },
+    {
+      "ticker": "C33",
+      "name": "Chuan Hup Holdings Ltd",
+      "segment": "mixed",
+      "healthScore": 62,
+      "healthStatus": "Green",
+      "scoreCoverage": 0.9999999999999999,
+      "topRiskContributors": [
+        {
+          "metric": "resilience",
+          "weightedRiskContribution": 29.383,
+          "riskScore": 83.95,
+          "metricKeys": [
+            "roic",
+            "roe"
+          ],
+          "aggregation": "average"
+        },
+        {
+          "metric": "leverage",
+          "weightedRiskContribution": 6.125,
+          "riskScore": 17.5,
           "metricKeys": [
             "netDebtToEbitda",
             "debtToEquity",
