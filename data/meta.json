@@ -1,11 +1,11 @@
 {
-  "last_updated_sgt": "2026-06-08T22:00:31.662+08:00",
+  "last_updated_sgt": "2026-06-09T10:08:38.020+08:00",
   "status": "success",
   "counts": {
     "existing_total": 516,
-    "new_items": 0,
-    "rejected_items": 432,
-    "total_all": 516,
+    "new_items": 4,
+    "rejected_items": 373,
+    "total_all": 520,
     "latest_90d": 315
   },
   "feeds": [
@@ -14,14 +14,14 @@
       "query": "(\"Singapore\" AND (developer OR \"property developer\" OR residential OR condo) AND (GLS OR \"land bid\" OR tender OR \"new launch\" OR preview OR \"preview weekend\" OR presales OR \"take-up\" OR \"launch weekend\" OR \"units sold\" OR psf)) (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com OR site:todayonline.com OR site:theedgesingapore.com OR site:edgeprop.sg)",
       "window_days": 7,
       "status": "ok",
-      "items_fetched": 100
+      "items_fetched": 49
     },
     {
       "source": "google_news",
       "query": "(\"Government Land Sales\" OR GLS) Singapore developer tender (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
       "window_days": 7,
       "status": "ok",
-      "items_fetched": 14
+      "items_fetched": 0
     },
     {
       "source": "google_news",
@@ -49,7 +49,7 @@
       "query": "UOL Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
       "window_days": 7,
       "status": "ok",
-      "items_fetched": 3
+      "items_fetched": 4
     },
     {
       "source": "google_news",
@@ -63,14 +63,14 @@
       "query": "CapitaLand Development Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
       "window_days": 7,
       "status": "ok",
-      "items_fetched": 24
+      "items_fetched": 29
     },
     {
       "source": "google_news",
       "query": "Frasers Property Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
       "window_days": 7,
       "status": "ok",
-      "items_fetched": 33
+      "items_fetched": 0
     },
     {
       "source": "google_news",
