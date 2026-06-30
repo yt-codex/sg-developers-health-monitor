@@ -1,109 +1,97 @@
 {
-  "last_updated_sgt": "2026-06-30T10:30:07.078+08:00",
-  "status": "error",
+  "last_updated_sgt": "2026-06-30T16:26:03.025+08:00",
+  "status": "success",
   "counts": {
-    "existing_total": 608,
-    "new_items": 0,
-    "rejected_items": 0,
-    "total_all": 608,
-    "latest_90d": 346
+    "existing_total": 609,
+    "new_items": 1,
+    "rejected_items": 346,
+    "total_all": 610,
+    "latest_90d": 345
   },
   "feeds": [
     {
       "source": "google_news",
       "query": "(\"Singapore\" AND (developer OR \"property developer\" OR residential OR condo) AND (GLS OR \"land bid\" OR tender OR \"new launch\" OR preview OR \"preview weekend\" OR presales OR \"take-up\" OR \"launch weekend\" OR \"units sold\" OR psf)) (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com OR site:todayonline.com OR site:theedgesingapore.com OR site:edgeprop.sg)",
       "window_days": 7,
-      "status": "error",
-      "error": "HTTP 503",
-      "items_fetched": 0
+      "status": "ok",
+      "items_fetched": 100
     },
     {
       "source": "google_news",
       "query": "(\"Government Land Sales\" OR GLS) Singapore developer tender (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
       "window_days": 7,
-      "status": "error",
-      "error": "HTTP 503",
-      "items_fetched": 0
+      "status": "ok",
+      "items_fetched": 2
     },
     {
       "source": "google_news",
       "query": "URA Singapore private housing supply developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
       "window_days": 7,
-      "status": "error",
-      "error": "HTTP 503",
-      "items_fetched": 0
+      "status": "ok",
+      "items_fetched": 6
     },
     {
       "source": "google_news",
       "query": "\"en bloc\" Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:theedgesingapore.com OR site:edgeprop.sg)",
       "window_days": 7,
-      "status": "error",
-      "error": "HTTP 503",
-      "items_fetched": 0
+      "status": "ok",
+      "items_fetched": 19
     },
     {
       "source": "google_news",
       "query": "(\"City Developments\" OR CDL) Singapore property developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
       "window_days": 7,
-      "status": "error",
-      "error": "HTTP 503",
-      "items_fetched": 0
+      "status": "ok",
+      "items_fetched": 70
     },
     {
       "source": "google_news",
       "query": "UOL Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
       "window_days": 7,
-      "status": "error",
-      "error": "HTTP 503",
+      "status": "ok",
       "items_fetched": 0
     },
     {
       "source": "google_news",
       "query": "GuocoLand Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:theedgesingapore.com OR site:edgeprop.sg)",
       "window_days": 7,
-      "status": "error",
-      "error": "HTTP 503",
-      "items_fetched": 0
+      "status": "ok",
+      "items_fetched": 5
     },
     {
       "source": "google_news",
       "query": "CapitaLand Development Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
       "window_days": 7,
-      "status": "error",
-      "error": "HTTP 503",
-      "items_fetched": 0
+      "status": "ok",
+      "items_fetched": 47
     },
     {
       "source": "google_news",
       "query": "Frasers Property Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
       "window_days": 7,
-      "status": "error",
-      "error": "HTTP 503",
-      "items_fetched": 0
+      "status": "ok",
+      "items_fetched": 70
     },
     {
       "source": "google_news",
       "query": "(\"Singapore property\" AND (preview OR \"preview weekend\" OR \"launch weekend\" OR showflat OR \"new launch\" OR psf OR residences)) (site:edgeprop.sg OR site:businesstimes.com.sg OR site:straitstimes.com OR site:theedgesingapore.com)",
       "window_days": 7,
-      "status": "error",
-      "error": "HTTP 503",
-      "items_fetched": 0
+      "status": "ok",
+      "items_fetched": 100
     },
     {
       "source": "google_news",
       "query": "(\"property players\" OR \"housing demand\" OR \"development costs\") Singapore property (site:businesstimes.com.sg OR site:straitstimes.com OR site:channelnewsasia.com)",
       "window_days": 7,
-      "status": "error",
-      "error": "HTTP 503",
-      "items_fetched": 0
+      "status": "ok",
+      "items_fetched": 6
     },
     {
       "source": "google_news",
       "query": "(\"Hoi Hup\" OR \"Sunway MCL\" OR \"MCL Land\") Singapore property (site:edgeprop.sg OR site:businesstimes.com.sg OR site:theedgesingapore.com)",
       "window_days": 7,
-      "status": "error",
-      "error": "HTTP 503",
-      "items_fetched": 0
+      "status": "ok",
+      "items_fetched": 7
     }
   ]
 }
