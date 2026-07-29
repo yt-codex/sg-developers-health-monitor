@@ -1,25 +1,25 @@
 {
-  "generatedAt": "2026-07-29T00:32:04.551Z",
+  "generatedAt": "2026-07-29T00:36:06.907Z",
   "totalDevelopers": 23,
   "coverageDistribution": {
-    "gte0_8": 23,
+    "gte0_8": 9,
     "gte0_5_lt0_8": 0,
-    "lt0_5": 0
+    "lt0_5": 14
   },
   "healthScoreDistribution": {
     "min": 23,
-    "p10": 35.6,
-    "p25": 46,
+    "p10": 28.6,
+    "p25": 48,
     "median": 60,
-    "p75": 65.5,
-    "p90": 83.6,
-    "max": 94
+    "p75": 65,
+    "p90": 77.6,
+    "max": 84
   },
   "statusCounts": {
-    "Green": 15,
-    "Amber": 6,
+    "Green": 5,
+    "Amber": 2,
     "Red": 2,
-    "Pending data": 0
+    "Pending data": 14
   },
   "lowestScores": [
     {
@@ -99,166 +99,6 @@
             "netDebtToEquity"
           ],
           "aggregation": "median"
-        }
-      ]
-    },
-    {
-      "ticker": "LJ3",
-      "name": "OUE Ltd",
-      "segment": "mixed",
-      "healthScore": 35,
-      "healthStatus": "Amber",
-      "scoreCoverage": 0.9999999999999999,
-      "topRiskContributors": [
-        {
-          "metric": "liquidity",
-          "weightedRiskContribution": 30,
-          "riskScore": 100,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
-        },
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 27.694,
-          "riskScore": 79.125,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
-        },
-        {
-          "metric": "leverage",
-          "weightedRiskContribution": 4,
-          "riskScore": 11.429,
-          "metricKeys": [
-            "netDebtToEbitda",
-            "debtToEquity",
-            "netDebtToEquity"
-          ],
-          "aggregation": "median"
-        }
-      ]
-    },
-    {
-      "ticker": "5UX",
-      "name": "Oxley Holdings Ltd",
-      "segment": "mixed",
-      "healthScore": 38,
-      "healthStatus": "Amber",
-      "scoreCoverage": 0.9999999999999999,
-      "topRiskContributors": [
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 23.8,
-          "riskScore": 68,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
-        },
-        {
-          "metric": "leverage",
-          "weightedRiskContribution": 23.538,
-          "riskScore": 67.25,
-          "metricKeys": [
-            "netDebtToEbitda",
-            "debtToEquity",
-            "netDebtToEquity"
-          ],
-          "aggregation": "median"
-        },
-        {
-          "metric": "liquidity",
-          "weightedRiskContribution": 15,
-          "riskScore": 50,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
-        }
-      ]
-    },
-    {
-      "ticker": "H13",
-      "name": "Ho Bee Land Ltd",
-      "segment": "mixed",
-      "healthScore": 43,
-      "healthStatus": "Amber",
-      "scoreCoverage": 0.9999999999999999,
-      "topRiskContributors": [
-        {
-          "metric": "liquidity",
-          "weightedRiskContribution": 27,
-          "riskScore": 90,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
-        },
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 22.242,
-          "riskScore": 63.55,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
-        },
-        {
-          "metric": "leverage",
-          "weightedRiskContribution": 5.25,
-          "riskScore": 15,
-          "metricKeys": [
-            "netDebtToEbitda",
-            "debtToEquity",
-            "netDebtToEquity"
-          ],
-          "aggregation": "median"
-        }
-      ]
-    },
-    {
-      "ticker": "S9B",
-      "name": "Amcorp Global Ltd",
-      "segment": "mixed",
-      "healthScore": 44,
-      "healthStatus": "Amber",
-      "scoreCoverage": 0.9999999999999999,
-      "topRiskContributors": [
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 35,
-          "riskScore": 100,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
-        },
-        {
-          "metric": "leverage",
-          "weightedRiskContribution": 19.25,
-          "riskScore": 55,
-          "metricKeys": [
-            "netDebtToEbitda",
-            "debtToEquity",
-            "netDebtToEquity"
-          ],
-          "aggregation": "median"
-        },
-        {
-          "metric": "liquidity",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
         }
       ]
     },
@@ -343,17 +183,17 @@
       ]
     },
     {
-      "ticker": "T24",
-      "name": "Tuan Sing Holdings Ltd",
+      "ticker": "C09",
+      "name": "City Developments Ltd",
       "segment": "mixed",
-      "healthScore": 51,
+      "healthScore": 60,
       "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "topRiskContributors": [
         {
           "metric": "resilience",
-          "weightedRiskContribution": 30.398,
-          "riskScore": 86.85,
+          "weightedRiskContribution": 21.997,
+          "riskScore": 62.85,
           "metricKeys": [
             "roic",
             "roe"
@@ -362,8 +202,8 @@
         },
         {
           "metric": "leverage",
-          "weightedRiskContribution": 15.25,
-          "riskScore": 43.571,
+          "weightedRiskContribution": 18,
+          "riskScore": 51.429,
           "metricKeys": [
             "netDebtToEbitda",
             "debtToEquity",
@@ -383,259 +223,17 @@
       ]
     },
     {
-      "ticker": "F1E",
-      "name": "Low Keng Huat (Singapore) Ltd",
+      "ticker": "C33",
+      "name": "Chuan Hup Holdings Ltd",
       "segment": "mixed",
-      "healthScore": 51,
+      "healthScore": 62,
       "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "topRiskContributors": [
         {
           "metric": "resilience",
-          "weightedRiskContribution": 34.519,
-          "riskScore": 98.625,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
-        },
-        {
-          "metric": "liquidity",
-          "weightedRiskContribution": 13.5,
-          "riskScore": 45,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
-        },
-        {
-          "metric": "leverage",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "netDebtToEbitda",
-            "debtToEquity",
-            "netDebtToEquity"
-          ],
-          "aggregation": "median"
-        }
-      ]
-    }
-  ],
-  "highestScores": [
-    {
-      "ticker": "B61",
-      "name": "Bukit Sembawang Estates Ltd",
-      "segment": "residential",
-      "healthScore": 94,
-      "healthStatus": "Green",
-      "scoreCoverage": 0.9999999999999999,
-      "topRiskContributors": [
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 3.693,
-          "riskScore": 10.55,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
-        },
-        {
-          "metric": "leverage",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "netDebtToEbitda",
-            "debtToEquity",
-            "netDebtToEquity"
-          ],
-          "aggregation": "median"
-        },
-        {
-          "metric": "liquidity",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
-        }
-      ]
-    },
-    {
-      "ticker": "F9D",
-      "name": "Boustead Singapore Ltd",
-      "segment": "industrial",
-      "healthScore": 92,
-      "healthStatus": "Green",
-      "scoreCoverage": 0.9999999999999999,
-      "topRiskContributors": [
-        {
-          "metric": "liquidity",
-          "weightedRiskContribution": 7.2,
-          "riskScore": 24,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
-        },
-        {
-          "metric": "leverage",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "netDebtToEbitda",
-            "debtToEquity",
-            "netDebtToEquity"
-          ],
-          "aggregation": "median"
-        },
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
-        }
-      ]
-    },
-    {
-      "ticker": "OU8",
-      "name": "Centurion Corp Ltd",
-      "segment": "specialised_accommodation",
-      "healthScore": 84,
-      "healthStatus": "Green",
-      "scoreCoverage": 0.9999999999999999,
-      "topRiskContributors": [
-        {
-          "metric": "liquidity",
-          "weightedRiskContribution": 11.7,
-          "riskScore": 39,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
-        },
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 2.957,
-          "riskScore": 8.45,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
-        },
-        {
-          "metric": "leverage",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "netDebtToEbitda",
-            "debtToEquity",
-            "netDebtToEquity"
-          ],
-          "aggregation": "median"
-        }
-      ]
-    },
-    {
-      "ticker": "U14",
-      "name": "UOL Group Ltd",
-      "segment": "mixed",
-      "healthScore": 82,
-      "healthStatus": "Green",
-      "scoreCoverage": 0.9999999999999999,
-      "topRiskContributors": [
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 18.358,
-          "riskScore": 52.45,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
-        },
-        {
-          "metric": "leverage",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "netDebtToEbitda",
-            "debtToEquity",
-            "netDebtToEquity"
-          ],
-          "aggregation": "median"
-        },
-        {
-          "metric": "liquidity",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
-        }
-      ]
-    },
-    {
-      "ticker": "H78",
-      "name": "Hongkong Land Holdings Ltd",
-      "segment": "mixed",
-      "healthScore": 70,
-      "healthStatus": "Green",
-      "scoreCoverage": 0.9999999999999999,
-      "topRiskContributors": [
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 27.72,
-          "riskScore": 79.2,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
-        },
-        {
-          "metric": "leverage",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "netDebtToEbitda",
-            "debtToEquity",
-            "netDebtToEquity"
-          ],
-          "aggregation": "median"
-        },
-        {
-          "metric": "liquidity",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "currentRatio"
-          ],
-          "aggregation": "single"
-        }
-      ]
-    },
-    {
-      "ticker": "BTE",
-      "name": "Lian Beng Group Ltd",
-      "segment": "mixed",
-      "healthScore": 66,
-      "healthStatus": "Green",
-      "scoreCoverage": 0.9999999999999999,
-      "topRiskContributors": [
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 26.53,
-          "riskScore": 75.8,
+          "weightedRiskContribution": 29.383,
+          "riskScore": 83.95,
           "metricKeys": [
             "roic",
             "roe"
@@ -705,17 +303,27 @@
       ]
     },
     {
-      "ticker": "5IC",
-      "name": "Sing Holdings Ltd",
-      "segment": "residential",
-      "healthScore": 65,
+      "ticker": "H78",
+      "name": "Hongkong Land Holdings Ltd",
+      "segment": "mixed",
+      "healthScore": 76,
       "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "topRiskContributors": [
         {
+          "metric": "resilience",
+          "weightedRiskContribution": 21.429,
+          "riskScore": 61.225,
+          "metricKeys": [
+            "roic",
+            "roe"
+          ],
+          "aggregation": "average"
+        },
+        {
           "metric": "leverage",
-          "weightedRiskContribution": 35,
-          "riskScore": 100,
+          "weightedRiskContribution": 0,
+          "riskScore": 0,
           "metricKeys": [
             "netDebtToEbitda",
             "debtToEquity",
@@ -731,31 +339,30 @@
             "currentRatio"
           ],
           "aggregation": "single"
-        },
-        {
-          "metric": "resilience",
-          "weightedRiskContribution": 0,
-          "riskScore": 0,
-          "metricKeys": [
-            "roic",
-            "roe"
-          ],
-          "aggregation": "average"
         }
       ]
     },
     {
-      "ticker": "W05",
-      "name": "Wing Tai Holdings Ltd",
-      "segment": "mixed",
-      "healthScore": 62,
+      "ticker": "OU8",
+      "name": "Centurion Corp Ltd",
+      "segment": "specialised_accommodation",
+      "healthScore": 84,
       "healthStatus": "Green",
       "scoreCoverage": 0.9999999999999999,
       "topRiskContributors": [
         {
+          "metric": "liquidity",
+          "weightedRiskContribution": 11.7,
+          "riskScore": 39,
+          "metricKeys": [
+            "currentRatio"
+          ],
+          "aggregation": "single"
+        },
+        {
           "metric": "resilience",
-          "weightedRiskContribution": 35,
-          "riskScore": 100,
+          "weightedRiskContribution": 2.957,
+          "riskScore": 8.45,
           "metricKeys": [
             "roic",
             "roe"
@@ -766,6 +373,119 @@
           "metric": "leverage",
           "weightedRiskContribution": 0,
           "riskScore": 0,
+          "metricKeys": [
+            "netDebtToEbitda",
+            "debtToEquity",
+            "netDebtToEquity"
+          ],
+          "aggregation": "median"
+        }
+      ]
+    }
+  ],
+  "highestScores": [
+    {
+      "ticker": "OU8",
+      "name": "Centurion Corp Ltd",
+      "segment": "specialised_accommodation",
+      "healthScore": 84,
+      "healthStatus": "Green",
+      "scoreCoverage": 0.9999999999999999,
+      "topRiskContributors": [
+        {
+          "metric": "liquidity",
+          "weightedRiskContribution": 11.7,
+          "riskScore": 39,
+          "metricKeys": [
+            "currentRatio"
+          ],
+          "aggregation": "single"
+        },
+        {
+          "metric": "resilience",
+          "weightedRiskContribution": 2.957,
+          "riskScore": 8.45,
+          "metricKeys": [
+            "roic",
+            "roe"
+          ],
+          "aggregation": "average"
+        },
+        {
+          "metric": "leverage",
+          "weightedRiskContribution": 0,
+          "riskScore": 0,
+          "metricKeys": [
+            "netDebtToEbitda",
+            "debtToEquity",
+            "netDebtToEquity"
+          ],
+          "aggregation": "median"
+        }
+      ]
+    },
+    {
+      "ticker": "H78",
+      "name": "Hongkong Land Holdings Ltd",
+      "segment": "mixed",
+      "healthScore": 76,
+      "healthStatus": "Green",
+      "scoreCoverage": 0.9999999999999999,
+      "topRiskContributors": [
+        {
+          "metric": "resilience",
+          "weightedRiskContribution": 21.429,
+          "riskScore": 61.225,
+          "metricKeys": [
+            "roic",
+            "roe"
+          ],
+          "aggregation": "average"
+        },
+        {
+          "metric": "leverage",
+          "weightedRiskContribution": 0,
+          "riskScore": 0,
+          "metricKeys": [
+            "netDebtToEbitda",
+            "debtToEquity",
+            "netDebtToEquity"
+          ],
+          "aggregation": "median"
+        },
+        {
+          "metric": "liquidity",
+          "weightedRiskContribution": 0,
+          "riskScore": 0,
+          "metricKeys": [
+            "currentRatio"
+          ],
+          "aggregation": "single"
+        }
+      ]
+    },
+    {
+      "ticker": "F17",
+      "name": "GuocoLand Ltd",
+      "segment": "mixed",
+      "healthScore": 65,
+      "healthStatus": "Green",
+      "scoreCoverage": 0.9999999999999999,
+      "topRiskContributors": [
+        {
+          "metric": "resilience",
+          "weightedRiskContribution": 25.086,
+          "riskScore": 71.675,
+          "metricKeys": [
+            "roic",
+            "roe"
+          ],
+          "aggregation": "average"
+        },
+        {
+          "metric": "leverage",
+          "weightedRiskContribution": 7.75,
+          "riskScore": 22.143,
           "metricKeys": [
             "netDebtToEbitda",
             "debtToEquity",
@@ -823,23 +543,223 @@
           "aggregation": "single"
         }
       ]
+    },
+    {
+      "ticker": "C09",
+      "name": "City Developments Ltd",
+      "segment": "mixed",
+      "healthScore": 60,
+      "healthStatus": "Green",
+      "scoreCoverage": 0.9999999999999999,
+      "topRiskContributors": [
+        {
+          "metric": "resilience",
+          "weightedRiskContribution": 21.997,
+          "riskScore": 62.85,
+          "metricKeys": [
+            "roic",
+            "roe"
+          ],
+          "aggregation": "average"
+        },
+        {
+          "metric": "leverage",
+          "weightedRiskContribution": 18,
+          "riskScore": 51.429,
+          "metricKeys": [
+            "netDebtToEbitda",
+            "debtToEquity",
+            "netDebtToEquity"
+          ],
+          "aggregation": "median"
+        },
+        {
+          "metric": "liquidity",
+          "weightedRiskContribution": 0,
+          "riskScore": 0,
+          "metricKeys": [
+            "currentRatio"
+          ],
+          "aggregation": "single"
+        }
+      ]
+    },
+    {
+      "ticker": "O10",
+      "name": "Far East Orchard Ltd",
+      "segment": "mixed",
+      "healthScore": 49,
+      "healthStatus": "Amber",
+      "scoreCoverage": 0.9999999999999999,
+      "topRiskContributors": [
+        {
+          "metric": "resilience",
+          "weightedRiskContribution": 25.279,
+          "riskScore": 72.225,
+          "metricKeys": [
+            "roic",
+            "roe"
+          ],
+          "aggregation": "average"
+        },
+        {
+          "metric": "liquidity",
+          "weightedRiskContribution": 22.5,
+          "riskScore": 75,
+          "metricKeys": [
+            "currentRatio"
+          ],
+          "aggregation": "single"
+        },
+        {
+          "metric": "leverage",
+          "weightedRiskContribution": 2,
+          "riskScore": 5.714,
+          "metricKeys": [
+            "netDebtToEbitda",
+            "debtToEquity",
+            "netDebtToEquity"
+          ],
+          "aggregation": "median"
+        }
+      ]
+    },
+    {
+      "ticker": "9CI",
+      "name": "CapitaLand Investment Ltd",
+      "segment": "mixed",
+      "healthScore": 48,
+      "healthStatus": "Amber",
+      "scoreCoverage": 0.9999999999999999,
+      "topRiskContributors": [
+        {
+          "metric": "resilience",
+          "weightedRiskContribution": 30.284,
+          "riskScore": 86.525,
+          "metricKeys": [
+            "roic",
+            "roe"
+          ],
+          "aggregation": "average"
+        },
+        {
+          "metric": "liquidity",
+          "weightedRiskContribution": 17.1,
+          "riskScore": 57,
+          "metricKeys": [
+            "currentRatio"
+          ],
+          "aggregation": "single"
+        },
+        {
+          "metric": "leverage",
+          "weightedRiskContribution": 2,
+          "riskScore": 5.714,
+          "metricKeys": [
+            "netDebtToEbitda",
+            "debtToEquity",
+            "netDebtToEquity"
+          ],
+          "aggregation": "median"
+        }
+      ]
+    },
+    {
+      "ticker": "TQ5",
+      "name": "Frasers Property Ltd",
+      "segment": "mixed",
+      "healthScore": 30,
+      "healthStatus": "Red",
+      "scoreCoverage": 0.9999999999999999,
+      "topRiskContributors": [
+        {
+          "metric": "liquidity",
+          "weightedRiskContribution": 28.8,
+          "riskScore": 96,
+          "metricKeys": [
+            "currentRatio"
+          ],
+          "aggregation": "single"
+        },
+        {
+          "metric": "resilience",
+          "weightedRiskContribution": 23.293,
+          "riskScore": 66.55,
+          "metricKeys": [
+            "roic",
+            "roe"
+          ],
+          "aggregation": "average"
+        },
+        {
+          "metric": "leverage",
+          "weightedRiskContribution": 15.25,
+          "riskScore": 43.571,
+          "metricKeys": [
+            "netDebtToEbitda",
+            "debtToEquity",
+            "netDebtToEquity"
+          ],
+          "aggregation": "median"
+        }
+      ]
+    },
+    {
+      "ticker": "5DP",
+      "name": "Heeton Holdings Ltd",
+      "segment": "mixed",
+      "healthScore": 23,
+      "healthStatus": "Red",
+      "scoreCoverage": 0.9999999999999999,
+      "topRiskContributors": [
+        {
+          "metric": "liquidity",
+          "weightedRiskContribution": 30,
+          "riskScore": 100,
+          "metricKeys": [
+            "currentRatio"
+          ],
+          "aggregation": "single"
+        },
+        {
+          "metric": "resilience",
+          "weightedRiskContribution": 28.306,
+          "riskScore": 80.875,
+          "metricKeys": [
+            "roic",
+            "roe"
+          ],
+          "aggregation": "average"
+        },
+        {
+          "metric": "leverage",
+          "weightedRiskContribution": 17.75,
+          "riskScore": 50.714,
+          "metricKeys": [
+            "netDebtToEbitda",
+            "debtToEquity",
+            "netDebtToEquity"
+          ],
+          "aggregation": "median"
+        }
+      ]
     }
   ],
   "segmentBreakdown": [
     {
       "segment": "mixed",
       "count": 19,
-      "medianHealthScore": 51
+      "medianHealthScore": 54.5
     },
     {
       "segment": "residential",
       "count": 2,
-      "medianHealthScore": 79.5
+      "medianHealthScore": null
     },
     {
       "segment": "industrial",
       "count": 1,
-      "medianHealthScore": 92
+      "medianHealthScore": null
     },
     {
       "segment": "specialised_accommodation",
