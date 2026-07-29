@@ -292,11 +292,50 @@ function buildDiagnostics(developers = []) {
   };
 }
 
+async function readPreviousDeveloperRecords(outputPath = OUTPUT_JSON) {
+  try {
+    const raw = await fs.readFile(outputPath, 'utf8');
+    const parsed = JSON.parse(raw);
+    const records = Array.isArray(parsed?.developers) ? parsed.developers : [];
+    return new Map(records.map((record) => [normalizeTicker(record.ticker), record]));
+  } catch {
+    return new Map();
+  }
+}
+
+function hasUsableDeveloperRecord(record) {
+  if (!record || typeof record !== 'object') return false;
+  if (!Array.isArray(record.periods) || record.periods.length === 0) return false;
+  const currentValues = Object.values(record.current || {});
+  const metricValues = Object.values(record.metrics || {}).flatMap((metric) => Object.values(metric?.values || {}));
+  return [...currentValues, ...metricValues].some((value) => Number.isFinite(value));
+}
+
+function preservePreviousOnFetchFailure(freshRecord, previousRecord) {
+  if (freshRecord?.fetchStatus !== 'error' || !hasUsableDeveloperRecord(previousRecord)) {
+    return freshRecord;
+  }
+
+  return {
+    ...previousRecord,
+    ticker: freshRecord.ticker,
+    name: freshRecord.name || previousRecord.name,
+    segment: freshRecord.segment || previousRecord.segment,
+    stockanalysis_ratios_url: freshRecord.stockanalysis_ratios_url || previousRecord.stockanalysis_ratios_url,
+    fetchStatus: previousRecord.fetchStatus || 'ok',
+    fetchError: previousRecord.fetchError || null,
+    refreshStatus: 'stale_fetch_error',
+    refreshError: freshRecord.fetchError || 'latest fetch failed; retained prior usable ratio record',
+    lastRefreshAttemptAt: freshRecord.lastFetchedAt || nowIso()
+  };
+}
+
 async function main() {
   await fs.mkdir(path.dirname(OUTPUT_JSON), { recursive: true });
   await fs.mkdir(CACHE_DIR, { recursive: true });
 
   const developers = await readDeveloperCsv(INPUT_CSV);
+  const previousRecordsByTicker = await readPreviousDeveloperRecords(OUTPUT_JSON);
   const enabledScoreMetrics = new Set(
     Object.values(POLICY_PILLAR_METRICS).reduce((all, metricKeys) => all.concat(metricKeys), [])
   );
@@ -349,13 +388,18 @@ async function main() {
     developers: []
   };
 
-  const statusCounts = { ok: 0, partial: 0, error: 0 };
+  const statusCounts = { ok: 0, partial: 0, error: 0, stale_fetch_error: 0 };
 
   for (const developer of developers) {
     const verboseDebug = process.env.DEBUG_STOCKANALYSIS === 'true';
     const { record } = await processDeveloper(developer, { verbose: verboseDebug });
-    output.developers.push(record);
-    statusCounts[record.fetchStatus] = (statusCounts[record.fetchStatus] || 0) + 1;
+    const previousRecord = previousRecordsByTicker.get(normalizeTicker(developer.ticker));
+    const outputRecord = preservePreviousOnFetchFailure(record, previousRecord);
+    output.developers.push(outputRecord);
+    statusCounts[outputRecord.fetchStatus] = (statusCounts[outputRecord.fetchStatus] || 0) + 1;
+    if (outputRecord.refreshStatus === 'stale_fetch_error') {
+      statusCounts.stale_fetch_error += 1;
+    }
   }
 
   output.updatedAt = nowIso();
@@ -385,5 +429,7 @@ if (require.main === module) {
 module.exports = {
   processDeveloper,
   main,
-  buildDiagnostics
+  buildDiagnostics,
+  preservePreviousOnFetchFailure,
+  hasUsableDeveloperRecord
 };

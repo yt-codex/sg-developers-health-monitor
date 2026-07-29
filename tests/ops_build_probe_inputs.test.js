@@ -282,6 +282,42 @@ test('developer parser degradation => WARN and FAIL depending on ok coverage', a
     assert.equal(payload.status, 'FAIL');
     assert.equal(getCheck(payload, 'developer.fetch_health')?.status, 'FAIL');
   });
+
+  await t.test('retained stale ratio records with refresh errors remain OK while data is usable', async () => {
+    const rootDir = mkTmpRoot();
+    const fixture = baseFixture();
+    fixture['data/processed/developer_ratios_history.json'].developers = [
+      {
+        ticker: 'AAA',
+        name: 'AAA Dev',
+        fetchStatus: 'ok',
+        fetchError: null,
+        refreshStatus: 'stale_fetch_error',
+        refreshError: 'HTTP 403 from stockanalysis'
+      },
+      {
+        ticker: 'BBB',
+        name: 'BBB Dev',
+        fetchStatus: 'ok',
+        fetchError: null,
+        refreshStatus: 'stale_fetch_error',
+        refreshError: 'HTTP 403 from stockanalysis'
+      }
+    ];
+    writeFixture(rootDir, fixture);
+
+    const payload = await buildProbeInputs({
+      rootDir,
+      now: FIXED_NOW,
+      env: buildEnv(),
+      workflowRunsByName: baselineWorkflowRuns(FIXED_NOW)
+    });
+
+    assert.equal(payload.status, 'OK');
+    assert.equal(payload.row_counts.dev_ok, 2);
+    assert.equal(payload.row_counts.dev_stale_fetch_error, 2);
+    assert.equal(getCheck(payload, 'developer.fetch_health')?.status, 'OK');
+  });
 });
 
 test('missing required files => FAIL', async () => {

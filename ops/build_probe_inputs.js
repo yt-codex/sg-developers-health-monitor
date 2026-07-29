@@ -304,10 +304,11 @@ function buildFailureFallback({
       macro_ok_count: 0,
       macro_failed_count: 0,
       macro_failed_series_count: 0,
-      dev_total: 0,
-      dev_ok: 0,
-      dev_partial: 0,
-      dev_error: 0
+    dev_total: 0,
+    dev_ok: 0,
+    dev_partial: 0,
+    dev_error: 0,
+    dev_stale_fetch_error: 0
     },
     schema_hash: sha256(`fallback:${String(error || 'unknown')}`),
     key_checks: [
@@ -417,7 +418,8 @@ async function buildProbeInputs(options = {}) {
     dev_total: developers.length,
     dev_ok: developers.filter((dev) => String(dev?.fetchStatus || '').toLowerCase() === 'ok').length,
     dev_partial: developers.filter((dev) => String(dev?.fetchStatus || '').toLowerCase() === 'partial').length,
-    dev_error: developers.filter((dev) => String(dev?.fetchStatus || '').toLowerCase() === 'error').length
+    dev_error: developers.filter((dev) => String(dev?.fetchStatus || '').toLowerCase() === 'error').length,
+    dev_stale_fetch_error: developers.filter((dev) => String(dev?.refreshStatus || '').toLowerCase() === 'stale_fetch_error').length
   };
 
   const allFeedsFailed = rowCounts.news_feeds_total > 0 && rowCounts.news_feeds_error === rowCounts.news_feeds_total;
