@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-29T00:36:06.906Z",
+  "updatedAt": "2026-07-29T03:57:33.141Z",
   "source": "stockanalysis",
   "scoringModel": {
     "formula": "round(clamp((100 - weightedPillarRisk) - trendPenalty, 0, 100))",
@@ -133,7 +133,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Jul '26 Jul 27, 2026"
+          "periodEnding": "Jul '26 Jul 28, 2026"
         },
         {
           "label": "FY 2025",
@@ -391,7 +391,7 @@
         "payoutRatio": 17.89,
         "assetTurnover": 0.14
       },
-      "lastFetchedAt": "2026-07-29T00:36:02.777Z",
+      "lastFetchedAt": "2026-07-29T03:57:30.406Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 60,
@@ -527,7 +527,7 @@
         "rawTrendPenalty": 3,
         "worseningMetricCount": 1
       },
-      "lastScoredAt": "2026-07-29T00:36:03.051Z"
+      "lastScoredAt": "2026-07-29T03:57:30.651Z"
     },
     {
       "ticker": "U14",
@@ -537,7 +537,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Jul '26 Jul 27, 2026"
+          "periodEnding": "Jul '26 Jul 28, 2026"
         },
         {
           "label": "FY 2025",
@@ -655,7 +655,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-07-29T00:36:03.052Z",
+      "lastFetchedAt": "2026-07-29T03:57:30.651Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -690,7 +690,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-07-29T00:36:03.283Z"
+      "lastScoredAt": "2026-07-29T03:57:30.922Z"
     },
     {
       "ticker": "F17",
@@ -700,7 +700,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Jul '26 Jul 27, 2026"
+          "periodEnding": "Jul '26 Jul 28, 2026"
         },
         {
           "label": "FY 2025",
@@ -958,7 +958,7 @@
         "payoutRatio": 66.12,
         "assetTurnover": 0.14
       },
-      "lastFetchedAt": "2026-07-29T00:36:03.283Z",
+      "lastFetchedAt": "2026-07-29T03:57:30.922Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 65,
@@ -1094,7 +1094,7 @@
         "rawTrendPenalty": 5.5,
         "worseningMetricCount": 2
       },
-      "lastScoredAt": "2026-07-29T00:36:03.470Z"
+      "lastScoredAt": "2026-07-29T03:57:31.164Z"
     },
     {
       "ticker": "TQ5",
@@ -1104,7 +1104,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Jul '26 Jul 27, 2026"
+          "periodEnding": "Jul '26 Jul 28, 2026"
         },
         {
           "label": "FY 2025",
@@ -1151,238 +1151,91 @@
         "netDebtToEbitda": {
           "label": "Net Debt / EBITDA Ratio",
           "unit": null,
-          "values": {
-            "Current": 17.43,
-            "FY 2025": 16.72,
-            "FY 2024": 14.22,
-            "FY 2023": 12.43,
-            "FY 2022": 11.57,
-            "FY 2021": 11.89
-          },
-          "rawValues": {
-            "Current": "17.43",
-            "FY 2025": "16.72",
-            "FY 2024": "14.22",
-            "FY 2023": "12.43",
-            "FY 2022": "11.57",
-            "FY 2021": "11.89"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "debtToEquity": {
           "label": "Debt / Equity Ratio",
           "unit": null,
-          "values": {
-            "Current": 1.13,
-            "FY 2025": 1.11,
-            "FY 2024": 1.07,
-            "FY 2023": 0.97,
-            "FY 2022": 0.88,
-            "FY 2021": 1.03
-          },
-          "rawValues": {
-            "Current": "1.13",
-            "FY 2025": "1.11",
-            "FY 2024": "1.07",
-            "FY 2023": "0.97",
-            "FY 2022": "0.88",
-            "FY 2021": "1.03"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "netDebtToEquity": {
           "label": "Net Debt / Equity Ratio",
           "unit": null,
-          "values": {
-            "Current": 1.01,
-            "FY 2025": 0.97,
-            "FY 2024": 0.91,
-            "FY 2023": 0.82,
-            "FY 2022": 0.71,
-            "FY 2021": 0.82
-          },
-          "rawValues": {
-            "Current": "1.01",
-            "FY 2025": "0.97",
-            "FY 2024": "0.91",
-            "FY 2023": "0.82",
-            "FY 2022": "0.71",
-            "FY 2021": "0.82"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "debtToEbitda": {
           "label": "Debt / EBITDA Ratio",
           "unit": null,
-          "values": {
-            "Current": 19.41,
-            "FY 2025": 19.12,
-            "FY 2024": 16.63,
-            "FY 2023": 14.62,
-            "FY 2022": 14.35,
-            "FY 2021": 14.87
-          },
-          "rawValues": {
-            "Current": "19.41",
-            "FY 2025": "19.12",
-            "FY 2024": "16.63",
-            "FY 2023": "14.62",
-            "FY 2022": "14.35",
-            "FY 2021": "14.87"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "quickRatio": {
           "label": "Quick Ratio",
           "unit": null,
-          "values": {
-            "Current": 0.47,
-            "FY 2025": 0.59,
-            "FY 2024": 0.57,
-            "FY 2023": 0.5,
-            "FY 2022": 0.64,
-            "FY 2021": 0.6
-          },
-          "rawValues": {
-            "Current": "0.47",
-            "FY 2025": "0.59",
-            "FY 2024": "0.57",
-            "FY 2023": "0.50",
-            "FY 2022": "0.64",
-            "FY 2021": "0.60"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "currentRatio": {
           "label": "Current Ratio",
           "unit": null,
-          "values": {
-            "Current": 1.04,
-            "FY 2025": 1.23,
-            "FY 2024": 1.18,
-            "FY 2023": 1.16,
-            "FY 2022": 1.38,
-            "FY 2021": 1.21
-          },
-          "rawValues": {
-            "Current": "1.04",
-            "FY 2025": "1.23",
-            "FY 2024": "1.18",
-            "FY 2023": "1.16",
-            "FY 2022": "1.38",
-            "FY 2021": "1.21"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "roic": {
           "label": "ROIC",
           "unit": null,
-          "values": {
-            "Current": 2.36,
-            "FY 2025": 2.73,
-            "FY 2024": 2.51,
-            "FY 2023": 2.51,
-            "FY 2022": 2.77,
-            "FY 2021": 2.76
-          },
-          "rawValues": {
-            "Current": "2.36%",
-            "FY 2025": "2.73%",
-            "FY 2024": "2.51%",
-            "FY 2023": "2.51%",
-            "FY 2022": "2.77%",
-            "FY 2021": "2.76%"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "roe": {
           "label": "ROE",
           "unit": null,
-          "values": {
-            "Current": 3.29,
-            "FY 2025": 3.36,
-            "FY 2024": 2.91,
-            "FY 2023": 1.57,
-            "FY 2022": 9.39,
-            "FY 2021": 9.37
-          },
-          "rawValues": {
-            "Current": "3.29%",
-            "FY 2025": "3.36%",
-            "FY 2024": "2.91%",
-            "FY 2023": "1.57%",
-            "FY 2022": "9.39%",
-            "FY 2021": "9.37%"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "payoutRatio": {
           "label": "Payout Ratio",
           "unit": null,
-          "values": {
-            "Current": 93.3,
-            "FY 2025": 72.67,
-            "FY 2024": 85.63,
-            "FY 2023": 68.03,
-            "FY 2022": 8.46,
-            "FY 2021": 5.28
-          },
-          "rawValues": {
-            "Current": "93.30%",
-            "FY 2025": "72.67%",
-            "FY 2024": "85.63%",
-            "FY 2023": "68.03%",
-            "FY 2022": "8.46%",
-            "FY 2021": "5.28%"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "assetTurnover": {
           "label": "Asset Turnover",
           "unit": null,
-          "values": {
-            "Current": 0.08,
-            "FY 2025": 0.09,
-            "FY 2024": 0.11,
-            "FY 2023": 0.1,
-            "FY 2022": 0.1,
-            "FY 2021": 0.1
-          },
-          "rawValues": {
-            "Current": "0.08",
-            "FY 2025": "0.09",
-            "FY 2024": "0.11",
-            "FY 2023": "0.10",
-            "FY 2022": "0.10",
-            "FY 2021": "0.10"
-          }
+          "values": {},
+          "rawValues": {}
         }
       },
       "current": {
         "marketCap": 4083,
-        "netDebtToEbitda": 17.43,
-        "debtToEquity": 1.13,
-        "netDebtToEquity": 1.01,
-        "debtToEbitda": 19.41,
-        "quickRatio": 0.47,
-        "currentRatio": 1.04,
-        "roic": 2.36,
-        "roe": 3.29,
-        "payoutRatio": 93.3,
-        "assetTurnover": 0.08
+        "netDebtToEbitda": null,
+        "debtToEquity": null,
+        "netDebtToEquity": null,
+        "debtToEbitda": null,
+        "quickRatio": null,
+        "currentRatio": null,
+        "roic": null,
+        "roe": null,
+        "payoutRatio": null,
+        "assetTurnover": null
       },
-      "lastFetchedAt": "2026-07-29T00:36:03.470Z",
-      "fetchStatus": "ok",
+      "lastFetchedAt": "2026-07-29T03:57:31.164Z",
+      "fetchStatus": "partial",
       "fetchError": null,
-      "healthScore": 30,
-      "healthStatus": "Red",
-      "scoreCoverage": 0.9999999999999999,
-      "scoreNote": null,
+      "healthScore": null,
+      "healthStatus": "Pending data",
+      "scoreCoverage": 0,
+      "scoreNote": "Insufficient ratio coverage",
       "healthScoreComponents": {
-        "staticRiskScore": 67.34250000000002,
-        "staticHealthScore": 32.657499999999985,
-        "trendPenalty": 2.2,
-        "finalHealthScore": 30,
-        "scoreCoverage": 0.9999999999999999,
-        "missingMetrics": [],
-        "excludedMetrics": [
-          "debtToEbitda",
-          "quickRatio",
-          "payoutRatio",
-          "assetTurnover"
-        ],
-        "usedMetrics": [
+        "staticRiskScore": null,
+        "staticHealthScore": null,
+        "trendPenalty": null,
+        "finalHealthScore": null,
+        "scoreCoverage": 0,
+        "missingMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
@@ -1390,115 +1243,21 @@
           "roic",
           "roe"
         ],
-        "riskByMetric": {
-          "netDebtToEbitda": 95.25,
-          "debtToEquity": 19.411764705882344,
-          "netDebtToEquity": 43.57142857142857,
-          "currentRatio": 96,
-          "roic": 66,
-          "roe": 67.10000000000001
-        },
-        "weightedContributors": {
-          "leverage": 15.25,
-          "liquidity": 28.8,
-          "resilience": 23.292500000000008
-        },
-        "pillarContributors": {
-          "leverage": {
-            "metricKeys": [
-              "netDebtToEbitda",
-              "debtToEquity",
-              "netDebtToEquity"
-            ],
-            "aggregation": "median",
-            "pillarRiskScore": 43.57142857142857,
-            "weightedRiskContribution": 15.25
-          },
-          "liquidity": {
-            "metricKeys": [
-              "currentRatio"
-            ],
-            "aggregation": "single",
-            "pillarRiskScore": 96,
-            "weightedRiskContribution": 28.8
-          },
-          "resilience": {
-            "metricKeys": [
-              "roic",
-              "roe"
-            ],
-            "aggregation": "average",
-            "pillarRiskScore": 66.55000000000001,
-            "weightedRiskContribution": 23.292500000000008
-          }
-        },
-        "pillarRisks": {
-          "leverage": 43.57142857142857,
-          "liquidity": 96,
-          "resilience": 66.55000000000001
-        },
+        "excludedMetrics": [
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
+        ],
+        "usedMetrics": [],
+        "riskByMetric": {},
+        "weightedContributors": {},
+        "pillarContributors": {},
+        "pillarRisks": {},
         "metricAdjustments": {},
-        "trendBreakdown": {
-          "netDebtToEbitda": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": true,
-            "appliedPenalty": 3,
-            "skipped": false
-          },
-          "debtToEquity": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": true,
-            "appliedPenalty": 2.5,
-            "skipped": false
-          },
-          "currentRatio": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
-            "skipped": false
-          },
-          "roic": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
-            "skipped": false
-          },
-          "roe": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
-            "skipped": false
-          }
-        },
-        "rawTrendPenalty": 5.5,
-        "worseningMetricCount": 2
+        "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-07-29T00:36:03.648Z"
+      "lastScoredAt": "2026-07-29T03:57:31.251Z"
     },
     {
       "ticker": "9CI",
@@ -1508,7 +1267,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Jul '26 Jul 27, 2026"
+          "periodEnding": "Jul '26 Jul 28, 2026"
         },
         {
           "label": "FY 2025",
@@ -1555,238 +1314,91 @@
         "netDebtToEbitda": {
           "label": "Net Debt / EBITDA Ratio",
           "unit": null,
-          "values": {
-            "Current": 10.27,
-            "FY 2025": 10.27,
-            "FY 2024": 6.67,
-            "FY 2023": 11.48,
-            "FY 2022": 10.48,
-            "FY 2021": 18.87
-          },
-          "rawValues": {
-            "Current": "10.27",
-            "FY 2025": "10.27",
-            "FY 2024": "6.67",
-            "FY 2023": "11.48",
-            "FY 2022": "10.48",
-            "FY 2021": "18.87"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "debtToEquity": {
           "label": "Debt / Equity Ratio",
           "unit": null,
-          "values": {
-            "Current": 0.63,
-            "FY 2025": 0.63,
-            "FY 2024": 0.56,
-            "FY 2023": 0.7,
-            "FY 2022": 0.67,
-            "FY 2021": 0.68
-          },
-          "rawValues": {
-            "Current": "0.63",
-            "FY 2025": "0.63",
-            "FY 2024": "0.56",
-            "FY 2023": "0.70",
-            "FY 2022": "0.67",
-            "FY 2021": "0.68"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "netDebtToEquity": {
           "label": "Net Debt / Equity Ratio",
           "unit": null,
-          "values": {
-            "Current": 0.48,
-            "FY 2025": 0.48,
-            "FY 2024": 0.4,
-            "FY 2023": 0.56,
-            "FY 2022": 0.53,
-            "FY 2021": 0.49
-          },
-          "rawValues": {
-            "Current": "0.48",
-            "FY 2025": "0.48",
-            "FY 2024": "0.40",
-            "FY 2023": "0.56",
-            "FY 2022": "0.53",
-            "FY 2021": "0.49"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "debtToEbitda": {
           "label": "Debt / EBITDA Ratio",
           "unit": null,
-          "values": {
-            "Current": 11.94,
-            "FY 2025": 11.94,
-            "FY 2024": 8.81,
-            "FY 2023": 13.33,
-            "FY 2022": 12.4,
-            "FY 2021": 23.5
-          },
-          "rawValues": {
-            "Current": "11.94",
-            "FY 2025": "11.94",
-            "FY 2024": "8.81",
-            "FY 2023": "13.33",
-            "FY 2022": "12.40",
-            "FY 2021": "23.50"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "quickRatio": {
           "label": "Quick Ratio",
           "unit": null,
-          "values": {
-            "Current": 1.33,
-            "FY 2025": 1.33,
-            "FY 2024": 1.19,
-            "FY 2023": 0.94,
-            "FY 2022": 0.87,
-            "FY 2021": 0.98
-          },
-          "rawValues": {
-            "Current": "1.33",
-            "FY 2025": "1.33",
-            "FY 2024": "1.19",
-            "FY 2023": "0.94",
-            "FY 2022": "0.87",
-            "FY 2021": "0.98"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "currentRatio": {
           "label": "Current Ratio",
           "unit": null,
-          "values": {
-            "Current": 1.43,
-            "FY 2025": 1.43,
-            "FY 2024": 1.26,
-            "FY 2023": 1.25,
-            "FY 2022": 1.06,
-            "FY 2021": 1.04
-          },
-          "rawValues": {
-            "Current": "1.43",
-            "FY 2025": "1.43",
-            "FY 2024": "1.26",
-            "FY 2023": "1.25",
-            "FY 2022": "1.06",
-            "FY 2021": "1.04"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "roic": {
           "label": "ROIC",
           "unit": null,
-          "values": {
-            "Current": 1.59,
-            "FY 2025": 1.58,
-            "FY 2024": 2.59,
-            "FY 2023": 1.83,
-            "FY 2022": 2.07,
-            "FY 2021": 0.97
-          },
-          "rawValues": {
-            "Current": "1.59%",
-            "FY 2025": "1.58%",
-            "FY 2024": "2.59%",
-            "FY 2023": "1.83%",
-            "FY 2022": "2.07%",
-            "FY 2021": "0.97%"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "roe": {
           "label": "ROE",
           "unit": null,
-          "values": {
-            "Current": 1.22,
-            "FY 2025": 1.22,
-            "FY 2024": 4.25,
-            "FY 2023": 1.79,
-            "FY 2022": 5.48,
-            "FY 2021": 8.71
-          },
-          "rawValues": {
-            "Current": "1.22%",
-            "FY 2025": "1.22%",
-            "FY 2024": "4.25%",
-            "FY 2023": "1.79%",
-            "FY 2022": "5.48%",
-            "FY 2021": "8.71%"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "payoutRatio": {
           "label": "Payout Ratio",
           "unit": null,
-          "values": {
-            "Current": 413.1,
-            "FY 2025": 413.1,
-            "FY 2024": 130.06,
-            "FY 2023": 346.96,
-            "FY 2022": 73.29,
-            "FY 2021": 1.04
-          },
-          "rawValues": {
-            "Current": "413.10%",
-            "FY 2025": "413.10%",
-            "FY 2024": "130.06%",
-            "FY 2023": "346.96%",
-            "FY 2022": "73.29%",
-            "FY 2021": "1.04%"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "assetTurnover": {
           "label": "Asset Turnover",
           "unit": null,
-          "values": {
-            "Current": 0.09,
-            "FY 2025": 0.09,
-            "FY 2024": 0.1,
-            "FY 2023": 0.08,
-            "FY 2022": 0.08,
-            "FY 2021": 0.06
-          },
-          "rawValues": {
-            "Current": "0.09",
-            "FY 2025": "0.09",
-            "FY 2024": "0.10",
-            "FY 2023": "0.08",
-            "FY 2022": "0.08",
-            "FY 2021": "0.06"
-          }
+          "values": {},
+          "rawValues": {}
         }
       },
       "current": {
         "marketCap": 13033,
-        "netDebtToEbitda": 10.27,
-        "debtToEquity": 0.63,
-        "netDebtToEquity": 0.48,
-        "debtToEbitda": 11.94,
-        "quickRatio": 1.33,
-        "currentRatio": 1.43,
-        "roic": 1.59,
-        "roe": 1.22,
-        "payoutRatio": 413.1,
-        "assetTurnover": 0.09
+        "netDebtToEbitda": null,
+        "debtToEquity": null,
+        "netDebtToEquity": null,
+        "debtToEbitda": null,
+        "quickRatio": null,
+        "currentRatio": null,
+        "roic": null,
+        "roe": null,
+        "payoutRatio": null,
+        "assetTurnover": null
       },
-      "lastFetchedAt": "2026-07-29T00:36:03.648Z",
-      "fetchStatus": "ok",
+      "lastFetchedAt": "2026-07-29T03:57:31.251Z",
+      "fetchStatus": "partial",
       "fetchError": null,
-      "healthScore": 48,
-      "healthStatus": "Amber",
-      "scoreCoverage": 0.9999999999999999,
-      "scoreNote": null,
+      "healthScore": null,
+      "healthStatus": "Pending data",
+      "scoreCoverage": 0,
+      "scoreNote": "Insufficient ratio coverage",
       "healthScoreComponents": {
-        "staticRiskScore": 49.38375,
-        "staticHealthScore": 50.61625,
-        "trendPenalty": 2.4000000000000004,
-        "finalHealthScore": 48,
-        "scoreCoverage": 0.9999999999999999,
-        "missingMetrics": [],
-        "excludedMetrics": [
-          "debtToEbitda",
-          "quickRatio",
-          "payoutRatio",
-          "assetTurnover"
-        ],
-        "usedMetrics": [
+        "staticRiskScore": null,
+        "staticHealthScore": null,
+        "trendPenalty": null,
+        "finalHealthScore": null,
+        "scoreCoverage": 0,
+        "missingMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
@@ -1794,115 +1406,21 @@
           "roic",
           "roe"
         ],
-        "riskByMetric": {
-          "netDebtToEbitda": 35.58333333333333,
-          "debtToEquity": 0,
-          "netDebtToEquity": 5.714285714285712,
-          "currentRatio": 57.00000000000001,
-          "roic": 85.25,
-          "roe": 87.79999999999998
-        },
-        "weightedContributors": {
-          "leverage": 1.9999999999999991,
-          "liquidity": 17.100000000000005,
-          "resilience": 30.283749999999998
-        },
-        "pillarContributors": {
-          "leverage": {
-            "metricKeys": [
-              "netDebtToEbitda",
-              "debtToEquity",
-              "netDebtToEquity"
-            ],
-            "aggregation": "median",
-            "pillarRiskScore": 5.714285714285712,
-            "weightedRiskContribution": 1.9999999999999991
-          },
-          "liquidity": {
-            "metricKeys": [
-              "currentRatio"
-            ],
-            "aggregation": "single",
-            "pillarRiskScore": 57.00000000000001,
-            "weightedRiskContribution": 17.100000000000005
-          },
-          "resilience": {
-            "metricKeys": [
-              "roic",
-              "roe"
-            ],
-            "aggregation": "average",
-            "pillarRiskScore": 86.52499999999999,
-            "weightedRiskContribution": 30.283749999999998
-          }
-        },
-        "pillarRisks": {
-          "leverage": 5.714285714285712,
-          "liquidity": 57.00000000000001,
-          "resilience": 86.52499999999999
-        },
+        "excludedMetrics": [
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
+        ],
+        "usedMetrics": [],
+        "riskByMetric": {},
+        "weightedContributors": {},
+        "pillarContributors": {},
+        "pillarRisks": {},
         "metricAdjustments": {},
-        "trendBreakdown": {
-          "netDebtToEbitda": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 2,
-            "skipped": false
-          },
-          "debtToEquity": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 1.5,
-            "skipped": false
-          },
-          "currentRatio": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
-            "skipped": false
-          },
-          "roic": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 1.5,
-            "skipped": false
-          },
-          "roe": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 1,
-            "skipped": false
-          }
-        },
-        "rawTrendPenalty": 6,
-        "worseningMetricCount": 4
+        "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-07-29T00:36:03.824Z"
+      "lastScoredAt": "2026-07-29T03:57:31.347Z"
     },
     {
       "ticker": "H78",
@@ -1912,7 +1430,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Jul '26 Jul 27, 2026"
+          "periodEnding": "Jul '26 Jul 28, 2026"
         },
         {
           "label": "FY 2025",
@@ -1940,7 +1458,7 @@
           "label": "Market Capitalization",
           "unit": "millions SGD",
           "values": {
-            "Current": 21790,
+            "Current": 21801,
             "FY 2025": 19299,
             "FY 2024": 13401,
             "FY 2023": 10136,
@@ -1948,7 +1466,7 @@
             "FY 2021": 16107
           },
           "rawValues": {
-            "Current": "21,790",
+            "Current": "21,801",
             "FY 2025": "19,299",
             "FY 2024": "13,401",
             "FY 2023": "10,136",
@@ -1959,238 +1477,91 @@
         "netDebtToEbitda": {
           "label": "Net Debt / EBITDA Ratio",
           "unit": null,
-          "values": {
-            "Current": 7.36,
-            "FY 2025": 11.15,
-            "FY 2024": 8.39,
-            "FY 2023": 6.67,
-            "FY 2022": 6.77,
-            "FY 2021": 5.55
-          },
-          "rawValues": {
-            "Current": "7.36",
-            "FY 2025": "11.15",
-            "FY 2024": "8.39",
-            "FY 2023": "6.67",
-            "FY 2022": "6.77",
-            "FY 2021": "5.55"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "debtToEquity": {
           "label": "Debt / Equity Ratio",
           "unit": null,
-          "values": {
-            "Current": 0.19,
-            "FY 2025": 0.2,
-            "FY 2024": 0.21,
-            "FY 2023": 0.21,
-            "FY 2022": 0.21,
-            "FY 2021": 0.19
-          },
-          "rawValues": {
-            "Current": "0.19",
-            "FY 2025": "0.20",
-            "FY 2024": "0.21",
-            "FY 2023": "0.21",
-            "FY 2022": "0.21",
-            "FY 2021": "0.19"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "netDebtToEquity": {
           "label": "Net Debt / Equity Ratio",
           "unit": null,
-          "values": {
-            "Current": 0.1,
-            "FY 2025": 0.12,
-            "FY 2024": 0.17,
-            "FY 2023": 0.17,
-            "FY 2022": 0.18,
-            "FY 2021": 0.15
-          },
-          "rawValues": {
-            "Current": "0.10",
-            "FY 2025": "0.12",
-            "FY 2024": "0.17",
-            "FY 2023": "0.17",
-            "FY 2022": "0.18",
-            "FY 2021": "0.15"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "debtToEbitda": {
           "label": "Debt / EBITDA Ratio",
           "unit": null,
-          "values": {
-            "Current": 14.62,
-            "FY 2025": 18.94,
-            "FY 2024": 10.11,
-            "FY 2023": 8.12,
-            "FY 2022": 8.09,
-            "FY 2021": 7.13
-          },
-          "rawValues": {
-            "Current": "14.62",
-            "FY 2025": "18.94",
-            "FY 2024": "10.11",
-            "FY 2023": "8.12",
-            "FY 2022": "8.09",
-            "FY 2021": "7.13"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "quickRatio": {
           "label": "Quick Ratio",
           "unit": null,
-          "values": {
-            "Current": 1.51,
-            "FY 2025": 1.61,
-            "FY 2024": 0.57,
-            "FY 2023": 0.52,
-            "FY 2022": 0.74,
-            "FY 2021": 0.78
-          },
-          "rawValues": {
-            "Current": "1.51",
-            "FY 2025": "1.61",
-            "FY 2024": "0.57",
-            "FY 2023": "0.52",
-            "FY 2022": "0.74",
-            "FY 2021": "0.78"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "currentRatio": {
           "label": "Current Ratio",
           "unit": null,
-          "values": {
-            "Current": 2.02,
-            "FY 2025": 3.7,
-            "FY 2024": 1.5,
-            "FY 2023": 1.46,
-            "FY 2022": 1.94,
-            "FY 2021": 1.69
-          },
-          "rawValues": {
-            "Current": "2.02",
-            "FY 2025": "3.70",
-            "FY 2024": "1.50",
-            "FY 2023": "1.46",
-            "FY 2022": "1.94",
-            "FY 2021": "1.69"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "roic": {
           "label": "ROIC",
           "unit": null,
-          "values": {
-            "Current": 1.09,
-            "FY 2025": 0.79,
-            "FY 2024": 1.65,
-            "FY 2023": 2.07,
-            "FY 2022": 1.33,
-            "FY 2021": 2.27
-          },
-          "rawValues": {
-            "Current": "1.09%",
-            "FY 2025": "0.79%",
-            "FY 2024": "1.65%",
-            "FY 2023": "2.07%",
-            "FY 2022": "1.33%",
-            "FY 2021": "2.27%"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "roe": {
           "label": "ROE",
           "unit": null,
-          "values": {
-            "Current": 7.53,
-            "FY 2025": 4.16,
-            "FY 2024": -4.44,
-            "FY 2023": -1.77,
-            "FY 2022": 0.59,
-            "FY 2021": -0.98
-          },
-          "rawValues": {
-            "Current": "7.53%",
-            "FY 2025": "4.16%",
-            "FY 2024": "-4.44%",
-            "FY 2023": "-1.77%",
-            "FY 2022": "0.59%",
-            "FY 2021": "-0.98%"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "payoutRatio": {
           "label": "Payout Ratio",
           "unit": null,
-          "values": {
-            "Current": 23.34,
-            "FY 2025": 39.78,
-            "FY 2024": null,
-            "FY 2023": null,
-            "FY 2022": 248.5,
-            "FY 2021": null
-          },
-          "rawValues": {
-            "Current": "23.34%",
-            "FY 2025": "39.78%",
-            "FY 2024": "-",
-            "FY 2023": "-",
-            "FY 2022": "248.50%",
-            "FY 2021": "-"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "assetTurnover": {
           "label": "Asset Turnover",
           "unit": null,
-          "values": {
-            "Current": 0.03,
-            "FY 2025": 0.04,
-            "FY 2024": 0.05,
-            "FY 2023": 0.04,
-            "FY 2022": 0.05,
-            "FY 2021": 0.05
-          },
-          "rawValues": {
-            "Current": "0.03",
-            "FY 2025": "0.04",
-            "FY 2024": "0.05",
-            "FY 2023": "0.04",
-            "FY 2022": "0.05",
-            "FY 2021": "0.05"
-          }
+          "values": {},
+          "rawValues": {}
         }
       },
       "current": {
-        "marketCap": 21790,
-        "netDebtToEbitda": 7.36,
-        "debtToEquity": 0.19,
-        "netDebtToEquity": 0.1,
-        "debtToEbitda": 14.62,
-        "quickRatio": 1.51,
-        "currentRatio": 2.02,
-        "roic": 1.09,
-        "roe": 7.53,
-        "payoutRatio": 23.34,
-        "assetTurnover": 0.03
+        "marketCap": 21801,
+        "netDebtToEbitda": null,
+        "debtToEquity": null,
+        "netDebtToEquity": null,
+        "debtToEbitda": null,
+        "quickRatio": null,
+        "currentRatio": null,
+        "roic": null,
+        "roe": null,
+        "payoutRatio": null,
+        "assetTurnover": null
       },
-      "lastFetchedAt": "2026-07-29T00:36:03.824Z",
-      "fetchStatus": "ok",
+      "lastFetchedAt": "2026-07-29T03:57:31.348Z",
+      "fetchStatus": "partial",
       "fetchError": null,
-      "healthScore": 76,
-      "healthStatus": "Green",
-      "scoreCoverage": 0.9999999999999999,
-      "scoreNote": null,
+      "healthScore": null,
+      "healthStatus": "Pending data",
+      "scoreCoverage": 0,
+      "scoreNote": "Insufficient ratio coverage",
       "healthScoreComponents": {
-        "staticRiskScore": 21.42875,
-        "staticHealthScore": 78.57124999999999,
-        "trendPenalty": 2.2,
-        "finalHealthScore": 76,
-        "scoreCoverage": 0.9999999999999999,
-        "missingMetrics": [],
-        "excludedMetrics": [
-          "debtToEbitda",
-          "quickRatio",
-          "payoutRatio",
-          "assetTurnover"
-        ],
-        "usedMetrics": [
+        "staticRiskScore": null,
+        "staticHealthScore": null,
+        "trendPenalty": null,
+        "finalHealthScore": null,
+        "scoreCoverage": 0,
+        "missingMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
@@ -2198,115 +1569,21 @@
           "roic",
           "roe"
         ],
-        "riskByMetric": {
-          "netDebtToEbitda": 11.333333333333336,
-          "debtToEquity": 0,
-          "netDebtToEquity": 0,
-          "currentRatio": 0,
-          "roic": 97.75,
-          "roe": 24.699999999999996
-        },
-        "weightedContributors": {
-          "leverage": 0,
-          "liquidity": 0,
-          "resilience": 21.42875
-        },
-        "pillarContributors": {
-          "leverage": {
-            "metricKeys": [
-              "netDebtToEbitda",
-              "debtToEquity",
-              "netDebtToEquity"
-            ],
-            "aggregation": "median",
-            "pillarRiskScore": 0,
-            "weightedRiskContribution": 0
-          },
-          "liquidity": {
-            "metricKeys": [
-              "currentRatio"
-            ],
-            "aggregation": "single",
-            "pillarRiskScore": 0,
-            "weightedRiskContribution": 0
-          },
-          "resilience": {
-            "metricKeys": [
-              "roic",
-              "roe"
-            ],
-            "aggregation": "average",
-            "pillarRiskScore": 61.224999999999994,
-            "weightedRiskContribution": 21.42875
-          }
-        },
-        "pillarRisks": {
-          "leverage": 0,
-          "liquidity": 0,
-          "resilience": 61.224999999999994
-        },
+        "excludedMetrics": [
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
+        ],
+        "usedMetrics": [],
+        "riskByMetric": {},
+        "weightedContributors": {},
+        "pillarContributors": {},
+        "pillarRisks": {},
         "metricAdjustments": {},
-        "trendBreakdown": {
-          "netDebtToEbitda": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": true,
-            "appliedPenalty": 3,
-            "skipped": false
-          },
-          "debtToEquity": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
-            "skipped": false
-          },
-          "currentRatio": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
-            "skipped": false
-          },
-          "roic": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": true,
-            "appliedPenalty": 2.5,
-            "skipped": false
-          },
-          "roe": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
-            "skipped": false
-          }
-        },
-        "rawTrendPenalty": 5.5,
-        "worseningMetricCount": 2
+        "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-07-29T00:36:03.993Z"
+      "lastScoredAt": "2026-07-29T03:57:31.428Z"
     },
     {
       "ticker": "LJ3",
@@ -2316,7 +1593,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Jul '26 Jul 27, 2026"
+          "periodEnding": "Jul '26 Jul 28, 2026"
         },
         {
           "label": "FY 2025",
@@ -2434,7 +1711,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-07-29T00:36:03.994Z",
+      "lastFetchedAt": "2026-07-29T03:57:31.428Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -2469,7 +1746,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-07-29T00:36:04.160Z"
+      "lastScoredAt": "2026-07-29T03:57:31.522Z"
     },
     {
       "ticker": "W05",
@@ -2526,91 +1803,238 @@
         "netDebtToEbitda": {
           "label": "Net Debt / EBITDA Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 11.22,
+            "FY 2025": 48.44,
+            "FY 2024": 11.87,
+            "FY 2023": 9.08,
+            "FY 2022": 1.37,
+            "FY 2021": -1.07
+          },
+          "rawValues": {
+            "Current": "11.22",
+            "FY 2025": "48.44",
+            "FY 2024": "11.87",
+            "FY 2023": "9.08",
+            "FY 2022": "1.37",
+            "FY 2021": "-1.07"
+          }
         },
         "debtToEquity": {
           "label": "Debt / Equity Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 0.29,
+            "FY 2025": 0.43,
+            "FY 2024": 0.26,
+            "FY 2023": 0.2,
+            "FY 2022": 0.17,
+            "FY 2021": 0.21
+          },
+          "rawValues": {
+            "Current": "0.29",
+            "FY 2025": "0.43",
+            "FY 2024": "0.26",
+            "FY 2023": "0.20",
+            "FY 2022": "0.17",
+            "FY 2021": "0.21"
+          }
         },
         "netDebtToEquity": {
           "label": "Net Debt / Equity Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 0.14,
+            "FY 2025": 0.29,
+            "FY 2024": 0.06,
+            "FY 2023": 0.08,
+            "FY 2022": 0.02,
+            "FY 2021": -0.02
+          },
+          "rawValues": {
+            "Current": "0.14",
+            "FY 2025": "0.29",
+            "FY 2024": "0.06",
+            "FY 2023": "0.08",
+            "FY 2022": "0.02",
+            "FY 2021": "-0.02"
+          }
         },
         "debtToEbitda": {
           "label": "Debt / EBITDA Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 23.41,
+            "FY 2025": 71.94,
+            "FY 2024": 49.6,
+            "FY 2023": 18.8,
+            "FY 2022": 8.58,
+            "FY 2021": 9.47
+          },
+          "rawValues": {
+            "Current": "23.41",
+            "FY 2025": "71.94",
+            "FY 2024": "49.60",
+            "FY 2023": "18.80",
+            "FY 2022": "8.58",
+            "FY 2021": "9.47"
+          }
         },
         "quickRatio": {
           "label": "Quick Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 6.66,
+            "FY 2025": 11.17,
+            "FY 2024": 8.46,
+            "FY 2023": 8.18,
+            "FY 2022": 3.17,
+            "FY 2021": 5.96
+          },
+          "rawValues": {
+            "Current": "6.66",
+            "FY 2025": "11.17",
+            "FY 2024": "8.46",
+            "FY 2023": "8.18",
+            "FY 2022": "3.17",
+            "FY 2021": "5.96"
+          }
         },
         "currentRatio": {
           "label": "Current Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 6.95,
+            "FY 2025": 11.44,
+            "FY 2024": 9.05,
+            "FY 2023": 8.37,
+            "FY 2022": 3.32,
+            "FY 2021": 6.07
+          },
+          "rawValues": {
+            "Current": "6.95",
+            "FY 2025": "11.44",
+            "FY 2024": "9.05",
+            "FY 2023": "8.37",
+            "FY 2022": "3.32",
+            "FY 2021": "6.07"
+          }
         },
         "roic": {
           "label": "ROIC",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 0.81,
+            "FY 2025": 0.17,
+            "FY 2024": 0.18,
+            "FY 2023": 0.74,
+            "FY 2022": 1.54,
+            "FY 2021": 0.97
+          },
+          "rawValues": {
+            "Current": "0.81%",
+            "FY 2025": "0.17%",
+            "FY 2024": "0.18%",
+            "FY 2023": "0.74%",
+            "FY 2022": "1.54%",
+            "FY 2021": "0.97%"
+          }
         },
         "roe": {
           "label": "ROE",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": -1.22,
+            "FY 2025": -2.22,
+            "FY 2024": -2.57,
+            "FY 2023": 0.33,
+            "FY 2022": 4.07,
+            "FY 2021": 1.18
+          },
+          "rawValues": {
+            "Current": "-1.22%",
+            "FY 2025": "-2.22%",
+            "FY 2024": "-2.57%",
+            "FY 2023": "0.33%",
+            "FY 2022": "4.07%",
+            "FY 2021": "1.18%"
+          }
         },
         "payoutRatio": {
           "label": "Payout Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": null,
+            "FY 2025": null,
+            "FY 2024": null,
+            "FY 2023": 221.83,
+            "FY 2022": 25.58,
+            "FY 2021": 82.53
+          },
+          "rawValues": {
+            "Current": "-",
+            "FY 2025": "-",
+            "FY 2024": "-",
+            "FY 2023": "221.83%",
+            "FY 2022": "25.58%",
+            "FY 2021": "82.53%"
+          }
         },
         "assetTurnover": {
           "label": "Asset Turnover",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 0.09,
+            "FY 2025": 0.06,
+            "FY 2024": 0.04,
+            "FY 2023": 0.11,
+            "FY 2022": 0.12,
+            "FY 2021": 0.1
+          },
+          "rawValues": {
+            "Current": "0.09",
+            "FY 2025": "0.06",
+            "FY 2024": "0.04",
+            "FY 2023": "0.11",
+            "FY 2022": "0.12",
+            "FY 2021": "0.10"
+          }
         }
       },
       "current": {
         "marketCap": 1207,
-        "netDebtToEbitda": null,
-        "debtToEquity": null,
-        "netDebtToEquity": null,
-        "debtToEbitda": null,
-        "quickRatio": null,
-        "currentRatio": null,
-        "roic": null,
-        "roe": null,
+        "netDebtToEbitda": 11.22,
+        "debtToEquity": 0.29,
+        "netDebtToEquity": 0.14,
+        "debtToEbitda": 23.41,
+        "quickRatio": 6.66,
+        "currentRatio": 6.95,
+        "roic": 0.81,
+        "roe": -1.22,
         "payoutRatio": null,
-        "assetTurnover": null
+        "assetTurnover": 0.09
       },
-      "lastFetchedAt": "2026-07-29T00:36:04.160Z",
-      "fetchStatus": "partial",
+      "lastFetchedAt": "2026-07-29T03:57:31.522Z",
+      "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": null,
-      "healthStatus": "Pending data",
-      "scoreCoverage": 0,
-      "scoreNote": "Insufficient ratio coverage",
+      "healthScore": 62,
+      "healthStatus": "Green",
+      "scoreCoverage": 0.9999999999999999,
+      "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": null,
-        "staticHealthScore": null,
-        "trendPenalty": null,
-        "finalHealthScore": null,
-        "scoreCoverage": 0,
-        "missingMetrics": [
+        "staticRiskScore": 35.00000000000001,
+        "staticHealthScore": 65,
+        "trendPenalty": 3.2,
+        "finalHealthScore": 62,
+        "scoreCoverage": 0.9999999999999999,
+        "missingMetrics": [],
+        "excludedMetrics": [
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
+        ],
+        "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
@@ -2618,21 +2042,115 @@
           "roic",
           "roe"
         ],
-        "excludedMetrics": [
-          "debtToEbitda",
-          "quickRatio",
-          "payoutRatio",
-          "assetTurnover"
-        ],
-        "usedMetrics": [],
-        "riskByMetric": {},
-        "weightedContributors": {},
-        "pillarContributors": {},
-        "pillarRisks": {},
+        "riskByMetric": {
+          "netDebtToEbitda": 43.50000000000001,
+          "debtToEquity": 0,
+          "netDebtToEquity": 0,
+          "currentRatio": 0,
+          "roic": 100,
+          "roe": 100
+        },
+        "weightedContributors": {
+          "leverage": 0,
+          "liquidity": 0,
+          "resilience": 35.00000000000001
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 100,
+            "weightedRiskContribution": 35.00000000000001
+          }
+        },
+        "pillarRisks": {
+          "leverage": 0,
+          "liquidity": 0,
+          "resilience": 100
+        },
         "metricAdjustments": {},
-        "trendBreakdown": {}
+        "trendBreakdown": {
+          "netDebtToEbitda": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": true,
+            "consecutiveWorsened": true,
+            "appliedPenalty": 3,
+            "skipped": false
+          },
+          "debtToEquity": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": true,
+            "consecutiveWorsened": true,
+            "appliedPenalty": 2.5,
+            "skipped": false
+          },
+          "currentRatio": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": false,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 0,
+            "skipped": false
+          },
+          "roic": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": true,
+            "consecutiveWorsened": true,
+            "appliedPenalty": 2.5,
+            "skipped": false
+          },
+          "roe": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": false,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 0,
+            "skipped": false
+          }
+        },
+        "rawTrendPenalty": 8,
+        "worseningMetricCount": 3
       },
-      "lastScoredAt": "2026-07-29T00:36:04.346Z"
+      "lastScoredAt": "2026-07-29T03:57:31.614Z"
     },
     {
       "ticker": "B61",
@@ -2642,7 +2160,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Jul '26 Jul 27, 2026"
+          "periodEnding": "Jul '26 Jul 28, 2026"
         },
         {
           "label": "FY 2026",
@@ -2760,7 +2278,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-07-29T00:36:04.347Z",
+      "lastFetchedAt": "2026-07-29T03:57:31.614Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -2795,7 +2313,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-07-29T00:36:04.468Z"
+      "lastScoredAt": "2026-07-29T03:57:31.704Z"
     },
     {
       "ticker": "H13",
@@ -2805,7 +2323,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Jul '26 Jul 27, 2026"
+          "periodEnding": "Jul '26 Jul 28, 2026"
         },
         {
           "label": "FY 2025",
@@ -2852,91 +2370,238 @@
         "netDebtToEbitda": {
           "label": "Net Debt / EBITDA Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 9.89,
+            "FY 2025": 9.89,
+            "FY 2024": 8.41,
+            "FY 2023": 9.36,
+            "FY 2022": 10.05,
+            "FY 2021": 10.36
+          },
+          "rawValues": {
+            "Current": "9.89",
+            "FY 2025": "9.89",
+            "FY 2024": "8.41",
+            "FY 2023": "9.36",
+            "FY 2022": "10.05",
+            "FY 2021": "10.36"
+          }
         },
         "debtToEquity": {
           "label": "Debt / Equity Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 0.67,
+            "FY 2025": 0.67,
+            "FY 2024": 0.71,
+            "FY 2023": 0.85,
+            "FY 2022": 0.87,
+            "FY 2021": 0.65
+          },
+          "rawValues": {
+            "Current": "0.67",
+            "FY 2025": "0.67",
+            "FY 2024": "0.71",
+            "FY 2023": "0.85",
+            "FY 2022": "0.87",
+            "FY 2021": "0.65"
+          }
         },
         "netDebtToEquity": {
           "label": "Net Debt / Equity Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 0.61,
+            "FY 2025": 0.61,
+            "FY 2024": 0.66,
+            "FY 2023": 0.8,
+            "FY 2022": 0.78,
+            "FY 2021": 0.62
+          },
+          "rawValues": {
+            "Current": "0.61",
+            "FY 2025": "0.61",
+            "FY 2024": "0.66",
+            "FY 2023": "0.80",
+            "FY 2022": "0.78",
+            "FY 2021": "0.62"
+          }
         },
         "debtToEbitda": {
           "label": "Debt / EBITDA Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 10.87,
+            "FY 2025": 10.87,
+            "FY 2024": 9.05,
+            "FY 2023": 9.94,
+            "FY 2022": 11.21,
+            "FY 2021": 10.88
+          },
+          "rawValues": {
+            "Current": "10.87",
+            "FY 2025": "10.87",
+            "FY 2024": "9.05",
+            "FY 2023": "9.94",
+            "FY 2022": "11.21",
+            "FY 2021": "10.88"
+          }
         },
         "quickRatio": {
           "label": "Quick Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 0.47,
+            "FY 2025": 0.47,
+            "FY 2024": 0.67,
+            "FY 2023": 0.33,
+            "FY 2022": 0.34,
+            "FY 2021": 0.2
+          },
+          "rawValues": {
+            "Current": "0.47",
+            "FY 2025": "0.47",
+            "FY 2024": "0.67",
+            "FY 2023": "0.33",
+            "FY 2022": "0.34",
+            "FY 2021": "0.20"
+          }
         },
         "currentRatio": {
           "label": "Current Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 1.1,
+            "FY 2025": 1.1,
+            "FY 2024": 1.87,
+            "FY 2023": 1.12,
+            "FY 2022": 0.77,
+            "FY 2021": 0.64
+          },
+          "rawValues": {
+            "Current": "1.10",
+            "FY 2025": "1.10",
+            "FY 2024": "1.87",
+            "FY 2023": "1.12",
+            "FY 2022": "0.77",
+            "FY 2021": "0.64"
+          }
         },
         "roic": {
           "label": "ROIC",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 2.82,
+            "FY 2025": 2.81,
+            "FY 2024": 3.2,
+            "FY 2023": 4.4,
+            "FY 2022": 4.12,
+            "FY 2021": 3.53
+          },
+          "rawValues": {
+            "Current": "2.82%",
+            "FY 2025": "2.81%",
+            "FY 2024": "3.20%",
+            "FY 2023": "4.40%",
+            "FY 2022": "4.12%",
+            "FY 2021": "3.53%"
+          }
         },
         "roe": {
           "label": "ROE",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 2.74,
+            "FY 2025": 2.74,
+            "FY 2024": 3,
+            "FY 2023": -6.87,
+            "FY 2022": 4.24,
+            "FY 2021": 8.96
+          },
+          "rawValues": {
+            "Current": "2.74%",
+            "FY 2025": "2.74%",
+            "FY 2024": "3.00%",
+            "FY 2023": "-6.87%",
+            "FY 2022": "4.24%",
+            "FY 2021": "8.96%"
+          }
         },
         "payoutRatio": {
           "label": "Payout Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 26.51,
+            "FY 2025": 26.51,
+            "FY 2024": 18.18,
+            "FY 2023": null,
+            "FY 2022": 40.03,
+            "FY 2021": 16.07
+          },
+          "rawValues": {
+            "Current": "26.51%",
+            "FY 2025": "26.51%",
+            "FY 2024": "18.18%",
+            "FY 2023": "-",
+            "FY 2022": "40.03%",
+            "FY 2021": "16.07%"
+          }
         },
         "assetTurnover": {
           "label": "Asset Turnover",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 0.07,
+            "FY 2025": 0.07,
+            "FY 2024": 0.08,
+            "FY 2023": 0.07,
+            "FY 2022": 0.07,
+            "FY 2021": 0.06
+          },
+          "rawValues": {
+            "Current": "0.07",
+            "FY 2025": "0.07",
+            "FY 2024": "0.08",
+            "FY 2023": "0.07",
+            "FY 2022": "0.07",
+            "FY 2021": "0.06"
+          }
         }
       },
       "current": {
         "marketCap": 1341,
-        "netDebtToEbitda": null,
-        "debtToEquity": null,
-        "netDebtToEquity": null,
-        "debtToEbitda": null,
-        "quickRatio": null,
-        "currentRatio": null,
-        "roic": null,
-        "roe": null,
-        "payoutRatio": null,
-        "assetTurnover": null
+        "netDebtToEbitda": 9.89,
+        "debtToEquity": 0.67,
+        "netDebtToEquity": 0.61,
+        "debtToEbitda": 10.87,
+        "quickRatio": 0.47,
+        "currentRatio": 1.1,
+        "roic": 2.82,
+        "roe": 2.74,
+        "payoutRatio": 26.51,
+        "assetTurnover": 0.07
       },
-      "lastFetchedAt": "2026-07-29T00:36:04.468Z",
-      "fetchStatus": "partial",
+      "lastFetchedAt": "2026-07-29T03:57:31.704Z",
+      "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": null,
-      "healthStatus": "Pending data",
-      "scoreCoverage": 0,
-      "scoreNote": "Insufficient ratio coverage",
+      "healthScore": 43,
+      "healthStatus": "Amber",
+      "scoreCoverage": 0.9999999999999999,
+      "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": null,
-        "staticHealthScore": null,
-        "trendPenalty": null,
-        "finalHealthScore": null,
-        "scoreCoverage": 0,
-        "missingMetrics": [
+        "staticRiskScore": 54.4925,
+        "staticHealthScore": 45.5075,
+        "trendPenalty": 2.6,
+        "finalHealthScore": 43,
+        "scoreCoverage": 0.9999999999999999,
+        "missingMetrics": [],
+        "excludedMetrics": [
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
+        ],
+        "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
@@ -2944,21 +2609,115 @@
           "roic",
           "roe"
         ],
-        "excludedMetrics": [
-          "debtToEbitda",
-          "quickRatio",
-          "payoutRatio",
-          "assetTurnover"
-        ],
-        "usedMetrics": [],
-        "riskByMetric": {},
-        "weightedContributors": {},
-        "pillarContributors": {},
-        "pillarRisks": {},
+        "riskByMetric": {
+          "netDebtToEbitda": 32.41666666666667,
+          "debtToEquity": 0,
+          "netDebtToEquity": 15,
+          "currentRatio": 89.99999999999999,
+          "roic": 54.50000000000001,
+          "roe": 72.6
+        },
+        "weightedContributors": {
+          "leverage": 5.250000000000001,
+          "liquidity": 27,
+          "resilience": 22.2425
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 15,
+            "weightedRiskContribution": 5.250000000000001
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 89.99999999999999,
+            "weightedRiskContribution": 27
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 63.55,
+            "weightedRiskContribution": 22.2425
+          }
+        },
+        "pillarRisks": {
+          "leverage": 15,
+          "liquidity": 89.99999999999999,
+          "resilience": 63.55
+        },
         "metricAdjustments": {},
-        "trendBreakdown": {}
+        "trendBreakdown": {
+          "netDebtToEbitda": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": true,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 2,
+            "skipped": false
+          },
+          "debtToEquity": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": false,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 0,
+            "skipped": false
+          },
+          "currentRatio": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": true,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 1,
+            "skipped": false
+          },
+          "roic": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": true,
+            "consecutiveWorsened": true,
+            "appliedPenalty": 2.5,
+            "skipped": false
+          },
+          "roe": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": true,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 1,
+            "skipped": false
+          }
+        },
+        "rawTrendPenalty": 6.5,
+        "worseningMetricCount": 4
       },
-      "lastScoredAt": "2026-07-29T00:36:04.639Z"
+      "lastScoredAt": "2026-07-29T03:57:31.798Z"
     },
     {
       "ticker": "T24",
@@ -2968,7 +2727,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Jul '26 Jul 27, 2026"
+          "periodEnding": "Jul '26 Jul 28, 2026"
         },
         {
           "label": "FY 2025",
@@ -3015,91 +2774,238 @@
         "netDebtToEbitda": {
           "label": "Net Debt / EBITDA Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 48.52,
+            "FY 2025": 48.52,
+            "FY 2024": 46.6,
+            "FY 2023": 32.14,
+            "FY 2022": 43.83,
+            "FY 2021": 58.17
+          },
+          "rawValues": {
+            "Current": "48.52",
+            "FY 2025": "48.52",
+            "FY 2024": "46.60",
+            "FY 2023": "32.14",
+            "FY 2022": "43.83",
+            "FY 2021": "58.17"
+          }
         },
         "debtToEquity": {
           "label": "Debt / Equity Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 1.14,
+            "FY 2025": 1.14,
+            "FY 2024": 1.09,
+            "FY 2023": 1,
+            "FY 2022": 1.04,
+            "FY 2021": 1.07
+          },
+          "rawValues": {
+            "Current": "1.14",
+            "FY 2025": "1.14",
+            "FY 2024": "1.09",
+            "FY 2023": "1.00",
+            "FY 2022": "1.04",
+            "FY 2021": "1.07"
+          }
         },
         "netDebtToEquity": {
           "label": "Net Debt / Equity Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 1.01,
+            "FY 2025": 1.01,
+            "FY 2024": 0.96,
+            "FY 2023": 0.82,
+            "FY 2022": 0.84,
+            "FY 2021": 0.75
+          },
+          "rawValues": {
+            "Current": "1.01",
+            "FY 2025": "1.01",
+            "FY 2024": "0.96",
+            "FY 2023": "0.82",
+            "FY 2022": "0.84",
+            "FY 2021": "0.75"
+          }
         },
         "debtToEbitda": {
           "label": "Debt / EBITDA Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 54.58,
+            "FY 2025": 54.58,
+            "FY 2024": 52.74,
+            "FY 2023": 39.23,
+            "FY 2022": 54.51,
+            "FY 2021": 82.89
+          },
+          "rawValues": {
+            "Current": "54.58",
+            "FY 2025": "54.58",
+            "FY 2024": "52.74",
+            "FY 2023": "39.23",
+            "FY 2022": "54.51",
+            "FY 2021": "82.89"
+          }
         },
         "quickRatio": {
           "label": "Quick Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 1.84,
+            "FY 2025": 1.84,
+            "FY 2024": 2.08,
+            "FY 2023": 0.65,
+            "FY 2022": 0.82,
+            "FY 2021": 0.74
+          },
+          "rawValues": {
+            "Current": "1.84",
+            "FY 2025": "1.84",
+            "FY 2024": "2.08",
+            "FY 2023": "0.65",
+            "FY 2022": "0.82",
+            "FY 2021": "0.74"
+          }
         },
         "currentRatio": {
           "label": "Current Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 2.46,
+            "FY 2025": 2.46,
+            "FY 2024": 2.82,
+            "FY 2023": 0.89,
+            "FY 2022": 1.31,
+            "FY 2021": 1.13
+          },
+          "rawValues": {
+            "Current": "2.46",
+            "FY 2025": "2.46",
+            "FY 2024": "2.82",
+            "FY 2023": "0.89",
+            "FY 2022": "1.31",
+            "FY 2021": "1.13"
+          }
         },
         "roic": {
           "label": "ROIC",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 0.59,
+            "FY 2025": 0.6,
+            "FY 2024": 0.79,
+            "FY 2023": 1.12,
+            "FY 2022": 0.75,
+            "FY 2021": 0.29
+          },
+          "rawValues": {
+            "Current": "0.59%",
+            "FY 2025": "0.60%",
+            "FY 2024": "0.79%",
+            "FY 2023": "1.12%",
+            "FY 2022": "0.75%",
+            "FY 2021": "0.29%"
+          }
         },
         "roe": {
           "label": "ROE",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 2.63,
+            "FY 2025": 2.63,
+            "FY 2024": 0.1,
+            "FY 2023": 0.44,
+            "FY 2022": 0.23,
+            "FY 2021": 6.71
+          },
+          "rawValues": {
+            "Current": "2.63%",
+            "FY 2025": "2.63%",
+            "FY 2024": "0.10%",
+            "FY 2023": "0.44%",
+            "FY 2022": "0.23%",
+            "FY 2021": "6.71%"
+          }
         },
         "payoutRatio": {
           "label": "Payout Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 23.14,
+            "FY 2025": 23.14,
+            "FY 2024": 313.35,
+            "FY 2023": 53.39,
+            "FY 2022": 53.97,
+            "FY 2021": 1.99
+          },
+          "rawValues": {
+            "Current": "23.14%",
+            "FY 2025": "23.14%",
+            "FY 2024": "313.35%",
+            "FY 2023": "53.39%",
+            "FY 2022": "53.97%",
+            "FY 2021": "1.99%"
+          }
         },
         "assetTurnover": {
           "label": "Asset Turnover",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 0.05,
+            "FY 2025": 0.05,
+            "FY 2024": 0.07,
+            "FY 2023": 0.12,
+            "FY 2022": 0.08,
+            "FY 2021": 0.08
+          },
+          "rawValues": {
+            "Current": "0.05",
+            "FY 2025": "0.05",
+            "FY 2024": "0.07",
+            "FY 2023": "0.12",
+            "FY 2022": "0.08",
+            "FY 2021": "0.08"
+          }
         }
       },
       "current": {
         "marketCap": 381,
-        "netDebtToEbitda": null,
-        "debtToEquity": null,
-        "netDebtToEquity": null,
-        "debtToEbitda": null,
-        "quickRatio": null,
-        "currentRatio": null,
-        "roic": null,
-        "roe": null,
-        "payoutRatio": null,
-        "assetTurnover": null
+        "netDebtToEbitda": 48.52,
+        "debtToEquity": 1.14,
+        "netDebtToEquity": 1.01,
+        "debtToEbitda": 54.58,
+        "quickRatio": 1.84,
+        "currentRatio": 2.46,
+        "roic": 0.59,
+        "roe": 2.63,
+        "payoutRatio": 23.14,
+        "assetTurnover": 0.05
       },
-      "lastFetchedAt": "2026-07-29T00:36:04.639Z",
-      "fetchStatus": "partial",
+      "lastFetchedAt": "2026-07-29T03:57:31.798Z",
+      "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": null,
-      "healthStatus": "Pending data",
-      "scoreCoverage": 0,
-      "scoreNote": "Insufficient ratio coverage",
+      "healthScore": 51,
+      "healthStatus": "Green",
+      "scoreCoverage": 0.9999999999999999,
+      "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": null,
-        "staticHealthScore": null,
-        "trendPenalty": null,
-        "finalHealthScore": null,
-        "scoreCoverage": 0,
-        "missingMetrics": [
+        "staticRiskScore": 45.6475,
+        "staticHealthScore": 54.3525,
+        "trendPenalty": 3.6,
+        "finalHealthScore": 51,
+        "scoreCoverage": 0.9999999999999999,
+        "missingMetrics": [],
+        "excludedMetrics": [
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
+        ],
+        "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
@@ -3107,21 +3013,115 @@
           "roic",
           "roe"
         ],
-        "excludedMetrics": [
-          "debtToEbitda",
-          "quickRatio",
-          "payoutRatio",
-          "assetTurnover"
-        ],
-        "usedMetrics": [],
-        "riskByMetric": {},
-        "weightedContributors": {},
-        "pillarContributors": {},
-        "pillarRisks": {},
+        "riskByMetric": {
+          "netDebtToEbitda": 100,
+          "debtToEquity": 19.999999999999993,
+          "netDebtToEquity": 43.57142857142857,
+          "currentRatio": 0,
+          "roic": 100,
+          "roe": 73.7
+        },
+        "weightedContributors": {
+          "leverage": 15.25,
+          "liquidity": 0,
+          "resilience": 30.3975
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 43.57142857142857,
+            "weightedRiskContribution": 15.25
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 86.85,
+            "weightedRiskContribution": 30.3975
+          }
+        },
+        "pillarRisks": {
+          "leverage": 43.57142857142857,
+          "liquidity": 0,
+          "resilience": 86.85
+        },
         "metricAdjustments": {},
-        "trendBreakdown": {}
+        "trendBreakdown": {
+          "netDebtToEbitda": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": true,
+            "consecutiveWorsened": true,
+            "appliedPenalty": 3,
+            "skipped": false
+          },
+          "debtToEquity": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": true,
+            "consecutiveWorsened": true,
+            "appliedPenalty": 2.5,
+            "skipped": false
+          },
+          "currentRatio": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": true,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 1,
+            "skipped": false
+          },
+          "roic": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": true,
+            "consecutiveWorsened": true,
+            "appliedPenalty": 2.5,
+            "skipped": false
+          },
+          "roe": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": false,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 0,
+            "skipped": false
+          }
+        },
+        "rawTrendPenalty": 9,
+        "worseningMetricCount": 4
       },
-      "lastScoredAt": "2026-07-29T00:36:04.760Z"
+      "lastScoredAt": "2026-07-29T03:57:31.878Z"
     },
     {
       "ticker": "O10",
@@ -3178,238 +3178,91 @@
         "netDebtToEbitda": {
           "label": "Net Debt / EBITDA Ratio",
           "unit": null,
-          "values": {
-            "Current": 13.81,
-            "FY 2025": 13.81,
-            "FY 2024": 13.02,
-            "FY 2023": 14.19,
-            "FY 2022": 18.34,
-            "FY 2021": 44.48
-          },
-          "rawValues": {
-            "Current": "13.81",
-            "FY 2025": "13.81",
-            "FY 2024": "13.02",
-            "FY 2023": "14.19",
-            "FY 2022": "18.34",
-            "FY 2021": "44.48"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "debtToEquity": {
           "label": "Debt / Equity Ratio",
           "unit": null,
-          "values": {
-            "Current": 0.6,
-            "FY 2025": 0.6,
-            "FY 2024": 0.6,
-            "FY 2023": 0.62,
-            "FY 2022": 0.65,
-            "FY 2021": 0.73
-          },
-          "rawValues": {
-            "Current": "0.60",
-            "FY 2025": "0.60",
-            "FY 2024": "0.60",
-            "FY 2023": "0.62",
-            "FY 2022": "0.65",
-            "FY 2021": "0.73"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "netDebtToEquity": {
           "label": "Net Debt / Equity Ratio",
           "unit": null,
-          "values": {
-            "Current": 0.48,
-            "FY 2025": 0.48,
-            "FY 2024": 0.45,
-            "FY 2023": 0.45,
-            "FY 2022": 0.47,
-            "FY 2021": 0.53
-          },
-          "rawValues": {
-            "Current": "0.48",
-            "FY 2025": "0.48",
-            "FY 2024": "0.45",
-            "FY 2023": "0.45",
-            "FY 2022": "0.47",
-            "FY 2021": "0.53"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "debtToEbitda": {
           "label": "Debt / EBITDA Ratio",
           "unit": null,
-          "values": {
-            "Current": 14.78,
-            "FY 2025": 14.78,
-            "FY 2024": 14.57,
-            "FY 2023": 16.15,
-            "FY 2022": 20.09,
-            "FY 2021": 34.98
-          },
-          "rawValues": {
-            "Current": "14.78",
-            "FY 2025": "14.78",
-            "FY 2024": "14.57",
-            "FY 2023": "16.15",
-            "FY 2022": "20.09",
-            "FY 2021": "34.98"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "quickRatio": {
           "label": "Quick Ratio",
           "unit": null,
-          "values": {
-            "Current": 0.66,
-            "FY 2025": 0.66,
-            "FY 2024": 0.46,
-            "FY 2023": 0.64,
-            "FY 2022": 0.74,
-            "FY 2021": 0.52
-          },
-          "rawValues": {
-            "Current": "0.66",
-            "FY 2025": "0.66",
-            "FY 2024": "0.46",
-            "FY 2023": "0.64",
-            "FY 2022": "0.74",
-            "FY 2021": "0.52"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "currentRatio": {
           "label": "Current Ratio",
           "unit": null,
-          "values": {
-            "Current": 1.25,
-            "FY 2025": 1.25,
-            "FY 2024": 0.89,
-            "FY 2023": 1.19,
-            "FY 2022": 1.32,
-            "FY 2021": 0.91
-          },
-          "rawValues": {
-            "Current": "1.25",
-            "FY 2025": "1.25",
-            "FY 2024": "0.89",
-            "FY 2023": "1.19",
-            "FY 2022": "1.32",
-            "FY 2021": "0.91"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "roic": {
           "label": "ROIC",
           "unit": null,
-          "values": {
-            "Current": 1.67,
-            "FY 2025": 1.7,
-            "FY 2024": 1.6,
-            "FY 2023": 1.38,
-            "FY 2022": 1.04,
-            "FY 2021": 0.12
-          },
-          "rawValues": {
-            "Current": "1.67%",
-            "FY 2025": "1.70%",
-            "FY 2024": "1.60%",
-            "FY 2023": "1.38%",
-            "FY 2022": "1.04%",
-            "FY 2021": "0.12%"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "roe": {
           "label": "ROE",
           "unit": null,
-          "values": {
-            "Current": 3.88,
-            "FY 2025": 3.88,
-            "FY 2024": 4.44,
-            "FY 2023": 4.95,
-            "FY 2022": 1.65,
-            "FY 2021": 1.31
-          },
-          "rawValues": {
-            "Current": "3.88%",
-            "FY 2025": "3.88%",
-            "FY 2024": "4.44%",
-            "FY 2023": "4.95%",
-            "FY 2022": "1.65%",
-            "FY 2021": "1.31%"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "payoutRatio": {
           "label": "Payout Ratio",
           "unit": null,
-          "values": {
-            "Current": 33.49,
-            "FY 2025": 33.49,
-            "FY 2024": 30.81,
-            "FY 2023": 8.44,
-            "FY 2022": 13.83,
-            "FY 2021": 13.63
-          },
-          "rawValues": {
-            "Current": "33.49%",
-            "FY 2025": "33.49%",
-            "FY 2024": "30.81%",
-            "FY 2023": "8.44%",
-            "FY 2022": "13.83%",
-            "FY 2021": "13.63%"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "assetTurnover": {
           "label": "Asset Turnover",
           "unit": null,
-          "values": {
-            "Current": 0.09,
-            "FY 2025": 0.09,
-            "FY 2024": 0.07,
-            "FY 2023": 0.07,
-            "FY 2022": 0.06,
-            "FY 2021": 0.04
-          },
-          "rawValues": {
-            "Current": "0.09",
-            "FY 2025": "0.09",
-            "FY 2024": "0.07",
-            "FY 2023": "0.07",
-            "FY 2022": "0.06",
-            "FY 2021": "0.04"
-          }
+          "values": {},
+          "rawValues": {}
         }
       },
       "current": {
         "marketCap": 540,
-        "netDebtToEbitda": 13.81,
-        "debtToEquity": 0.6,
-        "netDebtToEquity": 0.48,
-        "debtToEbitda": 14.78,
-        "quickRatio": 0.66,
-        "currentRatio": 1.25,
-        "roic": 1.67,
-        "roe": 3.88,
-        "payoutRatio": 33.49,
-        "assetTurnover": 0.09
+        "netDebtToEbitda": null,
+        "debtToEquity": null,
+        "netDebtToEquity": null,
+        "debtToEbitda": null,
+        "quickRatio": null,
+        "currentRatio": null,
+        "roic": null,
+        "roe": null,
+        "payoutRatio": null,
+        "assetTurnover": null
       },
-      "lastFetchedAt": "2026-07-29T00:36:04.760Z",
-      "fetchStatus": "ok",
+      "lastFetchedAt": "2026-07-29T03:57:31.878Z",
+      "fetchStatus": "partial",
       "fetchError": null,
-      "healthScore": 49,
-      "healthStatus": "Amber",
-      "scoreCoverage": 0.9999999999999999,
-      "scoreNote": null,
+      "healthScore": null,
+      "healthStatus": "Pending data",
+      "scoreCoverage": 0,
+      "scoreNote": "Insufficient ratio coverage",
       "healthScoreComponents": {
-        "staticRiskScore": 49.77875,
-        "staticHealthScore": 50.22125,
-        "trendPenalty": 1.4000000000000001,
-        "finalHealthScore": 49,
-        "scoreCoverage": 0.9999999999999999,
-        "missingMetrics": [],
-        "excludedMetrics": [
-          "debtToEbitda",
-          "quickRatio",
-          "payoutRatio",
-          "assetTurnover"
-        ],
-        "usedMetrics": [
+        "staticRiskScore": null,
+        "staticHealthScore": null,
+        "trendPenalty": null,
+        "finalHealthScore": null,
+        "scoreCoverage": 0,
+        "missingMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
@@ -3417,115 +3270,21 @@
           "roic",
           "roe"
         ],
-        "riskByMetric": {
-          "netDebtToEbitda": 65.08333333333334,
-          "debtToEquity": 0,
-          "netDebtToEquity": 5.714285714285712,
-          "currentRatio": 75,
-          "roic": 83.25,
-          "roe": 61.199999999999996
-        },
-        "weightedContributors": {
-          "leverage": 1.9999999999999991,
-          "liquidity": 22.500000000000004,
-          "resilience": 25.27875
-        },
-        "pillarContributors": {
-          "leverage": {
-            "metricKeys": [
-              "netDebtToEbitda",
-              "debtToEquity",
-              "netDebtToEquity"
-            ],
-            "aggregation": "median",
-            "pillarRiskScore": 5.714285714285712,
-            "weightedRiskContribution": 1.9999999999999991
-          },
-          "liquidity": {
-            "metricKeys": [
-              "currentRatio"
-            ],
-            "aggregation": "single",
-            "pillarRiskScore": 75,
-            "weightedRiskContribution": 22.500000000000004
-          },
-          "resilience": {
-            "metricKeys": [
-              "roic",
-              "roe"
-            ],
-            "aggregation": "average",
-            "pillarRiskScore": 72.225,
-            "weightedRiskContribution": 25.27875
-          }
-        },
-        "pillarRisks": {
-          "leverage": 5.714285714285712,
-          "liquidity": 75,
-          "resilience": 72.225
-        },
+        "excludedMetrics": [
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
+        ],
+        "usedMetrics": [],
+        "riskByMetric": {},
+        "weightedContributors": {},
+        "pillarContributors": {},
+        "pillarRisks": {},
         "metricAdjustments": {},
-        "trendBreakdown": {
-          "netDebtToEbitda": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 2,
-            "skipped": false
-          },
-          "debtToEquity": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
-            "skipped": false
-          },
-          "currentRatio": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
-            "skipped": false
-          },
-          "roic": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
-            "skipped": false
-          },
-          "roe": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": true,
-            "appliedPenalty": 1.5,
-            "skipped": false
-          }
-        },
-        "rawTrendPenalty": 3.5,
-        "worseningMetricCount": 2
+        "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-07-29T00:36:04.931Z"
+      "lastScoredAt": "2026-07-29T03:57:32.023Z"
     },
     {
       "ticker": "5IC",
@@ -3535,7 +3294,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Jul '26 Jul 27, 2026"
+          "periodEnding": "Jul '26 Jul 28, 2026"
         },
         {
           "label": "FY 2025",
@@ -3653,7 +3412,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-07-29T00:36:04.931Z",
+      "lastFetchedAt": "2026-07-29T03:57:32.023Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -3688,7 +3447,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-07-29T00:36:05.122Z"
+      "lastScoredAt": "2026-07-29T03:57:32.117Z"
     },
     {
       "ticker": "5DP",
@@ -3745,238 +3504,91 @@
         "netDebtToEbitda": {
           "label": "Net Debt / EBITDA Ratio",
           "unit": null,
-          "values": {
-            "Current": 15.91,
-            "FY 2025": 15.91,
-            "FY 2024": 16.07,
-            "FY 2023": 16.62,
-            "FY 2022": 20.49,
-            "FY 2021": 52.15
-          },
-          "rawValues": {
-            "Current": "15.91",
-            "FY 2025": "15.91",
-            "FY 2024": "16.07",
-            "FY 2023": "16.62",
-            "FY 2022": "20.49",
-            "FY 2021": "52.15"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "debtToEquity": {
           "label": "Debt / Equity Ratio",
           "unit": null,
-          "values": {
-            "Current": 1.23,
-            "FY 2025": 1.23,
-            "FY 2024": 1.15,
-            "FY 2023": 1.17,
-            "FY 2022": 1.14,
-            "FY 2021": 1.21
-          },
-          "rawValues": {
-            "Current": "1.23",
-            "FY 2025": "1.23",
-            "FY 2024": "1.15",
-            "FY 2023": "1.17",
-            "FY 2022": "1.14",
-            "FY 2021": "1.21"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "netDebtToEquity": {
           "label": "Net Debt / Equity Ratio",
           "unit": null,
-          "values": {
-            "Current": 1.11,
-            "FY 2025": 1.11,
-            "FY 2024": 1.02,
-            "FY 2023": 0.99,
-            "FY 2022": 1,
-            "FY 2021": 1.11
-          },
-          "rawValues": {
-            "Current": "1.11",
-            "FY 2025": "1.11",
-            "FY 2024": "1.02",
-            "FY 2023": "0.99",
-            "FY 2022": "1.00",
-            "FY 2021": "1.11"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "debtToEbitda": {
           "label": "Debt / EBITDA Ratio",
           "unit": null,
-          "values": {
-            "Current": 17.68,
-            "FY 2025": 17.68,
-            "FY 2024": 18.18,
-            "FY 2023": 19.62,
-            "FY 2022": 23.39,
-            "FY 2021": 56.98
-          },
-          "rawValues": {
-            "Current": "17.68",
-            "FY 2025": "17.68",
-            "FY 2024": "18.18",
-            "FY 2023": "19.62",
-            "FY 2022": "23.39",
-            "FY 2021": "56.98"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "quickRatio": {
           "label": "Quick Ratio",
           "unit": null,
-          "values": {
-            "Current": 0.8,
-            "FY 2025": 0.8,
-            "FY 2024": 1.41,
-            "FY 2023": 0.94,
-            "FY 2022": 1.08,
-            "FY 2021": 2.06
-          },
-          "rawValues": {
-            "Current": "0.80",
-            "FY 2025": "0.80",
-            "FY 2024": "1.41",
-            "FY 2023": "0.94",
-            "FY 2022": "1.08",
-            "FY 2021": "2.06"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "currentRatio": {
           "label": "Current Ratio",
           "unit": null,
-          "values": {
-            "Current": 0.96,
-            "FY 2025": 0.96,
-            "FY 2024": 1.65,
-            "FY 2023": 1.24,
-            "FY 2022": 1.1,
-            "FY 2021": 2.37
-          },
-          "rawValues": {
-            "Current": "0.96",
-            "FY 2025": "0.96",
-            "FY 2024": "1.65",
-            "FY 2023": "1.24",
-            "FY 2022": "1.10",
-            "FY 2021": "2.37"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "roic": {
           "label": "ROIC",
           "unit": null,
-          "values": {
-            "Current": 2.53,
-            "FY 2025": 2.55,
-            "FY 2024": 0.48,
-            "FY 2023": 2.35,
-            "FY 2022": 1.16,
-            "FY 2021": 0.44
-          },
-          "rawValues": {
-            "Current": "2.53%",
-            "FY 2025": "2.55%",
-            "FY 2024": "0.48%",
-            "FY 2023": "2.35%",
-            "FY 2022": "1.16%",
-            "FY 2021": "0.44%"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "roe": {
           "label": "ROE",
           "unit": null,
-          "values": {
-            "Current": -2.41,
-            "FY 2025": -2.41,
-            "FY 2024": 0.17,
-            "FY 2023": -1.56,
-            "FY 2022": 1.02,
-            "FY 2021": 6.65
-          },
-          "rawValues": {
-            "Current": "-2.41%",
-            "FY 2025": "-2.41%",
-            "FY 2024": "0.17%",
-            "FY 2023": "-1.56%",
-            "FY 2022": "1.02%",
-            "FY 2021": "6.65%"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "payoutRatio": {
           "label": "Payout Ratio",
           "unit": null,
-          "values": {
-            "Current": null,
-            "FY 2025": null,
-            "FY 2024": null,
-            "FY 2023": null,
-            "FY 2022": 85.47,
-            "FY 2021": null
-          },
-          "rawValues": {
-            "Current": "-",
-            "FY 2025": "-",
-            "FY 2024": "-",
-            "FY 2023": "-",
-            "FY 2022": "85.47%",
-            "FY 2021": "-"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "assetTurnover": {
           "label": "Asset Turnover",
           "unit": null,
-          "values": {
-            "Current": 0.08,
-            "FY 2025": 0.08,
-            "FY 2024": 0.08,
-            "FY 2023": 0.07,
-            "FY 2022": 0.06,
-            "FY 2021": 0.05
-          },
-          "rawValues": {
-            "Current": "0.08",
-            "FY 2025": "0.08",
-            "FY 2024": "0.08",
-            "FY 2023": "0.07",
-            "FY 2022": "0.06",
-            "FY 2021": "0.05"
-          }
+          "values": {},
+          "rawValues": {}
         }
       },
       "current": {
         "marketCap": 122,
-        "netDebtToEbitda": 15.91,
-        "debtToEquity": 1.23,
-        "netDebtToEquity": 1.11,
-        "debtToEbitda": 17.68,
-        "quickRatio": 0.8,
-        "currentRatio": 0.96,
-        "roic": 2.53,
-        "roe": -2.41,
+        "netDebtToEbitda": null,
+        "debtToEquity": null,
+        "netDebtToEquity": null,
+        "debtToEbitda": null,
+        "quickRatio": null,
+        "currentRatio": null,
+        "roic": null,
+        "roe": null,
         "payoutRatio": null,
-        "assetTurnover": 0.08
+        "assetTurnover": null
       },
-      "lastFetchedAt": "2026-07-29T00:36:05.122Z",
-      "fetchStatus": "ok",
+      "lastFetchedAt": "2026-07-29T03:57:32.117Z",
+      "fetchStatus": "partial",
       "fetchError": null,
-      "healthScore": 23,
-      "healthStatus": "Red",
-      "scoreCoverage": 0.9999999999999999,
-      "scoreNote": null,
+      "healthScore": null,
+      "healthStatus": "Pending data",
+      "scoreCoverage": 0,
+      "scoreNote": "Insufficient ratio coverage",
       "healthScoreComponents": {
-        "staticRiskScore": 76.05625000000002,
-        "staticHealthScore": 23.94374999999998,
-        "trendPenalty": 1.4000000000000001,
-        "finalHealthScore": 23,
-        "scoreCoverage": 0.9999999999999999,
-        "missingMetrics": [],
-        "excludedMetrics": [
-          "debtToEbitda",
-          "quickRatio",
-          "payoutRatio",
-          "assetTurnover"
-        ],
-        "usedMetrics": [
+        "staticRiskScore": null,
+        "staticHealthScore": null,
+        "trendPenalty": null,
+        "finalHealthScore": null,
+        "scoreCoverage": 0,
+        "missingMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
@@ -3984,115 +3596,21 @@
           "roic",
           "roe"
         ],
-        "riskByMetric": {
-          "netDebtToEbitda": 82.58333333333333,
-          "debtToEquity": 25.294117647058822,
-          "netDebtToEquity": 50.71428571428572,
-          "currentRatio": 100,
-          "roic": 61.75000000000001,
-          "roe": 100
-        },
-        "weightedContributors": {
-          "leverage": 17.750000000000004,
-          "liquidity": 30.000000000000004,
-          "resilience": 28.306250000000002
-        },
-        "pillarContributors": {
-          "leverage": {
-            "metricKeys": [
-              "netDebtToEbitda",
-              "debtToEquity",
-              "netDebtToEquity"
-            ],
-            "aggregation": "median",
-            "pillarRiskScore": 50.71428571428572,
-            "weightedRiskContribution": 17.750000000000004
-          },
-          "liquidity": {
-            "metricKeys": [
-              "currentRatio"
-            ],
-            "aggregation": "single",
-            "pillarRiskScore": 100,
-            "weightedRiskContribution": 30.000000000000004
-          },
-          "resilience": {
-            "metricKeys": [
-              "roic",
-              "roe"
-            ],
-            "aggregation": "average",
-            "pillarRiskScore": 80.875,
-            "weightedRiskContribution": 28.306250000000002
-          }
-        },
-        "pillarRisks": {
-          "leverage": 50.71428571428572,
-          "liquidity": 100,
-          "resilience": 80.875
-        },
+        "excludedMetrics": [
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
+        ],
+        "usedMetrics": [],
+        "riskByMetric": {},
+        "weightedContributors": {},
+        "pillarContributors": {},
+        "pillarRisks": {},
         "metricAdjustments": {},
-        "trendBreakdown": {
-          "netDebtToEbitda": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
-            "skipped": false
-          },
-          "debtToEquity": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 1.5,
-            "skipped": false
-          },
-          "currentRatio": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 1,
-            "skipped": false
-          },
-          "roic": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
-            "skipped": false
-          },
-          "roe": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 1,
-            "skipped": false
-          }
-        },
-        "rawTrendPenalty": 3.5,
-        "worseningMetricCount": 3
+        "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-07-29T00:36:05.333Z"
+      "lastScoredAt": "2026-07-29T03:57:32.207Z"
     },
     {
       "ticker": "5JK",
@@ -4102,7 +3620,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Jul '26 Jul 22, 2026"
+          "periodEnding": "Jul '26 Jul 28, 2026"
         },
         {
           "label": "FY 2025",
@@ -4149,91 +3667,238 @@
         "netDebtToEbitda": {
           "label": "Net Debt / EBITDA Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 14.57,
+            "FY 2025": 14.57,
+            "FY 2024": 15.8,
+            "FY 2023": 33.34,
+            "FY 2022": 20.02,
+            "FY 2021": 49.5
+          },
+          "rawValues": {
+            "Current": "14.57",
+            "FY 2025": "14.57",
+            "FY 2024": "15.80",
+            "FY 2023": "33.34",
+            "FY 2022": "20.02",
+            "FY 2021": "49.50"
+          }
         },
         "debtToEquity": {
           "label": "Debt / Equity Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 1.14,
+            "FY 2025": 1.14,
+            "FY 2024": 1.07,
+            "FY 2023": 1.05,
+            "FY 2022": 1.03,
+            "FY 2021": 1.02
+          },
+          "rawValues": {
+            "Current": "1.14",
+            "FY 2025": "1.14",
+            "FY 2024": "1.07",
+            "FY 2023": "1.05",
+            "FY 2022": "1.03",
+            "FY 2021": "1.02"
+          }
         },
         "netDebtToEquity": {
           "label": "Net Debt / Equity Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 0.83,
+            "FY 2025": 0.83,
+            "FY 2024": 0.76,
+            "FY 2023": 0.8,
+            "FY 2022": 0.85,
+            "FY 2021": 0.88
+          },
+          "rawValues": {
+            "Current": "0.83",
+            "FY 2025": "0.83",
+            "FY 2024": "0.76",
+            "FY 2023": "0.80",
+            "FY 2022": "0.85",
+            "FY 2021": "0.88"
+          }
         },
         "debtToEbitda": {
           "label": "Debt / EBITDA Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 20.01,
+            "FY 2025": 20.01,
+            "FY 2024": 22.18,
+            "FY 2023": 33.8,
+            "FY 2022": 20.68,
+            "FY 2021": 41.45
+          },
+          "rawValues": {
+            "Current": "20.01",
+            "FY 2025": "20.01",
+            "FY 2024": "22.18",
+            "FY 2023": "33.80",
+            "FY 2022": "20.68",
+            "FY 2021": "41.45"
+          }
         },
         "quickRatio": {
           "label": "Quick Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 0.89,
+            "FY 2025": 0.89,
+            "FY 2024": 1.13,
+            "FY 2023": 0.62,
+            "FY 2022": 0.33,
+            "FY 2021": 0.3
+          },
+          "rawValues": {
+            "Current": "0.89",
+            "FY 2025": "0.89",
+            "FY 2024": "1.13",
+            "FY 2023": "0.62",
+            "FY 2022": "0.33",
+            "FY 2021": "0.30"
+          }
         },
         "currentRatio": {
           "label": "Current Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 2.28,
+            "FY 2025": 2.28,
+            "FY 2024": 2.37,
+            "FY 2023": 1.5,
+            "FY 2022": 0.88,
+            "FY 2021": 0.94
+          },
+          "rawValues": {
+            "Current": "2.28",
+            "FY 2025": "2.28",
+            "FY 2024": "2.37",
+            "FY 2023": "1.50",
+            "FY 2022": "0.88",
+            "FY 2021": "0.94"
+          }
         },
         "roic": {
           "label": "ROIC",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 0.64,
+            "FY 2025": 0.66,
+            "FY 2024": 0.07,
+            "FY 2023": -0.77,
+            "FY 2022": -0.01,
+            "FY 2021": -0.98
+          },
+          "rawValues": {
+            "Current": "0.64%",
+            "FY 2025": "0.66%",
+            "FY 2024": "0.07%",
+            "FY 2023": "-0.77%",
+            "FY 2022": "-0.01%",
+            "FY 2021": "-0.98%"
+          }
         },
         "roe": {
           "label": "ROE",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 4.17,
+            "FY 2025": 4.17,
+            "FY 2024": 0.91,
+            "FY 2023": 0.76,
+            "FY 2022": -3,
+            "FY 2021": 2.83
+          },
+          "rawValues": {
+            "Current": "4.17%",
+            "FY 2025": "4.17%",
+            "FY 2024": "0.91%",
+            "FY 2023": "0.76%",
+            "FY 2022": "-3.00%",
+            "FY 2021": "2.83%"
+          }
         },
         "payoutRatio": {
           "label": "Payout Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 11.62,
+            "FY 2025": 11.62,
+            "FY 2024": 53.73,
+            "FY 2023": 50.79,
+            "FY 2022": null,
+            "FY 2021": 11.1
+          },
+          "rawValues": {
+            "Current": "11.62%",
+            "FY 2025": "11.62%",
+            "FY 2024": "53.73%",
+            "FY 2023": "50.79%",
+            "FY 2022": "-",
+            "FY 2021": "11.10%"
+          }
         },
         "assetTurnover": {
           "label": "Asset Turnover",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 0.08,
+            "FY 2025": 0.08,
+            "FY 2024": 0.08,
+            "FY 2023": 0.07,
+            "FY 2022": 0.08,
+            "FY 2021": 0.06
+          },
+          "rawValues": {
+            "Current": "0.08",
+            "FY 2025": "0.08",
+            "FY 2024": "0.08",
+            "FY 2023": "0.07",
+            "FY 2022": "0.08",
+            "FY 2021": "0.06"
+          }
         }
       },
       "current": {
         "marketCap": 301,
-        "netDebtToEbitda": null,
-        "debtToEquity": null,
-        "netDebtToEquity": null,
-        "debtToEbitda": null,
-        "quickRatio": null,
-        "currentRatio": null,
-        "roic": null,
-        "roe": null,
-        "payoutRatio": null,
-        "assetTurnover": null
+        "netDebtToEbitda": 14.57,
+        "debtToEquity": 1.14,
+        "netDebtToEquity": 0.83,
+        "debtToEbitda": 20.01,
+        "quickRatio": 0.89,
+        "currentRatio": 2.28,
+        "roic": 0.64,
+        "roe": 4.17,
+        "payoutRatio": 11.62,
+        "assetTurnover": 0.08
       },
-      "lastFetchedAt": "2026-07-29T00:36:05.334Z",
-      "fetchStatus": "partial",
+      "lastFetchedAt": "2026-07-29T03:57:32.207Z",
+      "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": null,
-      "healthStatus": "Pending data",
-      "scoreCoverage": 0,
-      "scoreNote": "Insufficient ratio coverage",
+      "healthScore": 60,
+      "healthStatus": "Green",
+      "scoreCoverage": 0.9999999999999999,
+      "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": null,
-        "staticHealthScore": null,
-        "trendPenalty": null,
-        "finalHealthScore": null,
-        "scoreCoverage": 0,
-        "missingMetrics": [
+        "staticRiskScore": 38.45250000000001,
+        "staticHealthScore": 61.54749999999999,
+        "trendPenalty": 1.4000000000000001,
+        "finalHealthScore": 60,
+        "scoreCoverage": 0.9999999999999999,
+        "missingMetrics": [],
+        "excludedMetrics": [
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
+        ],
+        "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
@@ -4241,21 +3906,115 @@
           "roic",
           "roe"
         ],
-        "excludedMetrics": [
-          "debtToEbitda",
-          "quickRatio",
-          "payoutRatio",
-          "assetTurnover"
-        ],
-        "usedMetrics": [],
-        "riskByMetric": {},
-        "weightedContributors": {},
-        "pillarContributors": {},
-        "pillarRisks": {},
+        "riskByMetric": {
+          "netDebtToEbitda": 71.41666666666667,
+          "debtToEquity": 19.999999999999993,
+          "netDebtToEquity": 30.71428571428571,
+          "currentRatio": 0,
+          "roic": 100,
+          "roe": 58.3
+        },
+        "weightedContributors": {
+          "leverage": 10.75,
+          "liquidity": 0,
+          "resilience": 27.702500000000004
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 30.71428571428571,
+            "weightedRiskContribution": 10.75
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 79.15,
+            "weightedRiskContribution": 27.702500000000004
+          }
+        },
+        "pillarRisks": {
+          "leverage": 30.71428571428571,
+          "liquidity": 0,
+          "resilience": 79.15
+        },
         "metricAdjustments": {},
-        "trendBreakdown": {}
+        "trendBreakdown": {
+          "netDebtToEbitda": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": false,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 0,
+            "skipped": false
+          },
+          "debtToEquity": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": true,
+            "consecutiveWorsened": true,
+            "appliedPenalty": 2.5,
+            "skipped": false
+          },
+          "currentRatio": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": true,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 1,
+            "skipped": false
+          },
+          "roic": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": false,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 0,
+            "skipped": false
+          },
+          "roe": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": false,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 0,
+            "skipped": false
+          }
+        },
+        "rawTrendPenalty": 3.5,
+        "worseningMetricCount": 2
       },
-      "lastScoredAt": "2026-07-29T00:36:05.506Z"
+      "lastScoredAt": "2026-07-29T03:57:32.396Z"
     },
     {
       "ticker": "F1E",
@@ -4312,91 +4071,238 @@
         "netDebtToEbitda": {
           "label": "Net Debt / EBITDA Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 10.67,
+            "FY 2025": 10.65,
+            "FY 2024": 11.57,
+            "FY 2023": 28.51,
+            "FY 2022": 55.96,
+            "FY 2021": 107.83
+          },
+          "rawValues": {
+            "Current": "10.67",
+            "FY 2025": "10.65",
+            "FY 2024": "11.57",
+            "FY 2023": "28.51",
+            "FY 2022": "55.96",
+            "FY 2021": "107.83"
+          }
         },
         "debtToEquity": {
           "label": "Debt / Equity Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 0.56,
+            "FY 2025": 0.73,
+            "FY 2024": 0.88,
+            "FY 2023": 0.99,
+            "FY 2022": 1.05,
+            "FY 2021": 1.08
+          },
+          "rawValues": {
+            "Current": "0.56",
+            "FY 2025": "0.73",
+            "FY 2024": "0.88",
+            "FY 2023": "0.99",
+            "FY 2022": "1.05",
+            "FY 2021": "1.08"
+          }
         },
         "netDebtToEquity": {
           "label": "Net Debt / Equity Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 0.32,
+            "FY 2025": 0.63,
+            "FY 2024": 0.76,
+            "FY 2023": 0.91,
+            "FY 2022": 0.87,
+            "FY 2021": 0.96
+          },
+          "rawValues": {
+            "Current": "0.32",
+            "FY 2025": "0.63",
+            "FY 2024": "0.76",
+            "FY 2023": "0.91",
+            "FY 2022": "0.87",
+            "FY 2021": "0.96"
+          }
         },
         "debtToEbitda": {
           "label": "Debt / EBITDA Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 17.35,
+            "FY 2025": 12.02,
+            "FY 2024": 13.03,
+            "FY 2023": 29.25,
+            "FY 2022": 66.5,
+            "FY 2021": 112.84
+          },
+          "rawValues": {
+            "Current": "17.35",
+            "FY 2025": "12.02",
+            "FY 2024": "13.03",
+            "FY 2023": "29.25",
+            "FY 2022": "66.50",
+            "FY 2021": "112.84"
+          }
         },
         "quickRatio": {
           "label": "Quick Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 1.55,
+            "FY 2025": 2.63,
+            "FY 2024": 4.25,
+            "FY 2023": 0.2,
+            "FY 2022": 1.54,
+            "FY 2021": 1.42
+          },
+          "rawValues": {
+            "Current": "1.55",
+            "FY 2025": "2.63",
+            "FY 2024": "4.25",
+            "FY 2023": "0.20",
+            "FY 2022": "1.54",
+            "FY 2021": "1.42"
+          }
         },
         "currentRatio": {
           "label": "Current Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 1.55,
+            "FY 2025": 2.73,
+            "FY 2024": 11.16,
+            "FY 2023": 1.51,
+            "FY 2022": 6.95,
+            "FY 2021": 9.27
+          },
+          "rawValues": {
+            "Current": "1.55",
+            "FY 2025": "2.73",
+            "FY 2024": "11.16",
+            "FY 2023": "1.51",
+            "FY 2022": "6.95",
+            "FY 2021": "9.27"
+          }
         },
         "roic": {
           "label": "ROIC",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 1.11,
+            "FY 2025": 2.47,
+            "FY 2024": 2.65,
+            "FY 2023": 0.75,
+            "FY 2022": 0.08,
+            "FY 2021": -0.19
+          },
+          "rawValues": {
+            "Current": "1.11%",
+            "FY 2025": "2.47%",
+            "FY 2024": "2.65%",
+            "FY 2023": "0.75%",
+            "FY 2022": "0.08%",
+            "FY 2021": "-0.19%"
+          }
         },
         "roe": {
           "label": "ROE",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": -2.19,
+            "FY 2025": 0.42,
+            "FY 2024": -0.16,
+            "FY 2023": -4.84,
+            "FY 2022": 2.89,
+            "FY 2021": 6.75
+          },
+          "rawValues": {
+            "Current": "-2.19%",
+            "FY 2025": "0.42%",
+            "FY 2024": "-0.16%",
+            "FY 2023": "-4.84%",
+            "FY 2022": "2.89%",
+            "FY 2021": "6.75%"
+          }
         },
         "payoutRatio": {
           "label": "Payout Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": null,
+            "FY 2025": 526.96,
+            "FY 2024": null,
+            "FY 2023": null,
+            "FY 2022": 88.73,
+            "FY 2021": 22.74
+          },
+          "rawValues": {
+            "Current": "-",
+            "FY 2025": "526.96%",
+            "FY 2024": "-",
+            "FY 2023": "-",
+            "FY 2022": "88.73%",
+            "FY 2021": "22.74%"
+          }
         },
         "assetTurnover": {
           "label": "Asset Turnover",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 0.25,
+            "FY 2025": 0.42,
+            "FY 2024": 0.29,
+            "FY 2023": 0.07,
+            "FY 2022": 0.11,
+            "FY 2021": 0.05
+          },
+          "rawValues": {
+            "Current": "0.25",
+            "FY 2025": "0.42",
+            "FY 2024": "0.29",
+            "FY 2023": "0.07",
+            "FY 2022": "0.11",
+            "FY 2021": "0.05"
+          }
         }
       },
       "current": {
         "marketCap": 576,
-        "netDebtToEbitda": null,
-        "debtToEquity": null,
-        "netDebtToEquity": null,
-        "debtToEbitda": null,
-        "quickRatio": null,
-        "currentRatio": null,
-        "roic": null,
-        "roe": null,
+        "netDebtToEbitda": 10.67,
+        "debtToEquity": 0.56,
+        "netDebtToEquity": 0.32,
+        "debtToEbitda": 17.35,
+        "quickRatio": 1.55,
+        "currentRatio": 1.55,
+        "roic": 1.11,
+        "roe": -2.19,
         "payoutRatio": null,
-        "assetTurnover": null
+        "assetTurnover": 0.25
       },
-      "lastFetchedAt": "2026-07-29T00:36:05.506Z",
-      "fetchStatus": "partial",
+      "lastFetchedAt": "2026-07-29T03:57:32.396Z",
+      "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": null,
-      "healthStatus": "Pending data",
-      "scoreCoverage": 0,
-      "scoreNote": "Insufficient ratio coverage",
+      "healthScore": 51,
+      "healthStatus": "Green",
+      "scoreCoverage": 0.9999999999999999,
+      "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": null,
-        "staticHealthScore": null,
-        "trendPenalty": null,
-        "finalHealthScore": null,
-        "scoreCoverage": 0,
-        "missingMetrics": [
+        "staticRiskScore": 48.018750000000004,
+        "staticHealthScore": 51.981249999999996,
+        "trendPenalty": 1,
+        "finalHealthScore": 51,
+        "scoreCoverage": 0.9999999999999999,
+        "missingMetrics": [],
+        "excludedMetrics": [
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
+        ],
+        "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
@@ -4404,21 +4310,115 @@
           "roic",
           "roe"
         ],
-        "excludedMetrics": [
-          "debtToEbitda",
-          "quickRatio",
-          "payoutRatio",
-          "assetTurnover"
-        ],
-        "usedMetrics": [],
-        "riskByMetric": {},
-        "weightedContributors": {},
-        "pillarContributors": {},
-        "pillarRisks": {},
+        "riskByMetric": {
+          "netDebtToEbitda": 38.916666666666664,
+          "debtToEquity": 0,
+          "netDebtToEquity": 0,
+          "currentRatio": 44.99999999999999,
+          "roic": 97.24999999999999,
+          "roe": 100
+        },
+        "weightedContributors": {
+          "leverage": 0,
+          "liquidity": 13.5,
+          "resilience": 34.518750000000004
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 44.99999999999999,
+            "weightedRiskContribution": 13.5
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 98.625,
+            "weightedRiskContribution": 34.518750000000004
+          }
+        },
+        "pillarRisks": {
+          "leverage": 0,
+          "liquidity": 44.99999999999999,
+          "resilience": 98.625
+        },
         "metricAdjustments": {},
-        "trendBreakdown": {}
+        "trendBreakdown": {
+          "netDebtToEbitda": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": false,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 0,
+            "skipped": false
+          },
+          "debtToEquity": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": false,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 0,
+            "skipped": false
+          },
+          "currentRatio": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": true,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 1,
+            "skipped": false
+          },
+          "roic": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": true,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 1.5,
+            "skipped": false
+          },
+          "roe": {
+            "comparedYears": [
+              "FY 2025",
+              "FY 2024",
+              "FY 2023"
+            ],
+            "latestWorsened": false,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 0,
+            "skipped": false
+          }
+        },
+        "rawTrendPenalty": 2.5,
+        "worseningMetricCount": 2
       },
-      "lastScoredAt": "2026-07-29T00:36:05.646Z"
+      "lastScoredAt": "2026-07-29T03:57:32.478Z"
     },
     {
       "ticker": "ER0",
@@ -4428,7 +4428,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Jul '26 Jul 27, 2026"
+          "periodEnding": "Jul '26 Jul 28, 2026"
         },
         {
           "label": "FY 2026",
@@ -4475,91 +4475,238 @@
         "netDebtToEbitda": {
           "label": "Net Debt / EBITDA Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": -0.34,
+            "FY 2026": -0.34,
+            "FY 2025": -1.33,
+            "FY 2024": -3.1,
+            "FY 2023": 8.94,
+            "FY 2022": 9.8
+          },
+          "rawValues": {
+            "Current": "-0.34",
+            "FY 2026": "-0.34",
+            "FY 2025": "-1.33",
+            "FY 2024": "-3.10",
+            "FY 2023": "8.94",
+            "FY 2022": "9.80"
+          }
         },
         "debtToEquity": {
           "label": "Debt / Equity Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 0.36,
+            "FY 2026": 0.36,
+            "FY 2025": 0.24,
+            "FY 2024": 0.48,
+            "FY 2023": 0.58,
+            "FY 2022": 0.35
+          },
+          "rawValues": {
+            "Current": "0.36",
+            "FY 2026": "0.36",
+            "FY 2025": "0.24",
+            "FY 2024": "0.48",
+            "FY 2023": "0.58",
+            "FY 2022": "0.35"
+          }
         },
         "netDebtToEquity": {
           "label": "Net Debt / Equity Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": -0.03,
+            "FY 2026": -0.03,
+            "FY 2025": -0.07,
+            "FY 2024": 0.19,
+            "FY 2023": 0.34,
+            "FY 2022": 0.07
+          },
+          "rawValues": {
+            "Current": "-0.03",
+            "FY 2026": "-0.03",
+            "FY 2025": "-0.07",
+            "FY 2024": "0.19",
+            "FY 2023": "0.34",
+            "FY 2022": "0.07"
+          }
         },
         "debtToEbitda": {
           "label": "Debt / EBITDA Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 4.34,
+            "FY 2026": 4.34,
+            "FY 2025": 4.46,
+            "FY 2024": null,
+            "FY 2023": 14.44,
+            "FY 2022": 38.37
+          },
+          "rawValues": {
+            "Current": "4.34",
+            "FY 2026": "4.34",
+            "FY 2025": "4.46",
+            "FY 2024": "-",
+            "FY 2023": "14.44",
+            "FY 2022": "38.37"
+          }
         },
         "quickRatio": {
           "label": "Quick Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 1.04,
+            "FY 2026": 1.04,
+            "FY 2025": 1.29,
+            "FY 2024": 0.96,
+            "FY 2023": 1.03,
+            "FY 2022": 1.23
+          },
+          "rawValues": {
+            "Current": "1.04",
+            "FY 2026": "1.04",
+            "FY 2025": "1.29",
+            "FY 2024": "0.96",
+            "FY 2023": "1.03",
+            "FY 2022": "1.23"
+          }
         },
         "currentRatio": {
           "label": "Current Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 1.27,
+            "FY 2026": 1.27,
+            "FY 2025": 1.59,
+            "FY 2024": 1.23,
+            "FY 2023": 1.27,
+            "FY 2022": 1.57
+          },
+          "rawValues": {
+            "Current": "1.27",
+            "FY 2026": "1.27",
+            "FY 2025": "1.59",
+            "FY 2024": "1.23",
+            "FY 2023": "1.27",
+            "FY 2022": "1.57"
+          }
         },
         "roic": {
           "label": "ROIC",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 4.67,
+            "FY 2026": 4.83,
+            "FY 2025": 4.33,
+            "FY 2024": -4.7,
+            "FY 2023": 2.68,
+            "FY 2022": 0.25
+          },
+          "rawValues": {
+            "Current": "4.67%",
+            "FY 2026": "4.83%",
+            "FY 2025": "4.33%",
+            "FY 2024": "-4.70%",
+            "FY 2023": "2.68%",
+            "FY 2022": "0.25%"
+          }
         },
         "roe": {
           "label": "ROE",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 1.82,
+            "FY 2026": 1.82,
+            "FY 2025": -3.08,
+            "FY 2024": -9.46,
+            "FY 2023": 6.16,
+            "FY 2022": 6.81
+          },
+          "rawValues": {
+            "Current": "1.82%",
+            "FY 2026": "1.82%",
+            "FY 2025": "-3.08%",
+            "FY 2024": "-9.46%",
+            "FY 2023": "6.16%",
+            "FY 2022": "6.81%"
+          }
         },
         "payoutRatio": {
           "label": "Payout Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 104.23,
+            "FY 2026": 104.23,
+            "FY 2025": null,
+            "FY 2024": null,
+            "FY 2023": 50.96,
+            "FY 2022": 46.64
+          },
+          "rawValues": {
+            "Current": "104.23%",
+            "FY 2026": "104.23%",
+            "FY 2025": "-",
+            "FY 2024": "-",
+            "FY 2023": "50.96%",
+            "FY 2022": "46.64%"
+          }
         },
         "assetTurnover": {
           "label": "Asset Turnover",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 0.3,
+            "FY 2026": 0.3,
+            "FY 2025": 0.35,
+            "FY 2024": 0.35,
+            "FY 2023": 0.46,
+            "FY 2022": 0.41
+          },
+          "rawValues": {
+            "Current": "0.30",
+            "FY 2026": "0.30",
+            "FY 2025": "0.35",
+            "FY 2024": "0.35",
+            "FY 2023": "0.46",
+            "FY 2022": "0.41"
+          }
         }
       },
       "current": {
         "marketCap": 179,
-        "netDebtToEbitda": null,
-        "debtToEquity": null,
-        "netDebtToEquity": null,
-        "debtToEbitda": null,
-        "quickRatio": null,
-        "currentRatio": null,
-        "roic": null,
-        "roe": null,
-        "payoutRatio": null,
-        "assetTurnover": null
+        "netDebtToEbitda": -0.34,
+        "debtToEquity": 0.36,
+        "netDebtToEquity": -0.03,
+        "debtToEbitda": 4.34,
+        "quickRatio": 1.04,
+        "currentRatio": 1.27,
+        "roic": 4.67,
+        "roe": 1.82,
+        "payoutRatio": 104.23,
+        "assetTurnover": 0.3
       },
-      "lastFetchedAt": "2026-07-29T00:36:05.646Z",
-      "fetchStatus": "partial",
+      "lastFetchedAt": "2026-07-29T03:57:32.478Z",
+      "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": null,
-      "healthStatus": "Pending data",
-      "scoreCoverage": 0,
-      "scoreNote": "Insufficient ratio coverage",
+      "healthScore": 54,
+      "healthStatus": "Green",
+      "scoreCoverage": 0.9999999999999999,
+      "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": null,
-        "staticHealthScore": null,
-        "trendPenalty": null,
-        "finalHealthScore": null,
-        "scoreCoverage": 0,
-        "missingMetrics": [
+        "staticRiskScore": 43.783750000000005,
+        "staticHealthScore": 56.216249999999995,
+        "trendPenalty": 2.2,
+        "finalHealthScore": 54,
+        "scoreCoverage": 0.9999999999999999,
+        "missingMetrics": [],
+        "excludedMetrics": [
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
+        ],
+        "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
@@ -4567,21 +4714,144 @@
           "roic",
           "roe"
         ],
-        "excludedMetrics": [
-          "debtToEbitda",
-          "quickRatio",
-          "payoutRatio",
-          "assetTurnover"
-        ],
-        "usedMetrics": [],
-        "riskByMetric": {},
-        "weightedContributors": {},
-        "pillarContributors": {},
-        "pillarRisks": {},
-        "metricAdjustments": {},
-        "trendBreakdown": {}
+        "riskByMetric": {
+          "netDebtToEbitda": 25,
+          "debtToEquity": 0,
+          "netDebtToEquity": 25,
+          "currentRatio": 73,
+          "roic": 8.250000000000002,
+          "roe": 81.8
+        },
+        "weightedContributors": {
+          "leverage": 6.125000000000001,
+          "liquidity": 21.900000000000002,
+          "resilience": 15.758750000000001
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 17.5,
+            "weightedRiskContribution": 6.125000000000001
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 73,
+            "weightedRiskContribution": 21.900000000000002
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 45.025,
+            "weightedRiskContribution": 15.758750000000001
+          }
+        },
+        "pillarRisks": {
+          "leverage": 17.5,
+          "liquidity": 73,
+          "resilience": 45.025
+        },
+        "metricAdjustments": {
+          "netDebtToEbitda": {
+            "rule": "negativeLeverageSupportGate",
+            "currentValue": -0.34,
+            "originalRisk": 0,
+            "adjustedRisk": 25,
+            "supportBand": "mixed",
+            "supportHealthScore": 45.65,
+            "supportMetricsUsed": [
+              "currentRatio",
+              "roic",
+              "roe"
+            ],
+            "applied": true
+          },
+          "netDebtToEquity": {
+            "rule": "negativeLeverageSupportGate",
+            "currentValue": -0.03,
+            "originalRisk": 0,
+            "adjustedRisk": 25,
+            "supportBand": "mixed",
+            "supportHealthScore": 45.65,
+            "supportMetricsUsed": [
+              "currentRatio",
+              "roic",
+              "roe"
+            ],
+            "applied": true
+          }
+        },
+        "trendBreakdown": {
+          "netDebtToEbitda": {
+            "comparedYears": [
+              "FY 2026",
+              "FY 2025",
+              "FY 2024"
+            ],
+            "latestWorsened": true,
+            "consecutiveWorsened": true,
+            "appliedPenalty": 3,
+            "skipped": false
+          },
+          "debtToEquity": {
+            "comparedYears": [
+              "FY 2026",
+              "FY 2025",
+              "FY 2024"
+            ],
+            "latestWorsened": true,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 1.5,
+            "skipped": false
+          },
+          "currentRatio": {
+            "comparedYears": [
+              "FY 2026",
+              "FY 2025",
+              "FY 2024"
+            ],
+            "latestWorsened": true,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 1,
+            "skipped": false
+          },
+          "roic": {
+            "comparedYears": [
+              "FY 2026",
+              "FY 2025",
+              "FY 2024"
+            ],
+            "latestWorsened": false,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 0,
+            "skipped": false
+          },
+          "roe": {
+            "comparedYears": [
+              "FY 2026",
+              "FY 2025",
+              "FY 2024"
+            ],
+            "latestWorsened": false,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 0,
+            "skipped": false
+          }
+        },
+        "rawTrendPenalty": 5.5,
+        "worseningMetricCount": 3
       },
-      "lastScoredAt": "2026-07-29T00:36:05.827Z"
+      "lastScoredAt": "2026-07-29T03:57:32.555Z"
     },
     {
       "ticker": "BTE",
@@ -4591,7 +4861,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Jul '26 Jul 24, 2026"
+          "periodEnding": "Jul '26 Jul 28, 2026"
         },
         {
           "label": "FY 2025",
@@ -4709,7 +4979,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-07-29T00:36:05.828Z",
+      "lastFetchedAt": "2026-07-29T03:57:32.555Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -4744,7 +5014,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-07-29T00:36:06.014Z"
+      "lastScoredAt": "2026-07-29T03:57:32.648Z"
     },
     {
       "ticker": "5UX",
@@ -4754,7 +5024,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Jul '26 Jul 27, 2026"
+          "periodEnding": "Jul '26 Jul 28, 2026"
         },
         {
           "label": "FY 2025",
@@ -4872,7 +5142,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-07-29T00:36:06.014Z",
+      "lastFetchedAt": "2026-07-29T03:57:32.648Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -4907,7 +5177,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-07-29T00:36:06.243Z"
+      "lastScoredAt": "2026-07-29T03:57:32.798Z"
     },
     {
       "ticker": "F9D",
@@ -4917,7 +5187,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Jul '26 Jul 27, 2026"
+          "periodEnding": "Jul '26 Jul 28, 2026"
         },
         {
           "label": "FY 2026",
@@ -5035,7 +5305,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-07-29T00:36:06.244Z",
+      "lastFetchedAt": "2026-07-29T03:57:32.798Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -5070,7 +5340,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-07-29T00:36:06.416Z"
+      "lastScoredAt": "2026-07-29T03:57:32.885Z"
     },
     {
       "ticker": "OU8",
@@ -5080,7 +5350,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Jul '26 Jul 27, 2026"
+          "periodEnding": "Jul '26 Jul 28, 2026"
         },
         {
           "label": "FY 2025",
@@ -5338,7 +5608,7 @@
         "payoutRatio": 29.3,
         "assetTurnover": 0.12
       },
-      "lastFetchedAt": "2026-07-29T00:36:06.417Z",
+      "lastFetchedAt": "2026-07-29T03:57:32.885Z",
       "fetchStatus": "ok",
       "fetchError": null,
       "healthScore": 84,
@@ -5474,7 +5744,7 @@
         "rawTrendPenalty": 2.5,
         "worseningMetricCount": 2
       },
-      "lastScoredAt": "2026-07-29T00:36:06.557Z"
+      "lastScoredAt": "2026-07-29T03:57:32.967Z"
     },
     {
       "ticker": "C33",
@@ -5484,7 +5754,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Jul '26 Jul 27, 2026"
+          "periodEnding": "Jul '26 Jul 28, 2026"
         },
         {
           "label": "FY 2025",
@@ -5531,238 +5801,91 @@
         "netDebtToEbitda": {
           "label": "Net Debt / EBITDA Ratio",
           "unit": null,
-          "values": {
-            "Current": -8.18,
-            "FY 2025": -2.09,
-            "FY 2024": -3.83,
-            "FY 2023": -86.84,
-            "FY 2022": -115.81,
-            "FY 2021": -86.03
-          },
-          "rawValues": {
-            "Current": "-8.18",
-            "FY 2025": "-2.09",
-            "FY 2024": "-3.83",
-            "FY 2023": "-86.84",
-            "FY 2022": "-115.81",
-            "FY 2021": "-86.03"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "debtToEquity": {
           "label": "Debt / Equity Ratio",
           "unit": null,
-          "values": {
-            "Current": 0.12,
-            "FY 2025": 0.11,
-            "FY 2024": 0.09,
-            "FY 2023": 0.02,
-            "FY 2022": null,
-            "FY 2021": null
-          },
-          "rawValues": {
-            "Current": "0.12",
-            "FY 2025": "0.11",
-            "FY 2024": "0.09",
-            "FY 2023": "0.02",
-            "FY 2022": "-",
-            "FY 2021": "-"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "netDebtToEquity": {
           "label": "Net Debt / Equity Ratio",
           "unit": null,
-          "values": {
-            "Current": -0.04,
-            "FY 2025": -0.01,
-            "FY 2024": -0.04,
-            "FY 2023": -0.21,
-            "FY 2022": -0.35,
-            "FY 2021": -0.42
-          },
-          "rawValues": {
-            "Current": "-0.04",
-            "FY 2025": "-0.01",
-            "FY 2024": "-0.04",
-            "FY 2023": "-0.21",
-            "FY 2022": "-0.35",
-            "FY 2021": "-0.42"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "debtToEbitda": {
           "label": "Debt / EBITDA Ratio",
           "unit": null,
-          "values": {
-            "Current": 25.49,
-            "FY 2025": 15.25,
-            "FY 2024": 9.02,
-            "FY 2023": 9.66,
-            "FY 2022": null,
-            "FY 2021": null
-          },
-          "rawValues": {
-            "Current": "25.49",
-            "FY 2025": "15.25",
-            "FY 2024": "9.02",
-            "FY 2023": "9.66",
-            "FY 2022": "-",
-            "FY 2021": "-"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "quickRatio": {
           "label": "Quick Ratio",
           "unit": null,
-          "values": {
-            "Current": 3.7,
-            "FY 2025": 3.48,
-            "FY 2024": 1.24,
-            "FY 2023": 6.09,
-            "FY 2022": 30.53,
-            "FY 2021": 7.13
-          },
-          "rawValues": {
-            "Current": "3.70",
-            "FY 2025": "3.48",
-            "FY 2024": "1.24",
-            "FY 2023": "6.09",
-            "FY 2022": "30.53",
-            "FY 2021": "7.13"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "currentRatio": {
           "label": "Current Ratio",
           "unit": null,
-          "values": {
-            "Current": 6.37,
-            "FY 2025": 5.71,
-            "FY 2024": 2.52,
-            "FY 2023": 7.05,
-            "FY 2022": 30.75,
-            "FY 2021": 7.86
-          },
-          "rawValues": {
-            "Current": "6.37",
-            "FY 2025": "5.71",
-            "FY 2024": "2.52",
-            "FY 2023": "7.05",
-            "FY 2022": "30.75",
-            "FY 2021": "7.86"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "roic": {
           "label": "ROIC",
           "unit": null,
-          "values": {
-            "Current": 0.15,
-            "FY 2025": 0.39,
-            "FY 2024": 0.44,
-            "FY 2023": 0.2,
-            "FY 2022": 0.29,
-            "FY 2021": 0.76
-          },
-          "rawValues": {
-            "Current": "0.15%",
-            "FY 2025": "0.39%",
-            "FY 2024": "0.44%",
-            "FY 2023": "0.20%",
-            "FY 2022": "0.29%",
-            "FY 2021": "0.76%"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "roe": {
           "label": "ROE",
           "unit": null,
-          "values": {
-            "Current": 3.21,
-            "FY 2025": 2.42,
-            "FY 2024": 0.6,
-            "FY 2023": 2.48,
-            "FY 2022": 0.81,
-            "FY 2021": 5.31
-          },
-          "rawValues": {
-            "Current": "3.21%",
-            "FY 2025": "2.42%",
-            "FY 2024": "0.60%",
-            "FY 2023": "2.48%",
-            "FY 2022": "0.81%",
-            "FY 2021": "5.31%"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "payoutRatio": {
           "label": "Payout Ratio",
           "unit": null,
-          "values": {
-            "Current": 63.27,
-            "FY 2025": 113.21,
-            "FY 2024": 343.42,
-            "FY 2023": 111.78,
-            "FY 2022": 343.43,
-            "FY 2021": null
-          },
-          "rawValues": {
-            "Current": "63.27%",
-            "FY 2025": "113.21%",
-            "FY 2024": "343.42%",
-            "FY 2023": "111.78%",
-            "FY 2022": "343.43%",
-            "FY 2021": "-"
-          }
+          "values": {},
+          "rawValues": {}
         },
         "assetTurnover": {
           "label": "Asset Turnover",
           "unit": null,
-          "values": {
-            "Current": 0.08,
-            "FY 2025": 0.07,
-            "FY 2024": 0.03,
-            "FY 2023": 0.02,
-            "FY 2022": 0.06,
-            "FY 2021": 0.07
-          },
-          "rawValues": {
-            "Current": "0.08",
-            "FY 2025": "0.07",
-            "FY 2024": "0.03",
-            "FY 2023": "0.02",
-            "FY 2022": "0.06",
-            "FY 2021": "0.07"
-          }
+          "values": {},
+          "rawValues": {}
         }
       },
       "current": {
         "marketCap": 229,
-        "netDebtToEbitda": -8.18,
-        "debtToEquity": 0.12,
-        "netDebtToEquity": -0.04,
-        "debtToEbitda": 25.49,
-        "quickRatio": 3.7,
-        "currentRatio": 6.37,
-        "roic": 0.15,
-        "roe": 3.21,
-        "payoutRatio": 63.27,
-        "assetTurnover": 0.08
+        "netDebtToEbitda": null,
+        "debtToEquity": null,
+        "netDebtToEquity": null,
+        "debtToEbitda": null,
+        "quickRatio": null,
+        "currentRatio": null,
+        "roic": null,
+        "roe": null,
+        "payoutRatio": null,
+        "assetTurnover": null
       },
-      "lastFetchedAt": "2026-07-29T00:36:06.557Z",
-      "fetchStatus": "ok",
+      "lastFetchedAt": "2026-07-29T03:57:32.968Z",
+      "fetchStatus": "partial",
       "fetchError": null,
-      "healthScore": 62,
-      "healthStatus": "Green",
-      "scoreCoverage": 0.9999999999999999,
-      "scoreNote": null,
+      "healthScore": null,
+      "healthStatus": "Pending data",
+      "scoreCoverage": 0,
+      "scoreNote": "Insufficient ratio coverage",
       "healthScoreComponents": {
-        "staticRiskScore": 35.50750000000001,
-        "staticHealthScore": 64.49249999999999,
-        "trendPenalty": 2.8000000000000003,
-        "finalHealthScore": 62,
-        "scoreCoverage": 0.9999999999999999,
-        "missingMetrics": [],
-        "excludedMetrics": [
-          "debtToEbitda",
-          "quickRatio",
-          "payoutRatio",
-          "assetTurnover"
-        ],
-        "usedMetrics": [
+        "staticRiskScore": null,
+        "staticHealthScore": null,
+        "trendPenalty": null,
+        "finalHealthScore": null,
+        "scoreCoverage": 0,
+        "missingMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
@@ -5770,144 +5893,21 @@
           "roic",
           "roe"
         ],
-        "riskByMetric": {
-          "netDebtToEbitda": 25,
-          "debtToEquity": 0,
-          "netDebtToEquity": 25,
-          "currentRatio": 0,
-          "roic": 100,
-          "roe": 67.9
-        },
-        "weightedContributors": {
-          "leverage": 6.125000000000001,
-          "liquidity": 0,
-          "resilience": 29.382500000000004
-        },
-        "pillarContributors": {
-          "leverage": {
-            "metricKeys": [
-              "netDebtToEbitda",
-              "debtToEquity",
-              "netDebtToEquity"
-            ],
-            "aggregation": "median",
-            "pillarRiskScore": 17.5,
-            "weightedRiskContribution": 6.125000000000001
-          },
-          "liquidity": {
-            "metricKeys": [
-              "currentRatio"
-            ],
-            "aggregation": "single",
-            "pillarRiskScore": 0,
-            "weightedRiskContribution": 0
-          },
-          "resilience": {
-            "metricKeys": [
-              "roic",
-              "roe"
-            ],
-            "aggregation": "average",
-            "pillarRiskScore": 83.95,
-            "weightedRiskContribution": 29.382500000000004
-          }
-        },
-        "pillarRisks": {
-          "leverage": 17.5,
-          "liquidity": 0,
-          "resilience": 83.95
-        },
-        "metricAdjustments": {
-          "netDebtToEbitda": {
-            "rule": "negativeLeverageSupportGate",
-            "currentValue": -8.18,
-            "originalRisk": 0,
-            "adjustedRisk": 25,
-            "supportBand": "mixed",
-            "supportHealthScore": 44.03333333333333,
-            "supportMetricsUsed": [
-              "currentRatio",
-              "roic",
-              "roe"
-            ],
-            "applied": true
-          },
-          "netDebtToEquity": {
-            "rule": "negativeLeverageSupportGate",
-            "currentValue": -0.04,
-            "originalRisk": 0,
-            "adjustedRisk": 25,
-            "supportBand": "mixed",
-            "supportHealthScore": 44.03333333333333,
-            "supportMetricsUsed": [
-              "currentRatio",
-              "roic",
-              "roe"
-            ],
-            "applied": true
-          }
-        },
-        "trendBreakdown": {
-          "netDebtToEbitda": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": true,
-            "appliedPenalty": 3,
-            "skipped": false
-          },
-          "debtToEquity": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": true,
-            "appliedPenalty": 2.5,
-            "skipped": false
-          },
-          "currentRatio": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
-            "skipped": false
-          },
-          "roic": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": true,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 1.5,
-            "skipped": false
-          },
-          "roe": {
-            "comparedYears": [
-              "FY 2025",
-              "FY 2024",
-              "FY 2023"
-            ],
-            "latestWorsened": false,
-            "consecutiveWorsened": false,
-            "appliedPenalty": 0,
-            "skipped": false
-          }
-        },
-        "rawTrendPenalty": 7,
-        "worseningMetricCount": 3
+        "excludedMetrics": [
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
+        ],
+        "usedMetrics": [],
+        "riskByMetric": {},
+        "weightedContributors": {},
+        "pillarContributors": {},
+        "pillarRisks": {},
+        "metricAdjustments": {},
+        "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-07-29T00:36:06.718Z"
+      "lastScoredAt": "2026-07-29T03:57:33.063Z"
     },
     {
       "ticker": "S9B",
@@ -5964,50 +5964,162 @@
         "netDebtToEbitda": {
           "label": "Net Debt / EBITDA Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 73.25,
+            "FY 2026": 73.25,
+            "FY 2025": 0.2,
+            "FY 2024": -5.49,
+            "FY 2023": 75.04,
+            "FY 2022": -14.09
+          },
+          "rawValues": {
+            "Current": "73.25",
+            "FY 2026": "73.25",
+            "FY 2025": "0.20",
+            "FY 2024": "-5.49",
+            "FY 2023": "75.04",
+            "FY 2022": "-14.09"
+          }
         },
         "debtToEquity": {
           "label": "Debt / Equity Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 0.29,
+            "FY 2026": 0.29,
+            "FY 2025": 0.3,
+            "FY 2024": 1.16,
+            "FY 2023": 1.2,
+            "FY 2022": 1.89
+          },
+          "rawValues": {
+            "Current": "0.29",
+            "FY 2026": "0.29",
+            "FY 2025": "0.30",
+            "FY 2024": "1.16",
+            "FY 2023": "1.20",
+            "FY 2022": "1.89"
+          }
         },
         "netDebtToEquity": {
           "label": "Net Debt / Equity Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": -0.28,
+            "FY 2026": -0.28,
+            "FY 2025": -0.01,
+            "FY 2024": 0.72,
+            "FY 2023": 0.82,
+            "FY 2022": 1.42
+          },
+          "rawValues": {
+            "Current": "-0.28",
+            "FY 2026": "-0.28",
+            "FY 2025": "-0.01",
+            "FY 2024": "0.72",
+            "FY 2023": "0.82",
+            "FY 2022": "1.42"
+          }
         },
         "debtToEbitda": {
           "label": "Debt / EBITDA Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": null,
+            "FY 2026": null,
+            "FY 2025": null,
+            "FY 2024": null,
+            "FY 2023": 98.01,
+            "FY 2022": null
+          },
+          "rawValues": {
+            "Current": "-",
+            "FY 2026": "-",
+            "FY 2025": "-",
+            "FY 2024": "-",
+            "FY 2023": "98.01",
+            "FY 2022": "-"
+          }
         },
         "quickRatio": {
           "label": "Quick Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 3.98,
+            "FY 2026": 3.98,
+            "FY 2025": 3.74,
+            "FY 2024": 1.12,
+            "FY 2023": 2.98,
+            "FY 2022": 1.8
+          },
+          "rawValues": {
+            "Current": "3.98",
+            "FY 2026": "3.98",
+            "FY 2025": "3.74",
+            "FY 2024": "1.12",
+            "FY 2023": "2.98",
+            "FY 2022": "1.80"
+          }
         },
         "currentRatio": {
           "label": "Current Ratio",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 8.03,
+            "FY 2026": 8.03,
+            "FY 2025": 7.49,
+            "FY 2024": 1.55,
+            "FY 2023": 4.32,
+            "FY 2022": 2.44
+          },
+          "rawValues": {
+            "Current": "8.03",
+            "FY 2026": "8.03",
+            "FY 2025": "7.49",
+            "FY 2024": "1.55",
+            "FY 2023": "4.32",
+            "FY 2022": "2.44"
+          }
         },
         "roic": {
           "label": "ROIC",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": -0.65,
+            "FY 2026": -0.55,
+            "FY 2025": -5.08,
+            "FY 2024": -6.68,
+            "FY 2023": -0.25,
+            "FY 2022": -4.74
+          },
+          "rawValues": {
+            "Current": "-0.65%",
+            "FY 2026": "-0.55%",
+            "FY 2025": "-5.08%",
+            "FY 2024": "-6.68%",
+            "FY 2023": "-0.25%",
+            "FY 2022": "-4.74%"
+          }
         },
         "roe": {
           "label": "ROE",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": -1.65,
+            "FY 2026": -1.65,
+            "FY 2025": 2.77,
+            "FY 2024": -20.9,
+            "FY 2023": 5.08,
+            "FY 2022": -14.62
+          },
+          "rawValues": {
+            "Current": "-1.65%",
+            "FY 2026": "-1.65%",
+            "FY 2025": "2.77%",
+            "FY 2024": "-20.90%",
+            "FY 2023": "5.08%",
+            "FY 2022": "-14.62%"
+          }
         },
         "payoutRatio": {
           "label": "Payout Ratio",
@@ -6018,37 +6130,58 @@
         "assetTurnover": {
           "label": "Asset Turnover",
           "unit": null,
-          "values": {},
-          "rawValues": {}
+          "values": {
+            "Current": 0.06,
+            "FY 2026": 0.06,
+            "FY 2025": 0.04,
+            "FY 2024": 0.45,
+            "FY 2023": 0.38,
+            "FY 2022": 0.16
+          },
+          "rawValues": {
+            "Current": "0.06",
+            "FY 2026": "0.06",
+            "FY 2025": "0.04",
+            "FY 2024": "0.45",
+            "FY 2023": "0.38",
+            "FY 2022": "0.16"
+          }
         }
       },
       "current": {
         "marketCap": 44,
-        "netDebtToEbitda": null,
-        "debtToEquity": null,
-        "netDebtToEquity": null,
+        "netDebtToEbitda": 73.25,
+        "debtToEquity": 0.29,
+        "netDebtToEquity": -0.28,
         "debtToEbitda": null,
-        "quickRatio": null,
-        "currentRatio": null,
-        "roic": null,
-        "roe": null,
+        "quickRatio": 3.98,
+        "currentRatio": 8.03,
+        "roic": -0.65,
+        "roe": -1.65,
         "payoutRatio": null,
-        "assetTurnover": null
+        "assetTurnover": 0.06
       },
-      "lastFetchedAt": "2026-07-29T00:36:06.719Z",
-      "fetchStatus": "partial",
+      "lastFetchedAt": "2026-07-29T03:57:33.063Z",
+      "fetchStatus": "ok",
       "fetchError": null,
-      "healthScore": null,
-      "healthStatus": "Pending data",
-      "scoreCoverage": 0,
-      "scoreNote": "Insufficient ratio coverage",
+      "healthScore": 44,
+      "healthStatus": "Amber",
+      "scoreCoverage": 0.9999999999999999,
+      "scoreNote": null,
       "healthScoreComponents": {
-        "staticRiskScore": null,
-        "staticHealthScore": null,
-        "trendPenalty": null,
-        "finalHealthScore": null,
-        "scoreCoverage": 0,
-        "missingMetrics": [
+        "staticRiskScore": 54.25000000000001,
+        "staticHealthScore": 45.74999999999999,
+        "trendPenalty": 1.6,
+        "finalHealthScore": 44,
+        "scoreCoverage": 0.9999999999999999,
+        "missingMetrics": [],
+        "excludedMetrics": [
+          "debtToEbitda",
+          "quickRatio",
+          "payoutRatio",
+          "assetTurnover"
+        ],
+        "usedMetrics": [
           "netDebtToEbitda",
           "debtToEquity",
           "netDebtToEquity",
@@ -6056,21 +6189,130 @@
           "roic",
           "roe"
         ],
-        "excludedMetrics": [
-          "debtToEbitda",
-          "quickRatio",
-          "payoutRatio",
-          "assetTurnover"
-        ],
-        "usedMetrics": [],
-        "riskByMetric": {},
-        "weightedContributors": {},
-        "pillarContributors": {},
-        "pillarRisks": {},
-        "metricAdjustments": {},
-        "trendBreakdown": {}
+        "riskByMetric": {
+          "netDebtToEbitda": 100,
+          "debtToEquity": 0,
+          "netDebtToEquity": 55,
+          "currentRatio": 0,
+          "roic": 100,
+          "roe": 100
+        },
+        "weightedContributors": {
+          "leverage": 19.250000000000004,
+          "liquidity": 0,
+          "resilience": 35.00000000000001
+        },
+        "pillarContributors": {
+          "leverage": {
+            "metricKeys": [
+              "netDebtToEbitda",
+              "debtToEquity",
+              "netDebtToEquity"
+            ],
+            "aggregation": "median",
+            "pillarRiskScore": 55,
+            "weightedRiskContribution": 19.250000000000004
+          },
+          "liquidity": {
+            "metricKeys": [
+              "currentRatio"
+            ],
+            "aggregation": "single",
+            "pillarRiskScore": 0,
+            "weightedRiskContribution": 0
+          },
+          "resilience": {
+            "metricKeys": [
+              "roic",
+              "roe"
+            ],
+            "aggregation": "average",
+            "pillarRiskScore": 100,
+            "weightedRiskContribution": 35.00000000000001
+          }
+        },
+        "pillarRisks": {
+          "leverage": 55,
+          "liquidity": 0,
+          "resilience": 100
+        },
+        "metricAdjustments": {
+          "netDebtToEquity": {
+            "rule": "negativeLeverageSupportGate",
+            "currentValue": -0.28,
+            "originalRisk": 0,
+            "adjustedRisk": 55,
+            "supportBand": "weak",
+            "supportHealthScore": 33.333333333333336,
+            "supportMetricsUsed": [
+              "currentRatio",
+              "roic",
+              "roe"
+            ],
+            "applied": true
+          }
+        },
+        "trendBreakdown": {
+          "netDebtToEbitda": {
+            "comparedYears": [
+              "FY 2026",
+              "FY 2025",
+              "FY 2024"
+            ],
+            "latestWorsened": true,
+            "consecutiveWorsened": true,
+            "appliedPenalty": 3,
+            "skipped": false
+          },
+          "debtToEquity": {
+            "comparedYears": [
+              "FY 2026",
+              "FY 2025",
+              "FY 2024"
+            ],
+            "latestWorsened": false,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 0,
+            "skipped": false
+          },
+          "currentRatio": {
+            "comparedYears": [
+              "FY 2026",
+              "FY 2025",
+              "FY 2024"
+            ],
+            "latestWorsened": false,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 0,
+            "skipped": false
+          },
+          "roic": {
+            "comparedYears": [
+              "FY 2026",
+              "FY 2025",
+              "FY 2024"
+            ],
+            "latestWorsened": false,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 0,
+            "skipped": false
+          },
+          "roe": {
+            "comparedYears": [
+              "FY 2026",
+              "FY 2025",
+              "FY 2024"
+            ],
+            "latestWorsened": true,
+            "consecutiveWorsened": false,
+            "appliedPenalty": 1,
+            "skipped": false
+          }
+        },
+        "rawTrendPenalty": 4,
+        "worseningMetricCount": 2
       },
-      "lastScoredAt": "2026-07-29T00:36:06.906Z"
+      "lastScoredAt": "2026-07-29T03:57:33.141Z"
     }
   ]
 }
