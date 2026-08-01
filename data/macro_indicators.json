@@ -4,7 +4,7 @@
     "sourceNote": "Compiled from public indicators and proxies"
   },
   "macro_indicators": {
-    "last_updated_utc": "2026-07-31T05:22:47.714Z",
+    "last_updated_utc": "2026-08-01T05:16:24.266Z",
     "sources": [
       {
         "name": "SingStat TableBuilder",
@@ -46,7 +46,7 @@
         "latest_period": "2026-06-01",
         "latest_value": 2.04,
         "units": "%",
-        "status": "ok",
+        "status": "failed",
         "last_ok_utc": "2026-07-31T05:22:47.714Z",
         "values": [
           {
@@ -1399,14 +1399,15 @@
           }
         ],
         "major_category": "C_funding_credit",
-        "major_category_label": "Funding & credit"
+        "major_category_label": "Funding & credit",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
       },
       "sgs_2y": {
         "freq": "M",
         "latest_period": "2026-06-01",
         "latest_value": 1.58,
         "units": "%",
-        "status": "ok",
+        "status": "failed",
         "last_ok_utc": "2026-07-31T05:22:47.714Z",
         "values": [
           {
@@ -3259,14 +3260,15 @@
           }
         ],
         "major_category": "C_funding_credit",
-        "major_category_label": "Funding & credit"
+        "major_category_label": "Funding & credit",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
       },
       "term_spread_10y_2y": {
         "freq": "M",
         "latest_period": "2026-06-01",
         "latest_value": 0.46,
         "units": "pp",
-        "status": "ok",
+        "status": "failed",
         "last_ok_utc": "2026-07-31T05:22:47.714Z",
         "values": [
           {
@@ -4619,10 +4621,11 @@
           }
         ],
         "major_category": "C_funding_credit",
-        "major_category_label": "Funding & credit"
+        "major_category_label": "Funding & credit",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
       },
       "unit_labour_cost_construction": {
-        "status": "ok",
+        "status": "failed",
         "freq": "Q",
         "latest_period": "2026 Q1",
         "latest_value": 150.6,
@@ -5371,7 +5374,8 @@
           }
         ],
         "major_category": "B_margin_pressures",
-        "major_category_label": "Margin pressures"
+        "major_category_label": "Margin pressures",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M183741)"
       },
       "loan_bc_total": {
         "status": "ok",
@@ -6121,7 +6125,7 @@
         "source_series_name": "Loans To Businesses - Building And Construction - Real Property And Development Of Land"
       },
       "sora_overnight": {
-        "status": "ok",
+        "status": "failed",
         "freq": "M",
         "values": [
           {
@@ -7138,7 +7142,8 @@
         "units": "%",
         "last_ok_utc": "2026-07-31T05:22:47.714Z",
         "major_category": "C_funding_credit",
-        "major_category_label": "Funding & credit"
+        "major_category_label": "Funding & credit",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
       },
       "loan_limits_granted_building_construction": {
         "status": "ok",
@@ -7448,7 +7453,7 @@
             "value": 277206.6
           }
         ],
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-01T05:16:24.266Z",
         "major_category": "C_funding_credit",
         "major_category_label": "Funding & credit",
         "source_status": "cached_due_to_upstream_unavailable",
@@ -7762,7 +7767,7 @@
             "value": 79.9
           }
         ],
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-01T05:16:24.266Z",
         "major_category": "C_funding_credit",
         "major_category_label": "Funding & credit",
         "source_status": "cached_due_to_upstream_unavailable",
@@ -32271,7 +32276,7 @@
         "latest_value": 27.9,
         "units": "S$ million",
         "source_series_name": "Construction",
-        "status": "ok",
+        "status": "failed",
         "last_ok_utc": "2026-07-31T05:22:47.714Z",
         "values": [
           {
@@ -33092,7 +33097,8 @@
           }
         ],
         "major_category": "D_macro_regime",
-        "major_category_label": "Macro regime"
+        "major_category_label": "Macro regime",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M015792)"
       },
       "construction_material_granite_20mm_aggregate": {
         "freq": "M",
@@ -40191,12 +40197,119 @@
         "last_ok_utc": "2026-07-31T05:22:47.714Z",
         "major_category": "A_pipeline_absorption",
         "major_category_label": "Pipeline & absorption"
+      },
+      "table_M211251": {
+        "status": "failed",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M211251)"
+      },
+      "table_M701091": {
+        "status": "failed",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M701091)"
+      },
+      "table_M400391": {
+        "status": "failed",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400391)"
+      },
+      "table_M400691": {
+        "status": "failed",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400691)"
+      },
+      "table_M400861": {
+        "status": "failed",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400861)"
+      },
+      "table_M400681": {
+        "status": "failed",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400681)"
+      },
+      "dataset_M400901": {
+        "status": "failed",
+        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400901)"
       }
     },
     "update_run": {
-      "ok_count": 15,
-      "failed_count": 0,
-      "failed_items": []
+      "ok_count": 2,
+      "failed_count": 13,
+      "failed_items": [
+        {
+          "name": "sgs_10y",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M700071",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
+        },
+        {
+          "name": "sgs_2y",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M700071",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
+        },
+        {
+          "name": "term_spread_10y_2y",
+          "source": "derived",
+          "dataset_ref": "sgs_10y-sgs_2y",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
+        },
+        {
+          "name": "table_M211251",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M211251",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M211251)"
+        },
+        {
+          "name": "table_M701091",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M701091",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M701091)"
+        },
+        {
+          "name": "table_M400391",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M400391",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400391)"
+        },
+        {
+          "name": "table_M400691",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M400691",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400691)"
+        },
+        {
+          "name": "table_M400861",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M400861",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400861)"
+        },
+        {
+          "name": "table_M400681",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M400681",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400681)"
+        },
+        {
+          "name": "dataset_M400901",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M400901",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400901)"
+        },
+        {
+          "name": "construction_gdp",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M015792",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M015792)"
+        },
+        {
+          "name": "unit_labour_cost_construction",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M183741",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M183741)"
+        },
+        {
+          "name": "sora_overnight",
+          "source": "SingStat TableBuilder",
+          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M700071",
+          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
+        }
+      ]
     }
   }
 }
