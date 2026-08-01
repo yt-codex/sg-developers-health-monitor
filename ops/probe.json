@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
   "status": "WARN",
-  "last_run_time": "2026-08-01T04:15:12Z",
+  "last_run_time": "2026-08-01T05:17:02Z",
   "duration_seconds": null,
   "freshness": {
-    "max_date": "2026-08-01T04:14:51.620Z",
-    "lag_seconds": 17.0,
+    "max_date": "2026-08-01T05:16:24.266Z",
+    "lag_seconds": 35.0,
     "stale": false
   },
   "row_counts": {
@@ -16,16 +16,16 @@
     "news_total_all": 649,
     "news_latest_90d": 252,
     "news_new_items": 1,
-    "macro_ok_count": 15,
-    "macro_failed_count": 0,
-    "macro_failed_series_count": 0,
+    "macro_ok_count": 2,
+    "macro_failed_count": 13,
+    "macro_failed_series_count": 13,
     "dev_total": 23,
     "dev_ok": 6,
     "dev_partial": 17,
     "dev_error": 0,
     "dev_stale_fetch_error": 0
   },
-  "schema_hash": "e2f7178e8848b2db2cbcc0d4af4625dfd388617f8023c23300fb0c7d174beb17",
+  "schema_hash": "bddb453f5adec36d4f9dfa414a16ca9067a72ac461bd442bc62a75e860783f4a",
   "key_checks": [
     {
       "name": "required_file.data_meta.json",
@@ -66,13 +66,14 @@
     {
       "name": "macro.ok_count",
       "status": "OK",
-      "detail": "ok_count=15",
-      "metric": 15
+      "detail": "ok_count=2",
+      "metric": 2
     },
     {
       "name": "macro.partial_degradation",
-      "status": "OK",
-      "detail": "no macro failed items/series"
+      "status": "WARN",
+      "detail": "macro failures increased vs baseline (0/0 -> 13/13); HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071) | HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071) | HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)",
+      "metric": 13
     },
     {
       "name": "developer.fetch_health",
@@ -116,26 +117,26 @@
     {
       "name": "freshness.news",
       "status": "OK",
-      "detail": "news lag=8364s",
-      "metric": 8364
+      "detail": "news lag=12075s",
+      "metric": 12075
     },
     {
       "name": "freshness.macro",
       "status": "OK",
-      "detail": "macro lag=82341s",
-      "metric": 82341
+      "detail": "macro lag=35s",
+      "metric": 35
     },
     {
       "name": "freshness.ratios",
       "status": "OK",
-      "detail": "ratios lag=17s",
-      "metric": 17
+      "detail": "ratios lag=3728s",
+      "metric": 3728
     },
     {
       "name": "freshness.overall",
       "status": "OK",
-      "detail": "lag=17s",
-      "metric": 17
+      "detail": "lag=35s",
+      "metric": 35
     },
     {
       "name": "developer.diagnostics",
@@ -145,37 +146,39 @@
     }
   ],
   "warnings": [
+    "macro.partial_degradation: macro failures increased vs baseline (0/0 -> 13/13); HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071) | HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071) | HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)",
+    "macro.failed_items: sgs_10y:HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071) | sgs_2y:HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071) | term_spread_10y_2y:HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)",
     "developer.fetch_health: partial=17 error=0",
     "developer.fetch_errors: C09:partial:no fetchError | U14:partial:no fetchError | 9CI:partial:no fetchError | H78:partial:no fetchError | LJ3:partial:no fetchError"
   ],
   "artifact_links": [
     {
       "label": "workflow_run",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/30683573937"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/30685536396"
     },
     {
       "label": "input:data_meta.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/59c050b59ddbfcfaa973db30d57fd017007e3d24/data/meta.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/07d08efea698e5d1a0dd4f19d12e0f27d4133069/data/meta.json"
     },
     {
       "label": "input:data_news_all.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/59c050b59ddbfcfaa973db30d57fd017007e3d24/data/news_all.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/07d08efea698e5d1a0dd4f19d12e0f27d4133069/data/news_all.json"
     },
     {
       "label": "input:data_news_latest_90d.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/59c050b59ddbfcfaa973db30d57fd017007e3d24/data/news_latest_90d.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/07d08efea698e5d1a0dd4f19d12e0f27d4133069/data/news_latest_90d.json"
     },
     {
       "label": "input:data_macro_indicators.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/59c050b59ddbfcfaa973db30d57fd017007e3d24/data/macro_indicators.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/07d08efea698e5d1a0dd4f19d12e0f27d4133069/data/macro_indicators.json"
     },
     {
       "label": "input:data_processed_developer_ratios_history.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/59c050b59ddbfcfaa973db30d57fd017007e3d24/data/processed/developer_ratios_history.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/07d08efea698e5d1a0dd4f19d12e0f27d4133069/data/processed/developer_ratios_history.json"
     },
     {
       "label": "input:data_processed_developer_health_diagnostics.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/59c050b59ddbfcfaa973db30d57fd017007e3d24/data/processed/developer_health_diagnostics.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/07d08efea698e5d1a0dd4f19d12e0f27d4133069/data/processed/developer_health_diagnostics.json"
     },
     {
       "label": "workflow:update_dashboard_data",
@@ -183,7 +186,7 @@
     },
     {
       "label": "workflow:update_macro_indicators",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/30606624043"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/30685507703"
     },
     {
       "label": "workflow:update_developer_news",
@@ -192,34 +195,34 @@
   ],
   "meta": {
     "repo": "yt-codex/sg-developers-health-monitor",
-    "run_id": "30683573937",
-    "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/30683573937",
+    "run_id": "30685536396",
+    "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/30685536396",
     "workflow": "Ops probe aggregator",
     "job": "emit-probe",
-    "sha": "59c050b59ddbfcfaa973db30d57fd017007e3d24",
-    "generated_at_utc": "2026-08-01T04:15:09.339Z",
+    "sha": "07d08efea698e5d1a0dd4f19d12e0f27d4133069",
+    "generated_at_utc": "2026-08-01T05:16:59.959Z",
     "workflow_conclusions": {
       "Update dashboard data": {
         "conclusion": "success",
         "status": "completed",
         "completed_at": "2026-08-01T04:14:35Z",
-        "age_seconds": 34,
+        "age_seconds": 3744,
         "stale": false,
         "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/30683562017"
       },
       "Update macro indicators": {
         "conclusion": "success",
         "status": "completed",
-        "completed_at": "2026-07-31T05:22:29Z",
-        "age_seconds": 82360,
+        "completed_at": "2026-08-01T05:15:54Z",
+        "age_seconds": 65,
         "stale": false,
-        "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/30606624043"
+        "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/30685507703"
       },
       "Update developer news": {
         "conclusion": "success",
         "status": "completed",
         "completed_at": "2026-08-01T01:52:34Z",
-        "age_seconds": 8555,
+        "age_seconds": 12265,
         "stale": false,
         "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/30678848917"
       }
@@ -228,7 +231,7 @@
       "news_item_keys": "aggregator,article_context_method,article_context_publisher,article_context_url,developer,developer_matches,developer_raw_entities,developer_relationships,developers,fetched_at_sgt,guid,id,link,matched_terms,original_link,pubDate,pubDate_sgt,publisher,query,relevance_reason,relevance_terms,resolved_link,resolved_link_status,severity,snippet,source,source_url,tags,title",
       "news_feed_keys": "items_fetched,query,source,status,window_days",
       "macro_update_run_keys": "failed_count,failed_items,ok_count",
-      "macro_series_keys": "category,check,freq,last_ok_utc,latest_period,latest_value,major_category,major_category_label,parent_total,source_error_summary,source_series_name,source_status,status,units,values",
+      "macro_series_keys": "category,check,error_summary,freq,last_ok_utc,latest_period,latest_value,major_category,major_category_label,parent_total,source_error_summary,source_series_name,source_status,status,units,values",
       "developer_record_keys": "current,fetchError,fetchStatus,healthScore,healthScoreComponents,healthStatus,lastFetchedAt,lastScoredAt,metrics,name,periods,scoreCoverage,scoreNote,segment,stockanalysis_ratios_url,ticker",
       "expected_news_required_fields": "id,title,link,source,pubDate,severity",
       "expected_mas_required_fields": "year,month,bc_lmtgrtd,bc_utl"
@@ -236,15 +239,15 @@
     "freshness_sources": {
       "news": {
         "date": "2026-08-01T01:55:44.646Z",
-        "lag_seconds": 8364
+        "lag_seconds": 12075
       },
       "macro": {
-        "date": "2026-07-31T05:22:47.714Z",
-        "lag_seconds": 82341
+        "date": "2026-08-01T05:16:24.266Z",
+        "lag_seconds": 35
       },
       "ratios": {
         "date": "2026-08-01T04:14:51.620Z",
-        "lag_seconds": 17
+        "lag_seconds": 3728
       }
     }
   }
