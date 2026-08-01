@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
   "status": "WARN",
-  "last_run_time": "2026-08-01T05:17:02Z",
+  "last_run_time": "2026-08-01T06:16:01Z",
   "duration_seconds": null,
   "freshness": {
     "max_date": "2026-08-01T05:16:24.266Z",
-    "lag_seconds": 35.0,
+    "lag_seconds": 3574.0,
     "stale": false
   },
   "row_counts": {
@@ -71,8 +71,8 @@
     },
     {
       "name": "macro.partial_degradation",
-      "status": "WARN",
-      "detail": "macro failures increased vs baseline (0/0 -> 13/13); HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071) | HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071) | HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)",
+      "status": "OK",
+      "detail": "macro failures unchanged vs baseline (13/13)",
       "metric": 13
     },
     {
@@ -117,26 +117,26 @@
     {
       "name": "freshness.news",
       "status": "OK",
-      "detail": "news lag=12075s",
-      "metric": 12075
+      "detail": "news lag=15614s",
+      "metric": 15614
     },
     {
       "name": "freshness.macro",
       "status": "OK",
-      "detail": "macro lag=35s",
-      "metric": 35
+      "detail": "macro lag=3574s",
+      "metric": 3574
     },
     {
       "name": "freshness.ratios",
       "status": "OK",
-      "detail": "ratios lag=3728s",
-      "metric": 3728
+      "detail": "ratios lag=7267s",
+      "metric": 7267
     },
     {
       "name": "freshness.overall",
       "status": "OK",
-      "detail": "lag=35s",
-      "metric": 35
+      "detail": "lag=3574s",
+      "metric": 3574
     },
     {
       "name": "developer.diagnostics",
@@ -146,7 +146,6 @@
     }
   ],
   "warnings": [
-    "macro.partial_degradation: macro failures increased vs baseline (0/0 -> 13/13); HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071) | HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071) | HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)",
     "macro.failed_items: sgs_10y:HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071) | sgs_2y:HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071) | term_spread_10y_2y:HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)",
     "developer.fetch_health: partial=17 error=0",
     "developer.fetch_errors: C09:partial:no fetchError | U14:partial:no fetchError | 9CI:partial:no fetchError | H78:partial:no fetchError | LJ3:partial:no fetchError"
@@ -154,31 +153,31 @@
   "artifact_links": [
     {
       "label": "workflow_run",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/30685536396"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/30687397025"
     },
     {
       "label": "input:data_meta.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/07d08efea698e5d1a0dd4f19d12e0f27d4133069/data/meta.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/ffc34281bff1c9c52257d9524cba28e633fd3818/data/meta.json"
     },
     {
       "label": "input:data_news_all.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/07d08efea698e5d1a0dd4f19d12e0f27d4133069/data/news_all.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/ffc34281bff1c9c52257d9524cba28e633fd3818/data/news_all.json"
     },
     {
       "label": "input:data_news_latest_90d.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/07d08efea698e5d1a0dd4f19d12e0f27d4133069/data/news_latest_90d.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/ffc34281bff1c9c52257d9524cba28e633fd3818/data/news_latest_90d.json"
     },
     {
       "label": "input:data_macro_indicators.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/07d08efea698e5d1a0dd4f19d12e0f27d4133069/data/macro_indicators.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/ffc34281bff1c9c52257d9524cba28e633fd3818/data/macro_indicators.json"
     },
     {
       "label": "input:data_processed_developer_ratios_history.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/07d08efea698e5d1a0dd4f19d12e0f27d4133069/data/processed/developer_ratios_history.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/ffc34281bff1c9c52257d9524cba28e633fd3818/data/processed/developer_ratios_history.json"
     },
     {
       "label": "input:data_processed_developer_health_diagnostics.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/07d08efea698e5d1a0dd4f19d12e0f27d4133069/data/processed/developer_health_diagnostics.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/ffc34281bff1c9c52257d9524cba28e633fd3818/data/processed/developer_health_diagnostics.json"
     },
     {
       "label": "workflow:update_dashboard_data",
@@ -195,18 +194,18 @@
   ],
   "meta": {
     "repo": "yt-codex/sg-developers-health-monitor",
-    "run_id": "30685536396",
-    "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/30685536396",
+    "run_id": "30687397025",
+    "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/30687397025",
     "workflow": "Ops probe aggregator",
     "job": "emit-probe",
-    "sha": "07d08efea698e5d1a0dd4f19d12e0f27d4133069",
-    "generated_at_utc": "2026-08-01T05:16:59.959Z",
+    "sha": "ffc34281bff1c9c52257d9524cba28e633fd3818",
+    "generated_at_utc": "2026-08-01T06:15:58.901Z",
     "workflow_conclusions": {
       "Update dashboard data": {
         "conclusion": "success",
         "status": "completed",
         "completed_at": "2026-08-01T04:14:35Z",
-        "age_seconds": 3744,
+        "age_seconds": 7283,
         "stale": false,
         "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/30683562017"
       },
@@ -214,7 +213,7 @@
         "conclusion": "success",
         "status": "completed",
         "completed_at": "2026-08-01T05:15:54Z",
-        "age_seconds": 65,
+        "age_seconds": 3604,
         "stale": false,
         "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/30685507703"
       },
@@ -222,7 +221,7 @@
         "conclusion": "success",
         "status": "completed",
         "completed_at": "2026-08-01T01:52:34Z",
-        "age_seconds": 12265,
+        "age_seconds": 15804,
         "stale": false,
         "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/30678848917"
       }
@@ -239,15 +238,15 @@
     "freshness_sources": {
       "news": {
         "date": "2026-08-01T01:55:44.646Z",
-        "lag_seconds": 12075
+        "lag_seconds": 15614
       },
       "macro": {
         "date": "2026-08-01T05:16:24.266Z",
-        "lag_seconds": 35
+        "lag_seconds": 3574
       },
       "ratios": {
         "date": "2026-08-01T04:14:51.620Z",
-        "lag_seconds": 3728
+        "lag_seconds": 7267
       }
     }
   }
