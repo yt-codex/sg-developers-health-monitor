@@ -4,7 +4,7 @@
     "sourceNote": "Compiled from public indicators and proxies"
   },
   "macro_indicators": {
-    "last_updated_utc": "2026-08-01T05:16:24.266Z",
+    "last_updated_utc": "2026-08-02T05:15:08.517Z",
     "sources": [
       {
         "name": "SingStat TableBuilder",
@@ -46,8 +46,8 @@
         "latest_period": "2026-06-01",
         "latest_value": 2.04,
         "units": "%",
-        "status": "failed",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "status": "ok",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "1998-06",
@@ -1399,16 +1399,15 @@
           }
         ],
         "major_category": "C_funding_credit",
-        "major_category_label": "Funding & credit",
-        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
+        "major_category_label": "Funding & credit"
       },
       "sgs_2y": {
         "freq": "M",
         "latest_period": "2026-06-01",
         "latest_value": 1.58,
         "units": "%",
-        "status": "failed",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "status": "ok",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "1988-01",
@@ -3260,16 +3259,15 @@
           }
         ],
         "major_category": "C_funding_credit",
-        "major_category_label": "Funding & credit",
-        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
+        "major_category_label": "Funding & credit"
       },
       "term_spread_10y_2y": {
         "freq": "M",
         "latest_period": "2026-06-01",
         "latest_value": 0.46,
         "units": "pp",
-        "status": "failed",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "status": "ok",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "1998-06",
@@ -4621,16 +4619,15 @@
           }
         ],
         "major_category": "C_funding_credit",
-        "major_category_label": "Funding & credit",
-        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
+        "major_category_label": "Funding & credit"
       },
       "unit_labour_cost_construction": {
-        "status": "failed",
+        "status": "ok",
         "freq": "Q",
         "latest_period": "2026 Q1",
         "latest_value": 150.6,
         "units": "index",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "1980 Q1",
@@ -5374,16 +5371,15 @@
           }
         ],
         "major_category": "B_margin_pressures",
-        "major_category_label": "Margin pressures",
-        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M183741)"
+        "major_category_label": "Margin pressures"
       },
       "loan_bc_total": {
         "status": "ok",
         "freq": "M",
-        "latest_period": "2026 May",
-        "latest_value": 185175.7,
+        "latest_period": "2026 Jun",
+        "latest_value": 186632.5,
         "units": "S$ million",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "2021 Aug",
@@ -5614,6 +5610,10 @@
             "value": 182225.2
           },
           {
+            "period": "2026 Jun",
+            "value": 186632.5
+          },
+          {
             "period": "2026 Mar",
             "value": 183703
           },
@@ -5629,10 +5629,10 @@
       "loan_bc_construction": {
         "status": "ok",
         "freq": "M",
-        "latest_period": "2026 May",
-        "latest_value": 9501.5,
+        "latest_period": "2026 Jun",
+        "latest_value": 9446.5,
         "units": "S$ million",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "2021 Aug",
@@ -5863,6 +5863,10 @@
             "value": 8946.2
           },
           {
+            "period": "2026 Jun",
+            "value": 9446.5
+          },
+          {
             "period": "2026 Mar",
             "value": 9229.4
           },
@@ -5878,10 +5882,10 @@
       "loan_bc_real_property": {
         "status": "ok",
         "freq": "M",
-        "latest_period": "2026 May",
-        "latest_value": 175674.1,
+        "latest_period": "2026 Jun",
+        "latest_value": 177186,
         "units": "S$ million",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "2021 Aug",
@@ -6112,6 +6116,10 @@
             "value": 173279
           },
           {
+            "period": "2026 Jun",
+            "value": 177186
+          },
+          {
             "period": "2026 Mar",
             "value": 174473.6
           },
@@ -6125,7 +6133,7 @@
         "source_series_name": "Loans To Businesses - Building And Construction - Real Property And Development Of Land"
       },
       "sora_overnight": {
-        "status": "failed",
+        "status": "ok",
         "freq": "M",
         "values": [
           {
@@ -7140,10 +7148,9 @@
         "latest_period": "2026-06-01",
         "latest_value": 1.1886,
         "units": "%",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "major_category": "C_funding_credit",
-        "major_category_label": "Funding & credit",
-        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
+        "major_category_label": "Funding & credit"
       },
       "loan_limits_granted_building_construction": {
         "status": "ok",
@@ -7453,7 +7460,7 @@
             "value": 277206.6
           }
         ],
-        "last_ok_utc": "2026-08-01T05:16:24.266Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "major_category": "C_funding_credit",
         "major_category_label": "Funding & credit",
         "source_status": "cached_due_to_upstream_unavailable",
@@ -7767,7 +7774,7 @@
             "value": 79.9
           }
         ],
-        "last_ok_utc": "2026-08-01T05:16:24.266Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "major_category": "C_funding_credit",
         "major_category_label": "Funding & credit",
         "source_status": "cached_due_to_upstream_unavailable",
@@ -7780,7 +7787,7 @@
         "units": "$/Tonne",
         "source_series_name": "Steel Reinforcement Bars (16-32mm High Tensile)",
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "1999 Apr",
@@ -10413,7 +10420,7 @@
         "units": "$/Tonne",
         "source_series_name": "Cement In Bulk (Ordinary Portland Cement)",
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "1999 Apr",
@@ -13046,7 +13053,7 @@
         "units": "$/Tonne",
         "source_series_name": "Concreting Sand",
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "1999 Apr",
@@ -17470,7 +17477,7 @@
         "latest_value": 455.34,
         "units": "K Tonnes",
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "1999-01",
@@ -18799,7 +18806,7 @@
         "latest_value": 262.3,
         "units": "K Tonnes",
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "1999-01",
@@ -20128,7 +20135,7 @@
         "latest_value": 2054.7,
         "units": "K Tonnes",
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "1999-01",
@@ -21457,7 +21464,7 @@
         "latest_value": 1315,
         "units": "K Tonnes",
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "1999-01",
@@ -22794,7 +22801,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "19932Q",
@@ -23346,7 +23353,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "19932Q",
@@ -23898,7 +23905,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "19932Q",
@@ -24450,7 +24457,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "19932Q",
@@ -25002,7 +25009,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "19932Q",
@@ -25556,7 +25563,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "19932Q",
@@ -26110,7 +26117,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "19932Q",
@@ -26664,7 +26671,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "19932Q",
@@ -27218,7 +27225,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "19932Q",
@@ -27772,7 +27779,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "19932Q",
@@ -28326,7 +28333,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "20023Q",
@@ -28732,7 +28739,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "20023Q",
@@ -29138,7 +29145,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "20134Q",
@@ -29364,7 +29371,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "20134Q",
@@ -29590,7 +29597,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "20134Q",
@@ -29816,7 +29823,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "20111Q",
@@ -30086,7 +30093,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "20111Q",
@@ -30356,7 +30363,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "20111Q",
@@ -30626,7 +30633,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "20111Q",
@@ -30896,7 +30903,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "20111Q",
@@ -31164,7 +31171,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "20134Q",
@@ -31388,7 +31395,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "20134Q",
@@ -31612,7 +31619,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "20134Q",
@@ -31836,7 +31843,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "20134Q",
@@ -32060,7 +32067,7 @@
           "pass": true
         },
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "20134Q",
@@ -32276,8 +32283,8 @@
         "latest_value": 27.9,
         "units": "S$ million",
         "source_series_name": "Construction",
-        "status": "failed",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "status": "ok",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "values": [
           {
             "period": "1975Q2",
@@ -33097,8 +33104,7 @@
           }
         ],
         "major_category": "D_macro_regime",
-        "major_category_label": "Macro regime",
-        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M015792)"
+        "major_category_label": "Macro regime"
       },
       "construction_material_granite_20mm_aggregate": {
         "freq": "M",
@@ -35729,7 +35735,7 @@
         ],
         "source_series_name": "Granite (20mm Aggregate)",
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "major_category": "B_margin_pressures",
         "major_category_label": "Margin pressures"
       },
@@ -38362,7 +38368,7 @@
         ],
         "source_series_name": "Ready Mixed Concrete",
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "major_category": "B_margin_pressures",
         "major_category_label": "Margin pressures"
       },
@@ -38907,7 +38913,7 @@
         ],
         "source_series_name": "Private Sector Office Space Vacant",
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "major_category": "A_pipeline_absorption",
         "major_category_label": "Pipeline & absorption"
       },
@@ -39304,7 +39310,7 @@
         ],
         "source_series_name": "Private Sector Business Park Space Vacant",
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "major_category": "A_pipeline_absorption",
         "major_category_label": "Pipeline & absorption"
       },
@@ -39933,7 +39939,7 @@
         ],
         "source_series_name": "Private Sector Multiple-User Factory Space Vacant",
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "major_category": "A_pipeline_absorption",
         "major_category_label": "Pipeline & absorption"
       },
@@ -40194,122 +40200,15 @@
         ],
         "source_series_name": "Private Sector Retail Space Vacant",
         "status": "ok",
-        "last_ok_utc": "2026-07-31T05:22:47.714Z",
+        "last_ok_utc": "2026-08-02T05:15:08.517Z",
         "major_category": "A_pipeline_absorption",
         "major_category_label": "Pipeline & absorption"
-      },
-      "table_M211251": {
-        "status": "failed",
-        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M211251)"
-      },
-      "table_M701091": {
-        "status": "failed",
-        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M701091)"
-      },
-      "table_M400391": {
-        "status": "failed",
-        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400391)"
-      },
-      "table_M400691": {
-        "status": "failed",
-        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400691)"
-      },
-      "table_M400861": {
-        "status": "failed",
-        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400861)"
-      },
-      "table_M400681": {
-        "status": "failed",
-        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400681)"
-      },
-      "dataset_M400901": {
-        "status": "failed",
-        "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400901)"
       }
     },
     "update_run": {
-      "ok_count": 2,
-      "failed_count": 13,
-      "failed_items": [
-        {
-          "name": "sgs_10y",
-          "source": "SingStat TableBuilder",
-          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M700071",
-          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
-        },
-        {
-          "name": "sgs_2y",
-          "source": "SingStat TableBuilder",
-          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M700071",
-          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
-        },
-        {
-          "name": "term_spread_10y_2y",
-          "source": "derived",
-          "dataset_ref": "sgs_10y-sgs_2y",
-          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
-        },
-        {
-          "name": "table_M211251",
-          "source": "SingStat TableBuilder",
-          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M211251",
-          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M211251)"
-        },
-        {
-          "name": "table_M701091",
-          "source": "SingStat TableBuilder",
-          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M701091",
-          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M701091)"
-        },
-        {
-          "name": "table_M400391",
-          "source": "SingStat TableBuilder",
-          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M400391",
-          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400391)"
-        },
-        {
-          "name": "table_M400691",
-          "source": "SingStat TableBuilder",
-          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M400691",
-          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400691)"
-        },
-        {
-          "name": "table_M400861",
-          "source": "SingStat TableBuilder",
-          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M400861",
-          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400861)"
-        },
-        {
-          "name": "table_M400681",
-          "source": "SingStat TableBuilder",
-          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M400681",
-          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400681)"
-        },
-        {
-          "name": "dataset_M400901",
-          "source": "SingStat TableBuilder",
-          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M400901",
-          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M400901)"
-        },
-        {
-          "name": "construction_gdp",
-          "source": "SingStat TableBuilder",
-          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M015792",
-          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M015792)"
-        },
-        {
-          "name": "unit_labour_cost_construction",
-          "source": "SingStat TableBuilder",
-          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M183741",
-          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M183741)"
-        },
-        {
-          "name": "sora_overnight",
-          "source": "SingStat TableBuilder",
-          "dataset_ref": "tablebuilder.singstat.gov.sg/table/M700071",
-          "error_summary": "HTTP 502 (https://tablebuilder.singstat.gov.sg/api/table/tabledata/M700071)"
-        }
-      ]
+      "ok_count": 15,
+      "failed_count": 0,
+      "failed_items": []
     }
   }
 }
