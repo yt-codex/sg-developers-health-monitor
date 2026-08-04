@@ -501,24 +501,30 @@ async function buildProbeInputs(options = {}) {
     warnings.push(`macro.failed_items: ${sample}`);
   }
 
-  if (rowCounts.dev_ok === 0) {
-    addCheck('developer.fetch_health', 'FAIL', 'developer ratios have zero ok records');
-  } else if (rowCounts.dev_partial > 0 || rowCounts.dev_error > 0) {
+  const developerFetchProblems = developers.filter((dev) => {
+    const state = String(dev?.fetchStatus || '').toLowerCase();
+    const fetchError = String(dev?.fetchError || '').trim();
+    return state === 'error' || fetchError.length > 0;
+  });
+  const developerPartialWithFetchError = developers.filter((dev) => (
+    String(dev?.fetchStatus || '').toLowerCase() === 'partial' && String(dev?.fetchError || '').trim().length > 0
+  ));
+
+  if (rowCounts.dev_ok === 0 && developerFetchProblems.length > 0) {
+    addCheck('developer.fetch_health', 'FAIL', 'developer ratios have zero ok fetches');
+  } else if (developerFetchProblems.length > 0 || developerPartialWithFetchError.length > 0) {
     addCheck(
       'developer.fetch_health',
       'WARN',
-      `partial=${rowCounts.dev_partial} error=${rowCounts.dev_error}`,
-      { partial: rowCounts.dev_partial, error: rowCounts.dev_error }
+      `fetch problems=${developerFetchProblems.length}; partial=${rowCounts.dev_partial} error=${rowCounts.dev_error}`,
+      { fetch_problems: developerFetchProblems.length, partial: rowCounts.dev_partial, error: rowCounts.dev_error }
     );
   } else {
-    addCheck('developer.fetch_health', 'OK', 'all developers fetchStatus=ok', rowCounts.dev_ok);
+    const partialDetail = rowCounts.dev_partial > 0 ? `; ${rowCounts.dev_partial} records have low score coverage but no fetch error` : '';
+    addCheck('developer.fetch_health', 'OK', `developer fetches healthy${partialDetail}`, rowCounts.dev_ok);
   }
 
-  const problematicDevelopers = developers
-    .filter((dev) => {
-      const state = String(dev?.fetchStatus || '').toLowerCase();
-      return state === 'partial' || state === 'error';
-    })
+  const problematicDevelopers = developerFetchProblems
     .slice(0, 5)
     .map((dev) => `${dev?.ticker || 'unknown'}:${dev?.fetchStatus || 'unknown'}:${dev?.fetchError || 'no fetchError'}`);
   if (problematicDevelopers.length > 0) {

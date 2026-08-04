@@ -228,7 +228,36 @@ test('macro partial degradation regression => WARN', async () => {
 });
 
 test('developer parser degradation => WARN and FAIL depending on ok coverage', async (t) => {
-  await t.test('partial/error with at least one ok => WARN', async () => {
+  await t.test('partial records without fetch errors are treated as low coverage, not fetch degradation', async () => {
+    const rootDir = mkTmpRoot();
+    const fixture = baseFixture();
+    fixture['data/processed/developer_ratios_history.json'].developers = [
+      { ticker: 'AAA', name: 'AAA Dev', fetchStatus: 'ok', fetchError: null },
+      {
+        ticker: 'BBB',
+        name: 'BBB Dev',
+        fetchStatus: 'partial',
+        fetchError: null,
+        scoreCoverage: 0,
+        scoreNote: 'Insufficient ratio coverage'
+      }
+    ];
+    writeFixture(rootDir, fixture);
+
+    const payload = await buildProbeInputs({
+      rootDir,
+      now: FIXED_NOW,
+      env: buildEnv(),
+      workflowRunsByName: baselineWorkflowRuns(FIXED_NOW)
+    });
+
+    assert.equal(payload.status, 'OK');
+    assert.equal(payload.row_counts.dev_partial, 1);
+    assert.equal(getCheck(payload, 'developer.fetch_health')?.status, 'OK');
+    assert.equal(payload.warnings.some((warning) => warning.startsWith('developer.fetch_errors:')), false);
+  });
+
+  await t.test('partial/error with fetch errors and at least one ok => WARN', async () => {
     const rootDir = mkTmpRoot();
     const fixture = baseFixture();
     fixture['data/processed/developer_ratios_history.json'].developers = [
