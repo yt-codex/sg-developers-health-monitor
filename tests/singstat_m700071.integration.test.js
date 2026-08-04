@@ -14,11 +14,22 @@ function isMonotonicAscending(items) {
   return true;
 }
 
-function assertRecentDate(dateString, maxLagDays) {
-  const then = new Date(`${dateString}T00:00:00Z`);
+function periodEndDate(dateString, frequency = 'monthly') {
+  const start = new Date(`${dateString}T00:00:00Z`);
+  assert.ok(!Number.isNaN(start.getTime()), `invalid period date: ${dateString}`);
+
+  const monthsToAdd = frequency === 'quarterly' ? 3 : 1;
+  return new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + monthsToAdd, 0));
+}
+
+function assertRecentDate(dateString, maxLagDays, { frequency = 'monthly' } = {}) {
+  const then = periodEndDate(dateString, frequency);
   const now = new Date();
   const lagDays = (now.getTime() - then.getTime()) / (24 * 60 * 60 * 1000);
-  assert.ok(lagDays <= maxLagDays, `latest date ${dateString} is too old (${Math.round(lagDays)} days)`);
+  assert.ok(
+    lagDays <= maxLagDays,
+    `latest ${frequency} period ${dateString} ended ${then.toISOString().slice(0, 10)} and is too old (${Math.round(lagDays)} days)`
+  );
 }
 
 function shouldSkipLive(err) {
@@ -53,7 +64,7 @@ test('SingStat M700071 includes SORA + SGS 2Y + SGS 10Y with numeric ascending m
   }
 });
 
-test('SingStat M183741 includes Unit labour cost of construction with numeric ascending monthly data', async (t) => {
+test('SingStat M183741 includes Unit labour cost of construction with numeric ascending quarterly data', async (t) => {
   let bundle;
   try {
     bundle = await fetchUnitLabourCostConstructionSeries({ tableId: 'M183741' });
@@ -72,7 +83,7 @@ test('SingStat M183741 includes Unit labour cost of construction with numeric as
     assert.ok(Number.isFinite(row.value));
   }
 
-  assertRecentDate(rows[rows.length - 1].date, 200);
+  assertRecentDate(rows[rows.length - 1].date, 200, { frequency: 'quarterly' });
 });
 
 
@@ -95,7 +106,7 @@ test('SingStat M015792 includes Construction GDP (seasonally adjusted) with nume
     assert.ok(Number.isFinite(row.value));
   }
 
-  assertRecentDate(rows[rows.length - 1].date, 200);
+  assertRecentDate(rows[rows.length - 1].date, 200, { frequency: 'quarterly' });
 });
 
 test('SingStat M211251 includes construction material price series with numeric ascending monthly data', async (t) => {
