@@ -189,6 +189,41 @@ test('all feeds down => FAIL', async () => {
   assert.equal(getCheck(payload, 'news.feed_health')?.status, 'FAIL');
 });
 
+test('google-only transient feed outage with cached news => WARN', async () => {
+  const rootDir = mkTmpRoot();
+  const fixture = baseFixture();
+  fixture['data/meta.json'].feeds = [
+    {
+      source: 'google_news',
+      query: 'Singapore developer GLS',
+      status: 'error',
+      error: 'HTTP 503',
+      items_fetched: 0
+    },
+    {
+      source: 'google_news',
+      query: 'Singapore property launch',
+      status: 'error',
+      error: 'HTTP 503',
+      items_fetched: 0
+    }
+  ];
+  writeFixture(rootDir, fixture);
+
+  const payload = await buildProbeInputs({
+    rootDir,
+    now: FIXED_NOW,
+    env: buildEnv(),
+    workflowRunsByName: baselineWorkflowRuns(FIXED_NOW)
+  });
+
+  assert.equal(payload.status, 'WARN');
+  assert.equal(payload.row_counts.news_feeds_ok, 0);
+  assert.equal(payload.row_counts.news_feeds_error, 2);
+  assert.equal(getCheck(payload, 'news.feed_health')?.status, 'WARN');
+  assert.match(getCheck(payload, 'news.feed_health')?.detail || '', /cached news data remains available/);
+});
+
 test('macro partial degradation regression => WARN', async () => {
   const rootDir = mkTmpRoot();
   const fixture = baseFixture();

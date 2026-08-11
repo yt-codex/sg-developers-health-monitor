@@ -425,9 +425,18 @@ async function buildProbeInputs(options = {}) {
   const allFeedsFailed = rowCounts.news_feeds_total > 0 && rowCounts.news_feeds_error === rowCounts.news_feeds_total;
   const allFeedsEmpty = rowCounts.news_feeds_total > 0 && rowCounts.news_feeds_nonempty === 0;
   const partialFeedFailures = rowCounts.news_feeds_error > 0 && rowCounts.news_feeds_ok > 0;
+  const googleOnlyFeedRun = feeds.length > 0 && feeds.every((feed) => String(feed?.source || '').toLowerCase() === 'google_news');
+  const hasCachedNewsData = newsAllItems.length > 0 && newsLatestItems.length > 0;
 
   if (rowCounts.news_feeds_total === 0) {
     addCheck('news.feed_health', 'FAIL', 'meta.feeds is empty');
+  } else if (allFeedsFailed && googleOnlyFeedRun && hasCachedNewsData) {
+    addCheck(
+      'news.feed_health',
+      'WARN',
+      `google news delta failed for all ${rowCounts.news_feeds_total} queries; cached news data remains available`,
+      rowCounts.news_feeds_error
+    );
   } else if (allFeedsFailed) {
     addCheck('news.feed_health', 'FAIL', 'all feeds failed', rowCounts.news_feeds_error);
   } else if (allFeedsEmpty) {
