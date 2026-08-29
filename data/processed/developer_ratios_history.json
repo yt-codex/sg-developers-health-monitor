@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-28T12:21:57.101Z",
+  "updatedAt": "2026-08-29T07:31:17.044Z",
   "source": "stockanalysis",
   "scoringModel": {
     "formula": "round(clamp((100 - weightedPillarRisk) - trendPenalty, 0, 100))",
@@ -161,7 +161,7 @@
           "label": "Market Capitalization",
           "unit": "millions SGD",
           "values": {
-            "Current": 7505,
+            "Current": 7451,
             "FY 2025": 7147,
             "FY 2024": 4565,
             "FY 2023": 6031,
@@ -169,7 +169,7 @@
             "FY 2021": 6176
           },
           "rawValues": {
-            "Current": "7,505",
+            "Current": "7,451",
             "FY 2025": "7,147",
             "FY 2024": "4,565",
             "FY 2023": "6,031",
@@ -239,7 +239,7 @@
         }
       },
       "current": {
-        "marketCap": 7505,
+        "marketCap": 7451,
         "netDebtToEbitda": null,
         "debtToEquity": null,
         "netDebtToEquity": null,
@@ -251,7 +251,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:53.997Z",
+      "lastFetchedAt": "2026-08-29T07:31:14.414Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -286,7 +286,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:54.291Z"
+      "lastScoredAt": "2026-08-29T07:31:14.670Z"
     },
     {
       "ticker": "U14",
@@ -414,7 +414,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:54.291Z",
+      "lastFetchedAt": "2026-08-29T07:31:14.670Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -449,7 +449,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:54.429Z"
+      "lastScoredAt": "2026-08-29T07:31:14.786Z"
     },
     {
       "ticker": "F17",
@@ -460,6 +460,10 @@
         {
           "label": "Current",
           "periodEnding": "Aug '26 Aug 27, 2026"
+        },
+        {
+          "label": "FY 2026",
+          "periodEnding": "Jun '26 Jun 30, 2026"
         },
         {
           "label": "FY 2025",
@@ -476,10 +480,6 @@
         {
           "label": "FY 2022",
           "periodEnding": "Jun '22 Jun 30, 2022"
-        },
-        {
-          "label": "FY 2021",
-          "periodEnding": "Jun '21 Jun 30, 2021"
         }
       ],
       "metrics": {
@@ -487,20 +487,20 @@
           "label": "Market Capitalization",
           "unit": "millions SGD",
           "values": {
-            "Current": 2504,
+            "Current": 2415,
+            "FY 2026": 2371,
             "FY 2025": 1667,
             "FY 2024": 1631,
             "FY 2023": 1676,
-            "FY 2022": 1753,
-            "FY 2021": 1776
+            "FY 2022": 1753
           },
           "rawValues": {
-            "Current": "2,504",
+            "Current": "2,415",
+            "FY 2026": "2,371",
             "FY 2025": "1,667",
             "FY 2024": "1,631",
             "FY 2023": "1,676",
-            "FY 2022": "1,753",
-            "FY 2021": "1,776"
+            "FY 2022": "1,753"
           }
         },
         "netDebtToEbitda": {
@@ -565,7 +565,7 @@
         }
       },
       "current": {
-        "marketCap": 2504,
+        "marketCap": 2415,
         "netDebtToEbitda": null,
         "debtToEquity": null,
         "netDebtToEquity": null,
@@ -577,7 +577,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:54.429Z",
+      "lastFetchedAt": "2026-08-29T07:31:14.786Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -612,7 +612,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:54.574Z"
+      "lastScoredAt": "2026-08-29T07:31:14.893Z"
     },
     {
       "ticker": "TQ5",
@@ -650,7 +650,7 @@
           "label": "Market Capitalization",
           "unit": "millions SGD",
           "values": {
-            "Current": 4005,
+            "Current": 3965,
             "FY 2025": 4005,
             "FY 2024": 3435,
             "FY 2023": 3278,
@@ -658,7 +658,7 @@
             "FY 2021": 4425
           },
           "rawValues": {
-            "Current": "4,005",
+            "Current": "3,965",
             "FY 2025": "4,005",
             "FY 2024": "3,435",
             "FY 2023": "3,278",
@@ -728,7 +728,7 @@
         }
       },
       "current": {
-        "marketCap": 4005,
+        "marketCap": 3965,
         "netDebtToEbitda": null,
         "debtToEquity": null,
         "netDebtToEquity": null,
@@ -740,7 +740,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:54.574Z",
+      "lastFetchedAt": "2026-08-29T07:31:14.893Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -775,7 +775,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:54.674Z"
+      "lastScoredAt": "2026-08-29T07:31:15.014Z"
     },
     {
       "ticker": "9CI",
@@ -813,7 +813,7 @@
           "label": "Market Capitalization",
           "unit": "millions SGD",
           "values": {
-            "Current": 13383,
+            "Current": 13283,
             "FY 2025": 13516,
             "FY 2024": 13056,
             "FY 2023": 16117,
@@ -821,7 +821,7 @@
             "FY 2021": 17531
           },
           "rawValues": {
-            "Current": "13,383",
+            "Current": "13,283",
             "FY 2025": "13,516",
             "FY 2024": "13,056",
             "FY 2023": "16,117",
@@ -891,7 +891,7 @@
         }
       },
       "current": {
-        "marketCap": 13383,
+        "marketCap": 13283,
         "netDebtToEbitda": null,
         "debtToEquity": null,
         "netDebtToEquity": null,
@@ -903,7 +903,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:54.674Z",
+      "lastFetchedAt": "2026-08-29T07:31:15.014Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -938,7 +938,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:54.798Z"
+      "lastScoredAt": "2026-08-29T07:31:15.115Z"
     },
     {
       "ticker": "H78",
@@ -976,7 +976,7 @@
           "label": "Market Capitalization",
           "unit": "millions SGD",
           "values": {
-            "Current": 22299,
+            "Current": 22322,
             "FY 2025": 19299,
             "FY 2024": 13401,
             "FY 2023": 10136,
@@ -984,7 +984,7 @@
             "FY 2021": 16107
           },
           "rawValues": {
-            "Current": "22,299",
+            "Current": "22,322",
             "FY 2025": "19,299",
             "FY 2024": "13,401",
             "FY 2023": "10,136",
@@ -1054,7 +1054,7 @@
         }
       },
       "current": {
-        "marketCap": 22299,
+        "marketCap": 22322,
         "netDebtToEbitda": null,
         "debtToEquity": null,
         "netDebtToEquity": null,
@@ -1066,7 +1066,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:54.798Z",
+      "lastFetchedAt": "2026-08-29T07:31:15.115Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -1101,7 +1101,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:54.946Z"
+      "lastScoredAt": "2026-08-29T07:31:15.222Z"
     },
     {
       "ticker": "LJ3",
@@ -1229,7 +1229,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:54.946Z",
+      "lastFetchedAt": "2026-08-29T07:31:15.222Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -1264,7 +1264,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:55.043Z"
+      "lastScoredAt": "2026-08-29T07:31:15.393Z"
     },
     {
       "ticker": "W05",
@@ -1392,7 +1392,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:55.043Z",
+      "lastFetchedAt": "2026-08-29T07:31:15.394Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -1427,7 +1427,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:55.163Z"
+      "lastScoredAt": "2026-08-29T07:31:15.481Z"
     },
     {
       "ticker": "B61",
@@ -1465,7 +1465,7 @@
           "label": "Market Capitalization",
           "unit": "millions SGD",
           "values": {
-            "Current": 1113,
+            "Current": 1121,
             "FY 2026": 1178,
             "FY 2025": 940,
             "FY 2024": 816,
@@ -1473,7 +1473,7 @@
             "FY 2022": 1297
           },
           "rawValues": {
-            "Current": "1,113",
+            "Current": "1,121",
             "FY 2026": "1,178",
             "FY 2025": "940",
             "FY 2024": "816",
@@ -1543,7 +1543,7 @@
         }
       },
       "current": {
-        "marketCap": 1113,
+        "marketCap": 1121,
         "netDebtToEbitda": null,
         "debtToEquity": null,
         "netDebtToEquity": null,
@@ -1555,7 +1555,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:55.163Z",
+      "lastFetchedAt": "2026-08-29T07:31:15.481Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -1590,7 +1590,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:55.291Z"
+      "lastScoredAt": "2026-08-29T07:31:15.576Z"
     },
     {
       "ticker": "H13",
@@ -1718,7 +1718,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:55.291Z",
+      "lastFetchedAt": "2026-08-29T07:31:15.576Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -1753,7 +1753,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:55.501Z"
+      "lastScoredAt": "2026-08-29T07:31:15.678Z"
     },
     {
       "ticker": "T24",
@@ -1791,7 +1791,7 @@
           "label": "Market Capitalization",
           "unit": "millions SGD",
           "values": {
-            "Current": 362,
+            "Current": 355,
             "FY 2025": 406,
             "FY 2024": 336,
             "FY 2023": 347,
@@ -1799,7 +1799,7 @@
             "FY 2021": 547
           },
           "rawValues": {
-            "Current": "362",
+            "Current": "355",
             "FY 2025": "406",
             "FY 2024": "336",
             "FY 2023": "347",
@@ -1869,7 +1869,7 @@
         }
       },
       "current": {
-        "marketCap": 362,
+        "marketCap": 355,
         "netDebtToEbitda": null,
         "debtToEquity": null,
         "netDebtToEquity": null,
@@ -1881,7 +1881,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:55.501Z",
+      "lastFetchedAt": "2026-08-29T07:31:15.678Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -1916,7 +1916,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:55.639Z"
+      "lastScoredAt": "2026-08-29T07:31:15.777Z"
     },
     {
       "ticker": "O10",
@@ -1954,7 +1954,7 @@
           "label": "Market Capitalization",
           "unit": "millions SGD",
           "values": {
-            "Current": 521,
+            "Current": 531,
             "FY 2025": 609,
             "FY 2024": 509,
             "FY 2023": 493,
@@ -1962,7 +1962,7 @@
             "FY 2021": 506
           },
           "rawValues": {
-            "Current": "521",
+            "Current": "531",
             "FY 2025": "609",
             "FY 2024": "509",
             "FY 2023": "493",
@@ -2032,7 +2032,7 @@
         }
       },
       "current": {
-        "marketCap": 521,
+        "marketCap": 531,
         "netDebtToEbitda": null,
         "debtToEquity": null,
         "netDebtToEquity": null,
@@ -2044,7 +2044,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:55.639Z",
+      "lastFetchedAt": "2026-08-29T07:31:15.777Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -2079,7 +2079,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:55.782Z"
+      "lastScoredAt": "2026-08-29T07:31:15.893Z"
     },
     {
       "ticker": "5IC",
@@ -2207,7 +2207,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:55.782Z",
+      "lastFetchedAt": "2026-08-29T07:31:15.893Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -2242,7 +2242,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:55.905Z"
+      "lastScoredAt": "2026-08-29T07:31:15.990Z"
     },
     {
       "ticker": "5DP",
@@ -2370,7 +2370,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:55.905Z",
+      "lastFetchedAt": "2026-08-29T07:31:15.991Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -2405,7 +2405,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:56.007Z"
+      "lastScoredAt": "2026-08-29T07:31:16.095Z"
     },
     {
       "ticker": "5JK",
@@ -2533,7 +2533,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:56.007Z",
+      "lastFetchedAt": "2026-08-29T07:31:16.095Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -2568,7 +2568,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:56.116Z"
+      "lastScoredAt": "2026-08-29T07:31:16.227Z"
     },
     {
       "ticker": "F1E",
@@ -2696,7 +2696,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:56.116Z",
+      "lastFetchedAt": "2026-08-29T07:31:16.227Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -2731,7 +2731,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:56.223Z"
+      "lastScoredAt": "2026-08-29T07:31:16.318Z"
     },
     {
       "ticker": "ER0",
@@ -2769,7 +2769,7 @@
           "label": "Market Capitalization",
           "unit": "millions SGD",
           "values": {
-            "Current": 171,
+            "Current": 177,
             "FY 2026": 191,
             "FY 2025": 116,
             "FY 2024": 148,
@@ -2777,7 +2777,7 @@
             "FY 2022": 197
           },
           "rawValues": {
-            "Current": "171",
+            "Current": "177",
             "FY 2026": "191",
             "FY 2025": "116",
             "FY 2024": "148",
@@ -2847,7 +2847,7 @@
         }
       },
       "current": {
-        "marketCap": 171,
+        "marketCap": 177,
         "netDebtToEbitda": null,
         "debtToEquity": null,
         "netDebtToEquity": null,
@@ -2859,7 +2859,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:56.224Z",
+      "lastFetchedAt": "2026-08-29T07:31:16.318Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -2894,7 +2894,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:56.388Z"
+      "lastScoredAt": "2026-08-29T07:31:16.429Z"
     },
     {
       "ticker": "BTE",
@@ -2932,7 +2932,7 @@
           "label": "Market Capitalization",
           "unit": "millions SGD",
           "values": {
-            "Current": 296,
+            "Current": 300,
             "FY 2025": 311,
             "FY 2024": 292,
             "FY 2023": 319,
@@ -2940,7 +2940,7 @@
             "FY 2021": 414
           },
           "rawValues": {
-            "Current": "296",
+            "Current": "300",
             "FY 2025": "311",
             "FY 2024": "292",
             "FY 2023": "319",
@@ -3010,7 +3010,7 @@
         }
       },
       "current": {
-        "marketCap": 296,
+        "marketCap": 300,
         "netDebtToEbitda": null,
         "debtToEquity": null,
         "netDebtToEquity": null,
@@ -3022,7 +3022,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:56.388Z",
+      "lastFetchedAt": "2026-08-29T07:31:16.430Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -3057,7 +3057,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:56.498Z"
+      "lastScoredAt": "2026-08-29T07:31:16.528Z"
     },
     {
       "ticker": "5UX",
@@ -3095,7 +3095,7 @@
           "label": "Market Capitalization",
           "unit": "millions SGD",
           "values": {
-            "Current": 295,
+            "Current": 299,
             "FY 2025": 384,
             "FY 2024": 330,
             "FY 2023": 541,
@@ -3103,7 +3103,7 @@
             "FY 2021": 996
           },
           "rawValues": {
-            "Current": "295",
+            "Current": "299",
             "FY 2025": "384",
             "FY 2024": "330",
             "FY 2023": "541",
@@ -3173,7 +3173,7 @@
         }
       },
       "current": {
-        "marketCap": 295,
+        "marketCap": 299,
         "netDebtToEbitda": null,
         "debtToEquity": null,
         "netDebtToEquity": null,
@@ -3185,7 +3185,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:56.498Z",
+      "lastFetchedAt": "2026-08-29T07:31:16.528Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -3220,7 +3220,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:56.672Z"
+      "lastScoredAt": "2026-08-29T07:31:16.634Z"
     },
     {
       "ticker": "F9D",
@@ -3258,7 +3258,7 @@
           "label": "Market Capitalization",
           "unit": "millions SGD",
           "values": {
-            "Current": 929,
+            "Current": 954,
             "FY 2026": 939,
             "FY 2025": 531,
             "FY 2024": 458,
@@ -3266,7 +3266,7 @@
             "FY 2022": 473
           },
           "rawValues": {
-            "Current": "929",
+            "Current": "954",
             "FY 2026": "939",
             "FY 2025": "531",
             "FY 2024": "458",
@@ -3336,7 +3336,7 @@
         }
       },
       "current": {
-        "marketCap": 929,
+        "marketCap": 954,
         "netDebtToEbitda": null,
         "debtToEquity": null,
         "netDebtToEquity": null,
@@ -3348,7 +3348,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:56.672Z",
+      "lastFetchedAt": "2026-08-29T07:31:16.634Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -3383,7 +3383,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:56.778Z"
+      "lastScoredAt": "2026-08-29T07:31:16.742Z"
     },
     {
       "ticker": "OU8",
@@ -3421,7 +3421,7 @@
           "label": "Market Capitalization",
           "unit": "millions SGD",
           "values": {
-            "Current": 1328,
+            "Current": 1312,
             "FY 2025": 1127,
             "FY 2024": 807,
             "FY 2023": 341,
@@ -3429,7 +3429,7 @@
             "FY 2021": 277
           },
           "rawValues": {
-            "Current": "1,328",
+            "Current": "1,312",
             "FY 2025": "1,127",
             "FY 2024": "807",
             "FY 2023": "341",
@@ -3499,7 +3499,7 @@
         }
       },
       "current": {
-        "marketCap": 1328,
+        "marketCap": 1312,
         "netDebtToEbitda": null,
         "debtToEquity": null,
         "netDebtToEquity": null,
@@ -3511,7 +3511,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:56.778Z",
+      "lastFetchedAt": "2026-08-29T07:31:16.742Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -3546,7 +3546,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:56.868Z"
+      "lastScoredAt": "2026-08-29T07:31:16.831Z"
     },
     {
       "ticker": "C33",
@@ -3556,7 +3556,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Aug '26 Aug 28, 2026"
+          "periodEnding": "Aug '26 Aug 27, 2026"
         },
         {
           "label": "FY 2025",
@@ -3584,7 +3584,7 @@
           "label": "Market Capitalization",
           "unit": "millions SGD",
           "values": {
-            "Current": 207,
+            "Current": 203,
             "FY 2025": 150,
             "FY 2024": 154,
             "FY 2023": 167,
@@ -3592,7 +3592,7 @@
             "FY 2021": 204
           },
           "rawValues": {
-            "Current": "207",
+            "Current": "203",
             "FY 2025": "150",
             "FY 2024": "154",
             "FY 2023": "167",
@@ -3662,7 +3662,7 @@
         }
       },
       "current": {
-        "marketCap": 207,
+        "marketCap": 203,
         "netDebtToEbitda": null,
         "debtToEquity": null,
         "netDebtToEquity": null,
@@ -3674,7 +3674,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:56.868Z",
+      "lastFetchedAt": "2026-08-29T07:31:16.832Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -3709,7 +3709,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:56.973Z"
+      "lastScoredAt": "2026-08-29T07:31:16.948Z"
     },
     {
       "ticker": "S9B",
@@ -3719,7 +3719,7 @@
       "periods": [
         {
           "label": "Current",
-          "periodEnding": "Aug '26 Aug 28, 2026"
+          "periodEnding": "Aug '26 Aug 21, 2026"
         },
         {
           "label": "FY 2026",
@@ -3837,7 +3837,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-28T12:21:56.973Z",
+      "lastFetchedAt": "2026-08-29T07:31:16.948Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -3872,7 +3872,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-28T12:21:57.101Z"
+      "lastScoredAt": "2026-08-29T07:31:17.044Z"
     }
   ]
 }
