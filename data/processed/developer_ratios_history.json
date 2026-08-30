@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-29T07:31:17.044Z",
+  "updatedAt": "2026-08-30T06:03:19.378Z",
   "source": "stockanalysis",
   "scoringModel": {
     "formula": "round(clamp((100 - weightedPillarRisk) - trendPenalty, 0, 100))",
@@ -251,7 +251,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:14.414Z",
+      "lastFetchedAt": "2026-08-30T06:03:13.538Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -286,7 +286,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:14.670Z"
+      "lastScoredAt": "2026-08-30T06:03:13.972Z"
     },
     {
       "ticker": "U14",
@@ -414,7 +414,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:14.670Z",
+      "lastFetchedAt": "2026-08-30T06:03:13.972Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -449,7 +449,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:14.786Z"
+      "lastScoredAt": "2026-08-30T06:03:14.350Z"
     },
     {
       "ticker": "F17",
@@ -577,7 +577,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:14.786Z",
+      "lastFetchedAt": "2026-08-30T06:03:14.350Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -612,7 +612,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:14.893Z"
+      "lastScoredAt": "2026-08-30T06:03:14.569Z"
     },
     {
       "ticker": "TQ5",
@@ -740,7 +740,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:14.893Z",
+      "lastFetchedAt": "2026-08-30T06:03:14.569Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -775,7 +775,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:15.014Z"
+      "lastScoredAt": "2026-08-30T06:03:14.733Z"
     },
     {
       "ticker": "9CI",
@@ -903,7 +903,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:15.014Z",
+      "lastFetchedAt": "2026-08-30T06:03:14.734Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -938,7 +938,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:15.115Z"
+      "lastScoredAt": "2026-08-30T06:03:14.969Z"
     },
     {
       "ticker": "H78",
@@ -1066,7 +1066,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:15.115Z",
+      "lastFetchedAt": "2026-08-30T06:03:14.969Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -1101,7 +1101,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:15.222Z"
+      "lastScoredAt": "2026-08-30T06:03:15.249Z"
     },
     {
       "ticker": "LJ3",
@@ -1229,7 +1229,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:15.222Z",
+      "lastFetchedAt": "2026-08-30T06:03:15.249Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -1264,7 +1264,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:15.393Z"
+      "lastScoredAt": "2026-08-30T06:03:15.464Z"
     },
     {
       "ticker": "W05",
@@ -1275,6 +1275,10 @@
         {
           "label": "Current",
           "periodEnding": "Aug '26 Aug 27, 2026"
+        },
+        {
+          "label": "FY 2026",
+          "periodEnding": "Jun '26 Jun 30, 2026"
         },
         {
           "label": "FY 2025",
@@ -1291,10 +1295,6 @@
         {
           "label": "FY 2022",
           "periodEnding": "Jun '22 Jun 30, 2022"
-        },
-        {
-          "label": "FY 2021",
-          "periodEnding": "Jun '21 Jun 30, 2021"
         }
       ],
       "metrics": {
@@ -1303,19 +1303,19 @@
           "unit": "millions SGD",
           "values": {
             "Current": 1184,
+            "FY 2026": 1176,
             "FY 2025": 984,
             "FY 2024": 1051,
             "FY 2023": 1117,
-            "FY 2022": 1324,
-            "FY 2021": 1385
+            "FY 2022": 1324
           },
           "rawValues": {
             "Current": "1,184",
+            "FY 2026": "1,176",
             "FY 2025": "984",
             "FY 2024": "1,051",
             "FY 2023": "1,117",
-            "FY 2022": "1,324",
-            "FY 2021": "1,385"
+            "FY 2022": "1,324"
           }
         },
         "netDebtToEbitda": {
@@ -1392,7 +1392,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:15.394Z",
+      "lastFetchedAt": "2026-08-30T06:03:15.464Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -1427,7 +1427,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:15.481Z"
+      "lastScoredAt": "2026-08-30T06:03:15.787Z"
     },
     {
       "ticker": "B61",
@@ -1555,7 +1555,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:15.481Z",
+      "lastFetchedAt": "2026-08-30T06:03:15.787Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -1590,7 +1590,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:15.576Z"
+      "lastScoredAt": "2026-08-30T06:03:16.006Z"
     },
     {
       "ticker": "H13",
@@ -1718,7 +1718,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:15.576Z",
+      "lastFetchedAt": "2026-08-30T06:03:16.007Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -1753,7 +1753,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:15.678Z"
+      "lastScoredAt": "2026-08-30T06:03:16.235Z"
     },
     {
       "ticker": "T24",
@@ -1881,7 +1881,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:15.678Z",
+      "lastFetchedAt": "2026-08-30T06:03:16.236Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -1916,7 +1916,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:15.777Z"
+      "lastScoredAt": "2026-08-30T06:03:16.443Z"
     },
     {
       "ticker": "O10",
@@ -2044,7 +2044,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:15.777Z",
+      "lastFetchedAt": "2026-08-30T06:03:16.444Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -2079,7 +2079,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:15.893Z"
+      "lastScoredAt": "2026-08-30T06:03:16.766Z"
     },
     {
       "ticker": "5IC",
@@ -2207,7 +2207,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:15.893Z",
+      "lastFetchedAt": "2026-08-30T06:03:16.766Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -2242,7 +2242,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:15.990Z"
+      "lastScoredAt": "2026-08-30T06:03:17.090Z"
     },
     {
       "ticker": "5DP",
@@ -2370,7 +2370,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:15.991Z",
+      "lastFetchedAt": "2026-08-30T06:03:17.090Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -2405,7 +2405,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:16.095Z"
+      "lastScoredAt": "2026-08-30T06:03:17.358Z"
     },
     {
       "ticker": "5JK",
@@ -2533,7 +2533,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:16.095Z",
+      "lastFetchedAt": "2026-08-30T06:03:17.359Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -2568,7 +2568,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:16.227Z"
+      "lastScoredAt": "2026-08-30T06:03:17.499Z"
     },
     {
       "ticker": "F1E",
@@ -2696,7 +2696,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:16.227Z",
+      "lastFetchedAt": "2026-08-30T06:03:17.499Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -2731,7 +2731,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:16.318Z"
+      "lastScoredAt": "2026-08-30T06:03:17.817Z"
     },
     {
       "ticker": "ER0",
@@ -2859,7 +2859,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:16.318Z",
+      "lastFetchedAt": "2026-08-30T06:03:17.817Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -2894,7 +2894,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:16.429Z"
+      "lastScoredAt": "2026-08-30T06:03:17.975Z"
     },
     {
       "ticker": "BTE",
@@ -3022,7 +3022,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:16.430Z",
+      "lastFetchedAt": "2026-08-30T06:03:17.975Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -3057,7 +3057,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:16.528Z"
+      "lastScoredAt": "2026-08-30T06:03:18.122Z"
     },
     {
       "ticker": "5UX",
@@ -3068,6 +3068,10 @@
         {
           "label": "Current",
           "periodEnding": "Aug '26 Aug 27, 2026"
+        },
+        {
+          "label": "FY 2026",
+          "periodEnding": "Jun '26 Jun 30, 2026"
         },
         {
           "label": "FY 2025",
@@ -3084,10 +3088,6 @@
         {
           "label": "FY 2022",
           "periodEnding": "Jun '22 Jun 30, 2022"
-        },
-        {
-          "label": "FY 2021",
-          "periodEnding": "Jun '21 Jun 30, 2021"
         }
       ],
       "metrics": {
@@ -3096,19 +3096,19 @@
           "unit": "millions SGD",
           "values": {
             "Current": 299,
+            "FY 2026": 324,
             "FY 2025": 384,
             "FY 2024": 330,
             "FY 2023": 541,
-            "FY 2022": 716,
-            "FY 2021": 996
+            "FY 2022": 716
           },
           "rawValues": {
             "Current": "299",
+            "FY 2026": "324",
             "FY 2025": "384",
             "FY 2024": "330",
             "FY 2023": "541",
-            "FY 2022": "716",
-            "FY 2021": "996"
+            "FY 2022": "716"
           }
         },
         "netDebtToEbitda": {
@@ -3185,7 +3185,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:16.528Z",
+      "lastFetchedAt": "2026-08-30T06:03:18.123Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -3220,7 +3220,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:16.634Z"
+      "lastScoredAt": "2026-08-30T06:03:18.276Z"
     },
     {
       "ticker": "F9D",
@@ -3348,7 +3348,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:16.634Z",
+      "lastFetchedAt": "2026-08-30T06:03:18.276Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -3383,7 +3383,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:16.742Z"
+      "lastScoredAt": "2026-08-30T06:03:18.504Z"
     },
     {
       "ticker": "OU8",
@@ -3511,7 +3511,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:16.742Z",
+      "lastFetchedAt": "2026-08-30T06:03:18.504Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -3546,7 +3546,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:16.831Z"
+      "lastScoredAt": "2026-08-30T06:03:18.805Z"
     },
     {
       "ticker": "C33",
@@ -3674,7 +3674,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:16.832Z",
+      "lastFetchedAt": "2026-08-30T06:03:18.805Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -3709,7 +3709,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:16.948Z"
+      "lastScoredAt": "2026-08-30T06:03:19.099Z"
     },
     {
       "ticker": "S9B",
@@ -3837,7 +3837,7 @@
         "payoutRatio": null,
         "assetTurnover": null
       },
-      "lastFetchedAt": "2026-08-29T07:31:16.948Z",
+      "lastFetchedAt": "2026-08-30T06:03:19.099Z",
       "fetchStatus": "partial",
       "fetchError": null,
       "healthScore": null,
@@ -3872,7 +3872,7 @@
         "metricAdjustments": {},
         "trendBreakdown": {}
       },
-      "lastScoredAt": "2026-08-29T07:31:17.044Z"
+      "lastScoredAt": "2026-08-30T06:03:19.378Z"
     }
   ]
 }
