@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
   "status": "OK",
-  "last_run_time": "2026-09-23T05:22:20Z",
+  "last_run_time": "2026-09-23T06:54:32Z",
   "duration_seconds": null,
   "freshness": {
-    "max_date": "2026-09-23T05:21:55.679Z",
-    "lag_seconds": 21.0,
+    "max_date": "2026-09-23T06:54:03.445Z",
+    "lag_seconds": 26.0,
     "stale": false
   },
   "row_counts": {
@@ -113,26 +113,26 @@
     {
       "name": "freshness.news",
       "status": "OK",
-      "detail": "news lag=10521s",
-      "metric": 10521
+      "detail": "news lag=16053s",
+      "metric": 16053
     },
     {
       "name": "freshness.macro",
       "status": "OK",
-      "detail": "macro lag=80552s",
-      "metric": 80552
+      "detail": "macro lag=26s",
+      "metric": 26
     },
     {
       "name": "freshness.ratios",
       "status": "OK",
-      "detail": "ratios lag=21s",
-      "metric": 21
+      "detail": "ratios lag=5553s",
+      "metric": 5553
     },
     {
       "name": "freshness.overall",
       "status": "OK",
-      "detail": "lag=21s",
-      "metric": 21
+      "detail": "lag=26s",
+      "metric": 26
     },
     {
       "name": "developer.diagnostics",
@@ -145,31 +145,31 @@
   "artifact_links": [
     {
       "label": "workflow_run",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/35822111928"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/35828965612"
     },
     {
       "label": "input:data_meta.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/34ef5b3347fc6f626f3a700658cf16b36389a6d8/data/meta.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/6e0c3e6b1a01df949584e5a0e914e35cad348571/data/meta.json"
     },
     {
       "label": "input:data_news_all.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/34ef5b3347fc6f626f3a700658cf16b36389a6d8/data/news_all.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/6e0c3e6b1a01df949584e5a0e914e35cad348571/data/news_all.json"
     },
     {
       "label": "input:data_news_latest_90d.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/34ef5b3347fc6f626f3a700658cf16b36389a6d8/data/news_latest_90d.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/6e0c3e6b1a01df949584e5a0e914e35cad348571/data/news_latest_90d.json"
     },
     {
       "label": "input:data_macro_indicators.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/34ef5b3347fc6f626f3a700658cf16b36389a6d8/data/macro_indicators.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/6e0c3e6b1a01df949584e5a0e914e35cad348571/data/macro_indicators.json"
     },
     {
       "label": "input:data_processed_developer_ratios_history.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/34ef5b3347fc6f626f3a700658cf16b36389a6d8/data/processed/developer_ratios_history.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/6e0c3e6b1a01df949584e5a0e914e35cad348571/data/processed/developer_ratios_history.json"
     },
     {
       "label": "input:data_processed_developer_health_diagnostics.json",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/34ef5b3347fc6f626f3a700658cf16b36389a6d8/data/processed/developer_health_diagnostics.json"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/blob/6e0c3e6b1a01df949584e5a0e914e35cad348571/data/processed/developer_health_diagnostics.json"
     },
     {
       "label": "workflow:update_dashboard_data",
@@ -177,7 +177,7 @@
     },
     {
       "label": "workflow:update_macro_indicators",
-      "url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/35697365828"
+      "url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/35828919264"
     },
     {
       "label": "workflow:update_developer_news",
@@ -186,34 +186,34 @@
   ],
   "meta": {
     "repo": "yt-codex/sg-developers-health-monitor",
-    "run_id": "35822111928",
-    "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/35822111928",
+    "run_id": "35828965612",
+    "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/35828965612",
     "workflow": "Ops probe aggregator",
     "job": "emit-probe",
-    "sha": "34ef5b3347fc6f626f3a700658cf16b36389a6d8",
-    "generated_at_utc": "2026-09-23T05:22:17.509Z",
+    "sha": "6e0c3e6b1a01df949584e5a0e914e35cad348571",
+    "generated_at_utc": "2026-09-23T06:54:29.633Z",
     "workflow_conclusions": {
       "Update dashboard data": {
         "conclusion": "success",
         "status": "completed",
         "completed_at": "2026-09-23T05:21:37Z",
-        "age_seconds": 40,
+        "age_seconds": 5572,
         "stale": false,
         "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/35822081239"
       },
       "Update macro indicators": {
         "conclusion": "success",
         "status": "completed",
-        "completed_at": "2026-09-22T06:59:23Z",
-        "age_seconds": 80574,
+        "completed_at": "2026-09-23T06:53:44Z",
+        "age_seconds": 45,
         "stale": false,
-        "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/35697365828"
+        "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/35828919264"
       },
       "Update developer news": {
         "conclusion": "success",
         "status": "completed",
         "completed_at": "2026-09-23T02:24:35Z",
-        "age_seconds": 10662,
+        "age_seconds": 16194,
         "stale": false,
         "run_url": "https://github.com/yt-codex/sg-developers-health-monitor/actions/runs/35810232731"
       }
@@ -230,15 +230,15 @@
     "freshness_sources": {
       "news": {
         "date": "2026-09-23T02:26:56.246Z",
-        "lag_seconds": 10521
+        "lag_seconds": 16053
       },
       "macro": {
-        "date": "2026-09-22T06:59:45.132Z",
-        "lag_seconds": 80552
+        "date": "2026-09-23T06:54:03.445Z",
+        "lag_seconds": 26
       },
       "ratios": {
         "date": "2026-09-23T05:21:55.679Z",
-        "lag_seconds": 21
+        "lag_seconds": 5553
       }
     }
   }
