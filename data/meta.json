@@ -1,10 +1,10 @@
 {
-  "last_updated_sgt": "2026-10-23T22:34:27.473+08:00",
+  "last_updated_sgt": "2026-10-24T10:32:58.651+08:00",
   "status": "success",
   "counts": {
     "existing_total": 965,
     "new_items": 0,
-    "rejected_items": 333,
+    "rejected_items": 371,
     "total_all": 965,
     "latest_90d": 340
   },
@@ -14,7 +14,7 @@
       "query": "(\"Singapore\" AND (developer OR \"property developer\" OR residential OR condo) AND (GLS OR \"land bid\" OR tender OR \"new launch\" OR preview OR \"preview weekend\" OR presales OR \"take-up\" OR \"launch weekend\" OR \"units sold\" OR psf)) (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com OR site:todayonline.com OR site:theedgesingapore.com OR site:edgeprop.sg)",
       "window_days": 7,
       "status": "ok",
-      "items_fetched": 47
+      "items_fetched": 100
     },
     {
       "source": "google_news",
@@ -56,7 +56,7 @@
       "query": "GuocoLand Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:theedgesingapore.com OR site:edgeprop.sg)",
       "window_days": 7,
       "status": "ok",
-      "items_fetched": 11
+      "items_fetched": 14
     },
     {
       "source": "google_news",
@@ -84,14 +84,14 @@
       "query": "(\"property players\" OR \"housing demand\" OR \"development costs\") Singapore property (site:businesstimes.com.sg OR site:straitstimes.com OR site:channelnewsasia.com)",
       "window_days": 7,
       "status": "ok",
-      "items_fetched": 0
+      "items_fetched": 1
     },
     {
       "source": "google_news",
       "query": "(\"Hoi Hup\" OR \"Sunway MCL\" OR \"MCL Land\") Singapore property (site:edgeprop.sg OR site:businesstimes.com.sg OR site:theedgesingapore.com)",
       "window_days": 7,
       "status": "ok",
-      "items_fetched": 16
+      "items_fetched": 17
     }
   ]
 }
