@@ -1,26 +1,28 @@
 {
-  "last_updated_sgt": "2026-11-25T04:28:32.936+08:00",
-  "status": "success",
+  "last_updated_sgt": "2026-11-25T14:06:25.593+08:00",
+  "status": "partial_success",
   "counts": {
-    "existing_total": 1063,
+    "existing_total": 1065,
     "new_items": 0,
-    "rejected_items": 349,
-    "total_all": 1063,
-    "latest_90d": 314
+    "rejected_items": 112,
+    "total_all": 1065,
+    "latest_90d": 313
   },
   "feeds": [
     {
       "source": "google_news",
       "query": "(\"Singapore\" AND (developer OR \"property developer\" OR residential OR condo) AND (GLS OR \"land bid\" OR tender OR \"new launch\" OR preview OR \"preview weekend\" OR presales OR \"take-up\" OR \"launch weekend\" OR \"units sold\" OR psf)) (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com OR site:todayonline.com OR site:theedgesingapore.com OR site:edgeprop.sg)",
       "window_days": 7,
-      "status": "ok",
-      "items_fetched": 100
+      "status": "error",
+      "error": "HTTP 429",
+      "items_fetched": 0
     },
     {
       "source": "google_news",
       "query": "(\"Government Land Sales\" OR GLS) Singapore developer tender (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
       "window_days": 7,
-      "status": "ok",
+      "status": "error",
+      "error": "HTTP 429",
       "items_fetched": 0
     },
     {
@@ -34,50 +36,54 @@
       "source": "google_news",
       "query": "\"en bloc\" Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:theedgesingapore.com OR site:edgeprop.sg)",
       "window_days": 7,
-      "status": "ok",
-      "items_fetched": 58
+      "status": "error",
+      "error": "HTTP 429",
+      "items_fetched": 0
     },
     {
       "source": "google_news",
       "query": "(\"City Developments\" OR CDL) Singapore property developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
       "window_days": 7,
       "status": "ok",
-      "items_fetched": 39
+      "items_fetched": 35
     },
     {
       "source": "google_news",
       "query": "UOL Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
       "window_days": 7,
-      "status": "ok",
-      "items_fetched": 2
+      "status": "error",
+      "error": "HTTP 429",
+      "items_fetched": 0
     },
     {
       "source": "google_news",
       "query": "GuocoLand Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:theedgesingapore.com OR site:edgeprop.sg)",
       "window_days": 7,
-      "status": "ok",
-      "items_fetched": 14
+      "status": "error",
+      "error": "HTTP 429",
+      "items_fetched": 0
     },
     {
       "source": "google_news",
       "query": "CapitaLand Development Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
       "window_days": 7,
       "status": "ok",
-      "items_fetched": 27
+      "items_fetched": 25
     },
     {
       "source": "google_news",
       "query": "Frasers Property Singapore developer (site:straitstimes.com OR site:businesstimes.com.sg OR site:channelnewsasia.com)",
       "window_days": 7,
       "status": "ok",
-      "items_fetched": 42
+      "items_fetched": 37
     },
     {
       "source": "google_news",
       "query": "(\"Singapore property\" AND (preview OR \"preview weekend\" OR \"launch weekend\" OR showflat OR \"new launch\" OR psf OR residences)) (site:edgeprop.sg OR site:businesstimes.com.sg OR site:straitstimes.com OR site:theedgesingapore.com)",
       "window_days": 7,
-      "status": "ok",
-      "items_fetched": 100
+      "status": "error",
+      "error": "HTTP 429",
+      "items_fetched": 0
     },
     {
       "source": "google_news",
@@ -91,7 +97,7 @@
       "query": "(\"Hoi Hup\" OR \"Sunway MCL\" OR \"MCL Land\") Singapore property (site:edgeprop.sg OR site:businesstimes.com.sg OR site:theedgesingapore.com)",
       "window_days": 7,
       "status": "ok",
-      "items_fetched": 17
+      "items_fetched": 21
     }
   ]
 }
